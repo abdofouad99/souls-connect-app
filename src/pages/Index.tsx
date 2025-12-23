@@ -1,8 +1,9 @@
 import { Link } from 'react-router-dom';
-import { Heart, Users, HandHeart, TrendingUp } from 'lucide-react';
+import { Heart, Users, HandHeart, TrendingUp, Phone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Layout } from '@/components/layout/Layout';
 import { useOrphanStats } from '@/hooks/useOrphans';
+import heroImage from '@/assets/hero-image.jpg';
 
 const Index = () => {
   const { data: stats } = useOrphanStats();
@@ -14,40 +15,66 @@ const Index = () => {
     { icon: TrendingUp, label: 'كفالة نشطة', value: stats?.activeSponsorships || 0, color: 'text-primary' },
   ];
 
+  const contactNumbers = [
+    '77243079',
+    '04251675',
+    '784665006',
+  ];
+
   return (
     <Layout>
       {/* Hero Section */}
-      <section className="relative min-h-[80vh] flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-bl from-primary/10 via-background to-secondary/10" />
-        <div className="absolute inset-0 opacity-5">
-          <div className="absolute top-20 right-20 w-72 h-72 bg-primary rounded-full blur-3xl" />
-          <div className="absolute bottom-20 left-20 w-96 h-96 bg-secondary rounded-full blur-3xl" />
-        </div>
-        
-        <div className="container relative z-10 text-center py-20">
-          <div className="animate-fade-up">
-            <Heart className="h-20 w-20 mx-auto mb-6 text-primary fill-primary/20 animate-float" />
-          </div>
-          
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-serif font-bold text-foreground mb-6 animate-fade-up" style={{ animationDelay: '0.1s' }}>
-            اكفل يتيماً
-            <span className="block text-primary mt-2">وأنر حياته</span>
-          </h1>
-          
-          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 animate-fade-up" style={{ animationDelay: '0.2s' }}>
-            ساهم في تغيير حياة يتيم من خلال كفالتك. كل يتيم يستحق فرصة للتعليم والرعاية والحياة الكريمة.
-          </p>
-          
-          <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-up" style={{ animationDelay: '0.3s' }}>
-            <Button asChild variant="hero" size="xl">
-              <Link to="/orphans">
-                <Heart className="h-5 w-5" />
-                ابدأ كفالة يتيم الآن
-              </Link>
-            </Button>
-            <Button asChild variant="outline" size="xl">
-              <Link to="/about">تعرف علينا</Link>
-            </Button>
+      <section className="py-12 md:py-20">
+        <div className="container">
+          <div className="max-w-4xl mx-auto text-center">
+            {/* العنوان الرئيسي */}
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-serif font-bold text-foreground mb-8 animate-fade-up">
+              جمعية الأقصى _ المكتب النسوي _ تعز
+            </h1>
+            
+            {/* الصورة الرئيسية */}
+            <div className="mb-10 animate-fade-up" style={{ animationDelay: '0.1s' }}>
+              <img
+                src={heroImage}
+                alt="مشروع كفالة الأيتام - جمعية الأقصى"
+                className="w-full max-w-3xl mx-auto rounded-2xl shadow-xl"
+              />
+            </div>
+            
+            {/* قسم أرقام التواصل */}
+            <div className="bg-card rounded-2xl p-6 md:p-8 shadow-card max-w-md mx-auto animate-fade-up" style={{ animationDelay: '0.2s' }}>
+              <div className="flex items-center justify-center gap-3 mb-6">
+                <Phone className="h-6 w-6 text-primary" />
+                <h2 className="text-xl md:text-2xl font-bold text-foreground">أرقام التواصل</h2>
+              </div>
+              
+              <div className="space-y-4">
+                {contactNumbers.map((number) => (
+                  <a
+                    key={number}
+                    href={`tel:${number}`}
+                    className="flex items-center justify-center gap-3 bg-primary/10 hover:bg-primary/20 text-primary font-semibold text-lg md:text-xl py-3 px-6 rounded-xl transition-colors"
+                    dir="ltr"
+                  >
+                    <Phone className="h-5 w-5" />
+                    {number}
+                  </a>
+                ))}
+              </div>
+            </div>
+            
+            {/* أزرار الإجراء */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mt-10 animate-fade-up" style={{ animationDelay: '0.3s' }}>
+              <Button asChild variant="hero" size="xl">
+                <Link to="/orphans">
+                  <Heart className="h-5 w-5" />
+                  ابدأ كفالة يتيم الآن
+                </Link>
+              </Button>
+              <Button asChild variant="outline" size="xl">
+                <Link to="/deposit-request">طلب سند إيداع</Link>
+              </Button>
+            </div>
           </div>
         </div>
       </section>

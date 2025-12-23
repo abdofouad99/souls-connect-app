@@ -28,6 +28,125 @@ export function exportToExcel(
   XLSX.writeFile(workbook, `${filename}.xlsx`);
 }
 
+// Parse Excel file and return data
+export function parseExcelFile(file: File): Promise<Record<string, any>[]> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    
+    reader.onload = (e) => {
+      try {
+        const data = new Uint8Array(e.target?.result as ArrayBuffer);
+        const workbook = XLSX.read(data, { type: 'array' });
+        
+        // Get first sheet
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+        
+        // Convert to JSON
+        const jsonData = XLSX.utils.sheet_to_json(worksheet);
+        resolve(jsonData as Record<string, any>[]);
+      } catch (error) {
+        reject(error);
+      }
+    };
+    
+    reader.onerror = () => reject(new Error('Failed to read file'));
+    reader.readAsArrayBuffer(file);
+  });
+}
+
+// Map Arabic headers to English keys for orphans
+export function mapOrphanImportData(data: Record<string, any>[]): Partial<{
+  full_name: string;
+  age: number;
+  gender: 'male' | 'female';
+  city: string;
+  country: string;
+  status: 'available' | 'partial' | 'full';
+  monthly_amount: number;
+  story: string;
+}>[] {
+  const headerMap: Record<string, string> = {
+    'الاسم الكامل': 'full_name',
+    'الاسم': 'full_name',
+    'العمر': 'age',
+    'الجنس': 'gender',
+    'المدينة': 'city',
+    'البلد': 'country',
+    'الحالة': 'status',
+    'المبلغ الشهري': 'monthly_amount',
+    'القصة': 'story',
+  };
+
+  const genderMap: Record<string, 'male' | 'female'> = {
+    'ذكر': 'male',
+    'أنثى': 'female',
+    'male': 'male',
+    'female': 'female',
+  };
+
+  const statusMap: Record<string, 'available' | 'partial' | 'full'> = {
+    'متاح': 'available',
+    'جزئي': 'partial',
+    'مكفول': 'full',
+    'available': 'available',
+    'partial': 'partial',
+    'full': 'full',
+  };
+
+  return data.map((row) => {
+    const mappedRow: Record<string, any> = {};
+    
+    Object.entries(row).forEach(([key, value]) => {
+      const englishKey = headerMap[key] || key;
+      
+      if (englishKey === 'gender' && typeof value === 'string') {
+        mappedRow[englishKey] = genderMap[value] || 'male';
+      } else if (englishKey === 'status' && typeof value === 'string') {
+        mappedRow[englishKey] = statusMap[value] || 'available';
+      } else if (englishKey === 'age' || englishKey === 'monthly_amount') {
+        mappedRow[englishKey] = Number(value) || 0;
+      } else {
+        mappedRow[englishKey] = value;
+      }
+    });
+    
+    return mappedRow;
+  });
+}
+
+// Download template Excel file for orphans import
+export function downloadOrphansTemplate() {
+  const templateData = [
+    {
+      'الاسم الكامل': 'مثال: أحمد محمد',
+      'العمر': 8,
+      'الجنس': 'ذكر',
+      'المدينة': 'مكة',
+      'البلد': 'السعودية',
+      'الحالة': 'متاح',
+      'المبلغ الشهري': 100,
+      'القصة': 'قصة اليتيم...',
+    },
+  ];
+
+  const worksheet = XLSX.utils.json_to_sheet(templateData);
+  worksheet['!cols'] = [
+    { wch: 25 },
+    { wch: 10 },
+    { wch: 10 },
+    { wch: 15 },
+    { wch: 15 },
+    { wch: 10 },
+    { wch: 15 },
+    { wch: 40 },
+  ];
+
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'قالب الأيتام');
+  XLSX.writeFile(workbook, 'قالب-استيراد-الأيتام.xlsx');
+}
+
 // Export functions for each data type
 export function exportOrphans(orphans: any[]) {
   const columns = [

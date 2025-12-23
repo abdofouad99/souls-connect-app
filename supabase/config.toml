@@ -1,1 +1,4 @@
 project_id = "sdzqvgtqzsgmhgvkmnkf"
+
+[functions.send-deposit-notification]
+verify_jwt = false

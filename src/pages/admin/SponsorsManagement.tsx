@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { Search, Mail, Phone } from 'lucide-react';
+import { Search, Mail, Phone, Download } from 'lucide-react';
 import { AdminLayout } from '@/components/admin/AdminLayout';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
   Table,
@@ -11,6 +12,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { useSponsors, useSponsorships } from '@/hooks/useSponsorships';
+import { exportSponsors } from '@/lib/exportUtils';
 import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
 
@@ -32,9 +34,15 @@ export default function SponsorsManagement() {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-serif font-bold text-foreground">إدارة الكفلاء</h1>
-          <p className="text-muted-foreground mt-1">عرض بيانات الكفلاء وكفالاتهم</p>
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-serif font-bold text-foreground">إدارة الكفلاء</h1>
+            <p className="text-muted-foreground mt-1">عرض بيانات الكفلاء وكفالاتهم</p>
+          </div>
+          <Button onClick={() => sponsors && exportSponsors(sponsors)} variant="outline" disabled={!sponsors?.length}>
+            <Download className="h-5 w-5" />
+            تصدير Excel
+          </Button>
         </div>
 
         <div className="bg-card rounded-2xl p-6 shadow-card">

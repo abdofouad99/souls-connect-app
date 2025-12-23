@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Search, Printer, Plus } from 'lucide-react';
+import { Search, Printer, Plus, Download } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { Button } from '@/components/ui/button';
@@ -27,6 +27,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useReceipts, useSponsorships, useCreateReceipt } from '@/hooks/useSponsorships';
+import { exportReceipts } from '@/lib/exportUtils';
 import { toast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
@@ -101,10 +102,16 @@ export default function ReceiptsManagement() {
             <h1 className="text-3xl font-serif font-bold text-foreground">إدارة الإيصالات</h1>
             <p className="text-muted-foreground mt-1">عرض وإضافة وطباعة إيصالات الكفالة</p>
           </div>
-          <Button onClick={handleOpenCreate} variant="hero">
-            <Plus className="h-5 w-5" />
-            إضافة إيصال
-          </Button>
+          <div className="flex gap-2">
+            <Button onClick={() => receipts && exportReceipts(receipts)} variant="outline" disabled={!receipts?.length}>
+              <Download className="h-5 w-5" />
+              تصدير Excel
+            </Button>
+            <Button onClick={handleOpenCreate} variant="hero">
+              <Plus className="h-5 w-5" />
+              إضافة إيصال
+            </Button>
+          </div>
         </div>
 
         <div className="bg-card rounded-2xl p-6 shadow-card">

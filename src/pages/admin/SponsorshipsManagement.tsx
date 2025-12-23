@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Search, ExternalLink } from 'lucide-react';
+import { Search, ExternalLink, Download } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { Button } from '@/components/ui/button';
@@ -21,6 +21,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useSponsorships, useUpdateSponsorshipStatus } from '@/hooks/useSponsorships';
+import { exportSponsorships } from '@/lib/exportUtils';
 import { toast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
@@ -66,9 +67,15 @@ export default function SponsorshipsManagement() {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-serif font-bold text-foreground">إدارة الكفالات</h1>
-          <p className="text-muted-foreground mt-1">عرض وإدارة جميع الكفالات</p>
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-serif font-bold text-foreground">إدارة الكفالات</h1>
+            <p className="text-muted-foreground mt-1">عرض وإدارة جميع الكفالات</p>
+          </div>
+          <Button onClick={() => sponsorships && exportSponsorships(sponsorships)} variant="outline" disabled={!sponsorships?.length}>
+            <Download className="h-5 w-5" />
+            تصدير Excel
+          </Button>
         </div>
 
         <div className="bg-card rounded-2xl p-6 shadow-card">

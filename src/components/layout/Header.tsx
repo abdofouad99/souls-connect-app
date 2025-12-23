@@ -24,6 +24,7 @@ export function Header() {
   const navLinks = [
     { href: '/', label: 'الرئيسية' },
     { href: '/orphans', label: 'الأيتام' },
+    { href: '/deposit-request', label: 'طلب سند إيداع' },
     { href: '/about', label: 'من نحن' },
   ];
 

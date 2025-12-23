@@ -16,6 +16,7 @@ import Auth from "./pages/Auth";
 import ReceiptPage from "./pages/ReceiptPage";
 import Profile from "./pages/Profile";
 import MyReceipts from "./pages/MyReceipts";
+import DepositReceiptRequest from "./pages/DepositReceiptRequest";
 import NotFound from "./pages/NotFound";
 
 // Admin Pages
@@ -45,6 +46,7 @@ const App = () => (
             <Route path="/receipt/:receiptNumber" element={<ReceiptPage />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/my-receipts" element={<MyReceipts />} />
+            <Route path="/deposit-request" element={<DepositReceiptRequest />} />
 
             {/* Admin Routes */}
             <Route path="/admin" element={

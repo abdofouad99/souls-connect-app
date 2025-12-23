@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      deposit_receipt_requests: {
+        Row: {
+          bank_method: string
+          created_at: string
+          deposit_amount: number
+          id: string
+          notes: string | null
+          phone_number: string
+          receipt_image_url: string | null
+          sponsor_name: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          bank_method: string
+          created_at?: string
+          deposit_amount: number
+          id?: string
+          notes?: string | null
+          phone_number: string
+          receipt_image_url?: string | null
+          sponsor_name: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          bank_method?: string
+          created_at?: string
+          deposit_amount?: number
+          id?: string
+          notes?: string | null
+          phone_number?: string
+          receipt_image_url?: string | null
+          sponsor_name?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       orphans: {
         Row: {
           age: number

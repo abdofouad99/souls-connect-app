@@ -127,24 +127,39 @@ export default function DepositReceiptRequest() {
         }
       }
 
-      // إرسال البيانات (يمكن استبدالها بـ API endpoint حقيقي)
-      const requestData = {
-        sponsor_name: data.sponsorName,
-        phone_number: data.phoneNumber,
-        deposit_amount: Number(data.depositAmount),
-        bank_method: data.bankMethod,
-        receipt_image_url: receiptUrl,
-        created_at: new Date().toISOString(),
-      };
+      // رفع الملف إلى bucket جديد إذا وُجد
+      if (selectedFile) {
+        const fileExt = selectedFile.name.split('.').pop();
+        const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+        
+        const { error: uploadError } = await supabase.storage
+          .from('deposit-receipts')
+          .upload(fileName, selectedFile);
 
-      // هنا يمكنك إرسال البيانات إلى API
-      // await fetch('/api/deposit-receipt-request', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(requestData),
-      // });
+        if (uploadError) {
+          console.error('Upload error:', uploadError);
+        } else {
+          const { data: urlData } = supabase.storage
+            .from('deposit-receipts')
+            .getPublicUrl(fileName);
+          receiptUrl = urlData.publicUrl;
+        }
+      }
 
-      console.log('Deposit request data:', requestData);
+      // حفظ البيانات في قاعدة البيانات
+      const { error: insertError } = await supabase
+        .from('deposit_receipt_requests')
+        .insert({
+          sponsor_name: data.sponsorName,
+          phone_number: data.phoneNumber,
+          deposit_amount: Number(data.depositAmount),
+          bank_method: data.bankMethod,
+          receipt_image_url: receiptUrl,
+        });
+
+      if (insertError) {
+        throw insertError;
+      }
 
       setIsSuccess(true);
       toast({

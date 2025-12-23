@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Plus, Pencil, Trash2, Search, Loader2, Download } from 'lucide-react';
+import { useState, useRef } from 'react';
+import { Plus, Pencil, Trash2, Search, Loader2, Download, Upload, FileSpreadsheet } from 'lucide-react';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -17,6 +17,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from '@/components/ui/dialog';
 import {
   AlertDialog,
@@ -28,13 +29,19 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ImageUpload } from '@/components/ui/image-upload';
 import { useOrphans, useCreateOrphan, useUpdateOrphan, useDeleteOrphan } from '@/hooks/useOrphans';
 import { uploadOrphanPhoto } from '@/lib/storage';
-import { exportOrphans } from '@/lib/exportUtils';
+import { exportOrphans, parseExcelFile, mapOrphanImportData, downloadOrphansTemplate } from '@/lib/exportUtils';
 import { toast } from '@/hooks/use-toast';
 import type { Orphan } from '@/lib/types';
 
@@ -66,10 +73,14 @@ export default function OrphansManagement() {
   const [search, setSearch] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [importDialogOpen, setImportDialogOpen] = useState(false);
   const [selectedOrphan, setSelectedOrphan] = useState<Orphan | null>(null);
   const [formData, setFormData] = useState<Omit<Orphan, 'id' | 'created_at' | 'updated_at'>>(emptyOrphan);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [importing, setImporting] = useState(false);
+  const [importPreview, setImportPreview] = useState<any[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const filteredOrphans = orphans?.filter(orphan =>
     orphan.full_name.includes(search) ||
@@ -146,6 +157,70 @@ export default function OrphansManagement() {
     }
   };
 
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const data = await parseExcelFile(file);
+      const mappedData = mapOrphanImportData(data);
+      setImportPreview(mappedData);
+      setImportDialogOpen(true);
+    } catch (error) {
+      toast({ title: 'خطأ في قراءة الملف', variant: 'destructive' });
+    }
+    
+    // Reset input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const handleImport = async () => {
+    if (importPreview.length === 0) return;
+    
+    setImporting(true);
+    let successCount = 0;
+    let errorCount = 0;
+
+    for (const orphan of importPreview) {
+      try {
+        // Validate required fields
+        if (!orphan.full_name || !orphan.city || !orphan.country) {
+          errorCount++;
+          continue;
+        }
+
+        await createOrphan.mutateAsync({
+          full_name: orphan.full_name,
+          age: orphan.age || 5,
+          gender: orphan.gender || 'male',
+          city: orphan.city,
+          country: orphan.country,
+          status: orphan.status || 'available',
+          monthly_amount: orphan.monthly_amount || 100,
+          story: orphan.story || '',
+          photo_url: '',
+          intro_video_url: '',
+        });
+        successCount++;
+      } catch (error) {
+        errorCount++;
+      }
+    }
+
+    setImporting(false);
+    setImportDialogOpen(false);
+    setImportPreview([]);
+
+    if (successCount > 0) {
+      toast({ title: `تم استيراد ${successCount} يتيم بنجاح` });
+    }
+    if (errorCount > 0) {
+      toast({ title: `فشل استيراد ${errorCount} سجل`, variant: 'destructive' });
+    }
+  };
+
   return (
     <AdminLayout>
       <div className="space-y-6">
@@ -154,7 +229,32 @@ export default function OrphansManagement() {
             <h1 className="text-3xl font-serif font-bold text-foreground">إدارة الأيتام</h1>
             <p className="text-muted-foreground mt-1">إضافة وتعديل وحذف بيانات الأيتام</p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileSelect}
+              accept=".xlsx,.xls"
+              className="hidden"
+            />
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline">
+                  <Upload className="h-5 w-5" />
+                  استيراد
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => fileInputRef.current?.click()}>
+                  <FileSpreadsheet className="h-4 w-4 ml-2" />
+                  استيراد من Excel
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={downloadOrphansTemplate}>
+                  <Download className="h-4 w-4 ml-2" />
+                  تحميل القالب
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
             <Button onClick={() => orphans && exportOrphans(orphans)} variant="outline" disabled={!orphans?.length}>
               <Download className="h-5 w-5" />
               تصدير Excel
@@ -402,6 +502,84 @@ export default function OrphansManagement() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Import Preview Dialog */}
+      <Dialog open={importDialogOpen} onOpenChange={setImportDialogOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="font-serif">معاينة الاستيراد</DialogTitle>
+            <DialogDescription>
+              سيتم استيراد {importPreview.length} سجل. تأكد من صحة البيانات قبل المتابعة.
+            </DialogDescription>
+          </DialogHeader>
+          
+          {importPreview.length > 0 && (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>#</TableHead>
+                    <TableHead>الاسم</TableHead>
+                    <TableHead>العمر</TableHead>
+                    <TableHead>الجنس</TableHead>
+                    <TableHead>المدينة</TableHead>
+                    <TableHead>البلد</TableHead>
+                    <TableHead>المبلغ</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {importPreview.slice(0, 10).map((orphan, index) => (
+                    <TableRow key={index}>
+                      <TableCell>{index + 1}</TableCell>
+                      <TableCell className="font-medium">{orphan.full_name || '-'}</TableCell>
+                      <TableCell>{orphan.age || '-'}</TableCell>
+                      <TableCell>{orphan.gender === 'male' ? 'ذكر' : orphan.gender === 'female' ? 'أنثى' : '-'}</TableCell>
+                      <TableCell>{orphan.city || '-'}</TableCell>
+                      <TableCell>{orphan.country || '-'}</TableCell>
+                      <TableCell>{orphan.monthly_amount || '-'}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+              {importPreview.length > 10 && (
+                <p className="text-sm text-muted-foreground text-center mt-4">
+                  و {importPreview.length - 10} سجلات أخرى...
+                </p>
+              )}
+            </div>
+          )}
+
+          <div className="flex gap-4 pt-4">
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={() => {
+                setImportDialogOpen(false);
+                setImportPreview([]);
+              }} 
+              className="flex-1"
+              disabled={importing}
+            >
+              إلغاء
+            </Button>
+            <Button 
+              onClick={handleImport} 
+              variant="hero" 
+              className="flex-1" 
+              disabled={importing || importPreview.length === 0}
+            >
+              {importing ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  جاري الاستيراد...
+                </>
+              ) : (
+                `استيراد ${importPreview.length} سجل`
+              )}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </AdminLayout>
   );
 }

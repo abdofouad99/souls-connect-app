@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { Search, Printer } from 'lucide-react';
+import { Search, Printer, Plus } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Table,
   TableBody,
@@ -12,13 +13,35 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { useReceipts } from '@/hooks/useSponsorships';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { useReceipts, useSponsorships, useCreateReceipt } from '@/hooks/useSponsorships';
+import { toast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
 
 export default function ReceiptsManagement() {
   const { data: receipts, isLoading } = useReceipts();
+  const { data: sponsorships } = useSponsorships();
+  const createReceipt = useCreateReceipt();
   const [search, setSearch] = useState('');
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    sponsorship_id: '',
+    amount: 0,
+    payment_reference: '',
+  });
 
   const filteredReceipts = receipts?.filter(receipt =>
     receipt.receipt_number.includes(search) ||
@@ -26,12 +49,62 @@ export default function ReceiptsManagement() {
     receipt.sponsorship?.sponsor?.full_name.includes(search)
   ) || [];
 
+  // Get active sponsorships for the dropdown
+  const activeSponsorships = sponsorships?.filter(s => s.status === 'active') || [];
+
+  const handleOpenCreate = () => {
+    setFormData({
+      sponsorship_id: '',
+      amount: 0,
+      payment_reference: '',
+    });
+    setDialogOpen(true);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!formData.sponsorship_id) {
+      toast({ title: 'يرجى اختيار الكفالة', variant: 'destructive' });
+      return;
+    }
+
+    try {
+      await createReceipt.mutateAsync({
+        sponsorship_id: formData.sponsorship_id,
+        amount: formData.amount,
+        payment_reference: formData.payment_reference || undefined,
+      });
+      toast({ title: 'تم إضافة الإيصال بنجاح' });
+      setDialogOpen(false);
+    } catch (error) {
+      toast({ title: 'حدث خطأ', variant: 'destructive' });
+    }
+  };
+
+  const handleSponsorshipChange = (sponsorshipId: string) => {
+    const selectedSponsorship = sponsorships?.find(s => s.id === sponsorshipId);
+    if (selectedSponsorship) {
+      setFormData({
+        ...formData,
+        sponsorship_id: sponsorshipId,
+        amount: selectedSponsorship.monthly_amount,
+      });
+    }
+  };
+
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-serif font-bold text-foreground">إدارة الإيصالات</h1>
-          <p className="text-muted-foreground mt-1">عرض وطباعة إيصالات الكفالة</p>
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-serif font-bold text-foreground">إدارة الإيصالات</h1>
+            <p className="text-muted-foreground mt-1">عرض وإضافة وطباعة إيصالات الكفالة</p>
+          </div>
+          <Button onClick={handleOpenCreate} variant="hero">
+            <Plus className="h-5 w-5" />
+            إضافة إيصال
+          </Button>
         </div>
 
         <div className="bg-card rounded-2xl p-6 shadow-card">
@@ -66,6 +139,7 @@ export default function ReceiptsManagement() {
                     <TableHead>الكافل</TableHead>
                     <TableHead>اليتيم</TableHead>
                     <TableHead>المبلغ</TableHead>
+                    <TableHead>مرجع الدفع</TableHead>
                     <TableHead>تاريخ الإصدار</TableHead>
                     <TableHead>الإجراءات</TableHead>
                   </TableRow>
@@ -84,6 +158,9 @@ export default function ReceiptsManagement() {
                       </TableCell>
                       <TableCell className="font-bold text-primary">
                         {receipt.amount} ر.س
+                      </TableCell>
+                      <TableCell className="text-muted-foreground">
+                        {receipt.payment_reference || '-'}
                       </TableCell>
                       <TableCell>
                         {format(new Date(receipt.issue_date), 'dd MMM yyyy', { locale: ar })}
@@ -104,6 +181,61 @@ export default function ReceiptsManagement() {
           )}
         </div>
       </div>
+
+      {/* Add Receipt Dialog */}
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="font-serif">إضافة إيصال جديد</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <Label>الكفالة *</Label>
+              <Select value={formData.sponsorship_id} onValueChange={handleSponsorshipChange}>
+                <SelectTrigger>
+                  <SelectValue placeholder="اختر الكفالة..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {activeSponsorships.map((sponsorship) => (
+                    <SelectItem key={sponsorship.id} value={sponsorship.id}>
+                      {sponsorship.orphan?.full_name} - {sponsorship.sponsor?.full_name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Label>المبلغ (ر.س) *</Label>
+              <Input
+                type="number"
+                required
+                min={1}
+                value={formData.amount}
+                onChange={(e) => setFormData({ ...formData, amount: parseFloat(e.target.value) })}
+              />
+            </div>
+
+            <div>
+              <Label>مرجع الدفع (اختياري)</Label>
+              <Input
+                value={formData.payment_reference}
+                onChange={(e) => setFormData({ ...formData, payment_reference: e.target.value })}
+                placeholder="رقم التحويل أو العملية..."
+              />
+            </div>
+
+            <div className="flex gap-4 pt-4">
+              <Button type="button" variant="outline" onClick={() => setDialogOpen(false)} className="flex-1">
+                إلغاء
+              </Button>
+              <Button type="submit" variant="hero" className="flex-1" disabled={createReceipt.isPending}>
+                {createReceipt.isPending ? 'جاري الإضافة...' : 'إضافة الإيصال'}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </AdminLayout>
   );
 }

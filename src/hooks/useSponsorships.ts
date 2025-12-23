@@ -205,3 +205,37 @@ export function useUpdateSponsorshipStatus() {
     },
   });
 }
+
+interface CreateReceiptData {
+  sponsorship_id: string;
+  amount: number;
+  payment_reference?: string;
+}
+
+export function useCreateReceipt() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (data: CreateReceiptData) => {
+      // Generate receipt number
+      const receiptNumber = `RCP-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`;
+
+      const { data: receipt, error } = await supabase
+        .from('receipts')
+        .insert({
+          sponsorship_id: data.sponsorship_id,
+          receipt_number: receiptNumber,
+          amount: data.amount,
+          payment_reference: data.payment_reference,
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      return receipt;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['receipts'] });
+    },
+  });
+}

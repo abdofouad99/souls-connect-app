@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Pencil, Trash2, Search } from 'lucide-react';
+import { Plus, Pencil, Trash2, Search, Loader2 } from 'lucide-react';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -17,7 +17,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@/components/ui/dialog';
 import {
   AlertDialog,
@@ -32,7 +31,9 @@ import {
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { ImageUpload } from '@/components/ui/image-upload';
 import { useOrphans, useCreateOrphan, useUpdateOrphan, useDeleteOrphan } from '@/hooks/useOrphans';
+import { uploadOrphanPhoto } from '@/lib/storage';
 import { toast } from '@/hooks/use-toast';
 import type { Orphan } from '@/lib/types';
 
@@ -66,6 +67,8 @@ export default function OrphansManagement() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedOrphan, setSelectedOrphan] = useState<Orphan | null>(null);
   const [formData, setFormData] = useState<Omit<Orphan, 'id' | 'created_at' | 'updated_at'>>(emptyOrphan);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
 
   const filteredOrphans = orphans?.filter(orphan =>
     orphan.full_name.includes(search) ||
@@ -76,6 +79,7 @@ export default function OrphansManagement() {
   const handleOpenCreate = () => {
     setSelectedOrphan(null);
     setFormData(emptyOrphan);
+    setSelectedFile(null);
     setDialogOpen(true);
   };
 
@@ -93,22 +97,39 @@ export default function OrphansManagement() {
       photo_url: orphan.photo_url || '',
       intro_video_url: orphan.intro_video_url || '',
     });
+    setSelectedFile(null);
     setDialogOpen(true);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setUploading(true);
+    
     try {
+      let photoUrl = formData.photo_url;
+
+      // Upload photo if a new file was selected
+      if (selectedFile) {
+        const tempId = selectedOrphan?.id || `temp-${Date.now()}`;
+        photoUrl = await uploadOrphanPhoto(selectedFile, tempId);
+      }
+
+      const dataToSave = { ...formData, photo_url: photoUrl };
+
       if (selectedOrphan) {
-        await updateOrphan.mutateAsync({ id: selectedOrphan.id, ...formData });
+        await updateOrphan.mutateAsync({ id: selectedOrphan.id, ...dataToSave });
         toast({ title: 'تم تحديث بيانات اليتيم بنجاح' });
       } else {
-        await createOrphan.mutateAsync(formData);
+        await createOrphan.mutateAsync(dataToSave);
         toast({ title: 'تمت إضافة اليتيم بنجاح' });
       }
       setDialogOpen(false);
+      setSelectedFile(null);
     } catch (error) {
+      console.error('Error:', error);
       toast({ title: 'حدث خطأ', variant: 'destructive' });
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -162,6 +183,7 @@ export default function OrphansManagement() {
               <Table>
                 <TableHeader>
                   <TableRow>
+                    <TableHead>الصورة</TableHead>
                     <TableHead>الاسم</TableHead>
                     <TableHead>العمر</TableHead>
                     <TableHead>الجنس</TableHead>
@@ -174,6 +196,17 @@ export default function OrphansManagement() {
                 <TableBody>
                   {filteredOrphans.map((orphan) => (
                     <TableRow key={orphan.id}>
+                      <TableCell>
+                        <div className="w-12 h-12 rounded-lg bg-muted overflow-hidden">
+                          {orphan.photo_url ? (
+                            <img src={orphan.photo_url} alt={orphan.full_name} className="w-full h-full object-cover" />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-muted-foreground text-xs">
+                              لا صورة
+                            </div>
+                          )}
+                        </div>
+                      </TableCell>
                       <TableCell className="font-medium">{orphan.full_name}</TableCell>
                       <TableCell>{orphan.age} سنة</TableCell>
                       <TableCell>{orphan.gender === 'male' ? 'ذكر' : 'أنثى'}</TableCell>
@@ -223,6 +256,17 @@ export default function OrphansManagement() {
             </DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Photo Upload */}
+            <div>
+              <Label>صورة اليتيم</Label>
+              <ImageUpload
+                value={formData.photo_url}
+                onChange={(url) => setFormData({ ...formData, photo_url: url })}
+                onFileSelect={setSelectedFile}
+                disabled={uploading}
+              />
+            </div>
+
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label>الاسم الكامل *</Label>
@@ -308,29 +352,26 @@ export default function OrphansManagement() {
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label>رابط الصورة</Label>
-                <Input
-                  value={formData.photo_url}
-                  onChange={(e) => setFormData({ ...formData, photo_url: e.target.value })}
-                />
-              </div>
-              <div>
-                <Label>رابط الفيديو</Label>
-                <Input
-                  value={formData.intro_video_url}
-                  onChange={(e) => setFormData({ ...formData, intro_video_url: e.target.value })}
-                />
-              </div>
+            <div>
+              <Label>رابط الفيديو التعريفي</Label>
+              <Input
+                value={formData.intro_video_url}
+                onChange={(e) => setFormData({ ...formData, intro_video_url: e.target.value })}
+                placeholder="https://youtube.com/..."
+              />
             </div>
 
             <div className="flex gap-4 pt-4">
-              <Button type="button" variant="outline" onClick={() => setDialogOpen(false)} className="flex-1">
+              <Button type="button" variant="outline" onClick={() => setDialogOpen(false)} className="flex-1" disabled={uploading}>
                 إلغاء
               </Button>
-              <Button type="submit" variant="hero" className="flex-1" disabled={createOrphan.isPending || updateOrphan.isPending}>
-                {selectedOrphan ? 'تحديث' : 'إضافة'}
+              <Button type="submit" variant="hero" className="flex-1" disabled={uploading || createOrphan.isPending || updateOrphan.isPending}>
+                {uploading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    جاري الرفع...
+                  </>
+                ) : selectedOrphan ? 'تحديث' : 'إضافة'}
               </Button>
             </div>
           </form>

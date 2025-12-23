@@ -8,7 +8,8 @@ import {
   Receipt, 
   LogOut,
   Menu,
-  X
+  X,
+  FileText
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
@@ -25,6 +26,7 @@ const navItems = [
   { href: '/admin/sponsors', label: 'الكفلاء', icon: Users },
   { href: '/admin/sponsorships', label: 'الكفالات', icon: HandHeart },
   { href: '/admin/receipts', label: 'الإيصالات', icon: Receipt },
+  { href: '/admin/deposit-requests', label: 'طلبات الإيداع', icon: FileText },
 ];
 
 export function AdminLayout({ children }: AdminLayoutProps) {

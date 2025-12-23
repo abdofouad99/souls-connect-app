@@ -108,26 +108,7 @@ export default function DepositReceiptRequest() {
     try {
       let receiptUrl = null;
 
-      // رفع الملف إذا وُجد
-      if (selectedFile) {
-        const fileExt = selectedFile.name.split('.').pop();
-        const fileName = `deposit-receipts/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
-        
-        const { error: uploadError } = await supabase.storage
-          .from('orphan-photos')
-          .upload(fileName, selectedFile);
-
-        if (uploadError) {
-          console.error('Upload error:', uploadError);
-        } else {
-          const { data: urlData } = supabase.storage
-            .from('orphan-photos')
-            .getPublicUrl(fileName);
-          receiptUrl = urlData.publicUrl;
-        }
-      }
-
-      // رفع الملف إلى bucket جديد إذا وُجد
+      // رفع الملف إلى bucket إذا وُجد
       if (selectedFile) {
         const fileExt = selectedFile.name.split('.').pop();
         const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
@@ -159,6 +140,23 @@ export default function DepositReceiptRequest() {
 
       if (insertError) {
         throw insertError;
+      }
+
+      // إرسال إشعار بالبريد الإلكتروني (اختياري - لا يوقف العملية إذا فشل)
+      try {
+        await supabase.functions.invoke('send-deposit-notification', {
+          body: {
+            sponsorName: data.sponsorName,
+            phoneNumber: data.phoneNumber,
+            depositAmount: Number(data.depositAmount),
+            bankMethod: data.bankMethod,
+            adminEmail: 'admin@example.com', // يمكن تغييره لبريد المسؤول الفعلي
+          },
+        });
+        console.log('Email notification sent');
+      } catch (emailError) {
+        console.error('Failed to send email notification:', emailError);
+        // لا نريد إيقاف العملية إذا فشل إرسال البريد
       }
 
       setIsSuccess(true);

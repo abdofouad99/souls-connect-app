@@ -72,6 +72,9 @@ export function Header() {
                 <DropdownMenuItem asChild>
                   <Link to="/profile">الملف الشخصي</Link>
                 </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/my-receipts">إيصالاتي</Link>
+                </DropdownMenuItem>
                 {(isAdmin || isStaff) && (
                   <DropdownMenuItem asChild>
                     <Link to="/admin">لوحة التحكم</Link>

@@ -132,10 +132,18 @@ export function Header() {
             
             <div className="flex flex-col gap-2 pt-4 border-t border-border">
               {user ? (
-                <Button variant="outline" onClick={handleSignOut} className="w-full">
-                  <LogOut className="h-4 w-4 ml-2" />
-                  تسجيل الخروج
-                </Button>
+                <>
+                  <Button asChild variant="outline" className="w-full">
+                    <Link to="/profile" onClick={() => setIsOpen(false)}>
+                      <User className="h-4 w-4 ml-2" />
+                      الملف الشخصي
+                    </Link>
+                  </Button>
+                  <Button variant="outline" onClick={handleSignOut} className="w-full">
+                    <LogOut className="h-4 w-4 ml-2" />
+                    تسجيل الخروج
+                  </Button>
+                </>
               ) : (
                 <Button asChild variant="outline" className="w-full">
                   <Link to="/auth" onClick={() => setIsOpen(false)}>

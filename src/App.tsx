@@ -25,6 +25,7 @@ import OrphansManagement from "./pages/admin/OrphansManagement";
 import SponsorsManagement from "./pages/admin/SponsorsManagement";
 import SponsorshipsManagement from "./pages/admin/SponsorshipsManagement";
 import ReceiptsManagement from "./pages/admin/ReceiptsManagement";
+import DepositRequestsManagement from "./pages/admin/DepositRequestsManagement";
 
 const queryClient = new QueryClient();
 
@@ -72,6 +73,11 @@ const App = () => (
             <Route path="/admin/receipts" element={
               <ProtectedAdminRoute>
                 <ReceiptsManagement />
+              </ProtectedAdminRoute>
+            } />
+            <Route path="/admin/deposit-requests" element={
+              <ProtectedAdminRoute>
+                <DepositRequestsManagement />
               </ProtectedAdminRoute>
             } />
 

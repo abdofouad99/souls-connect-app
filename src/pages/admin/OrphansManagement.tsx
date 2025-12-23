@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Pencil, Trash2, Search, Loader2 } from 'lucide-react';
+import { Plus, Pencil, Trash2, Search, Loader2, Download } from 'lucide-react';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -34,6 +34,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { ImageUpload } from '@/components/ui/image-upload';
 import { useOrphans, useCreateOrphan, useUpdateOrphan, useDeleteOrphan } from '@/hooks/useOrphans';
 import { uploadOrphanPhoto } from '@/lib/storage';
+import { exportOrphans } from '@/lib/exportUtils';
 import { toast } from '@/hooks/use-toast';
 import type { Orphan } from '@/lib/types';
 
@@ -153,10 +154,16 @@ export default function OrphansManagement() {
             <h1 className="text-3xl font-serif font-bold text-foreground">إدارة الأيتام</h1>
             <p className="text-muted-foreground mt-1">إضافة وتعديل وحذف بيانات الأيتام</p>
           </div>
-          <Button onClick={handleOpenCreate} variant="hero">
-            <Plus className="h-5 w-5" />
-            إضافة يتيم
-          </Button>
+          <div className="flex gap-2">
+            <Button onClick={() => orphans && exportOrphans(orphans)} variant="outline" disabled={!orphans?.length}>
+              <Download className="h-5 w-5" />
+              تصدير Excel
+            </Button>
+            <Button onClick={handleOpenCreate} variant="hero">
+              <Plus className="h-5 w-5" />
+              إضافة يتيم
+            </Button>
+          </div>
         </div>
 
         <div className="bg-card rounded-2xl p-6 shadow-card">

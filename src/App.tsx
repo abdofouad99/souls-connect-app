@@ -15,6 +15,7 @@ import About from "./pages/About";
 import Auth from "./pages/Auth";
 import ReceiptPage from "./pages/ReceiptPage";
 import Profile from "./pages/Profile";
+import MyReceipts from "./pages/MyReceipts";
 import NotFound from "./pages/NotFound";
 
 // Admin Pages
@@ -43,6 +44,7 @@ const App = () => (
             <Route path="/auth" element={<Auth />} />
             <Route path="/receipt/:receiptNumber" element={<ReceiptPage />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/my-receipts" element={<MyReceipts />} />
 
             {/* Admin Routes */}
             <Route path="/admin" element={

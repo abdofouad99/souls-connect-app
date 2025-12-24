@@ -182,6 +182,13 @@ export default function ReceiptPage() {
             <div className="mt-8 pt-6 border-t border-border text-center text-sm text-muted-foreground">
               <p>جزاكم الله خيراً على مساهمتكم في رعاية الأيتام</p>
               <p className="mt-2">للاستفسارات: 77243079 - 04251675 - 784665006</p>
+              <Button 
+                variant="hero" 
+                className="mt-6 no-print" 
+                onClick={() => navigate('/')}
+              >
+                العودة للصفحة الرئيسية
+              </Button>
             </div>
           </div>
         </div>

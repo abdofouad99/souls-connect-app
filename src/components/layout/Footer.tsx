@@ -30,16 +30,28 @@ export function Footer() {
                 الرئيسية
               </Link>
               <Link
+                to="/about"
+                className="text-sm text-primary-foreground/80 hover:text-secondary transition-colors"
+              >
+                من نحن
+              </Link>
+              <Link
+                to="/sponsorship"
+                className="text-sm text-primary-foreground/80 hover:text-secondary transition-colors"
+              >
+                كفالة الأيتام
+              </Link>
+              <Link
                 to="/orphans"
                 className="text-sm text-primary-foreground/80 hover:text-secondary transition-colors"
               >
                 الأيتام
               </Link>
               <Link
-                to="/about"
+                to="/deposit-request"
                 className="text-sm text-primary-foreground/80 hover:text-secondary transition-colors"
               >
-                من نحن
+                طلب سند إيداع
               </Link>
             </nav>
           </div>

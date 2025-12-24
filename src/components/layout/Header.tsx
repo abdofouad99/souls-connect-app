@@ -24,10 +24,9 @@ export function Header() {
 
   const navLinks = [
     { href: '/', label: 'الرئيسية' },
-    { href: '/sponsorship', label: 'الكفالة' },
-    { href: '/orphans', label: 'الأيتام' },
-    { href: '/deposit-request', label: 'طلب سند إيداع' },
     { href: '/about', label: 'من نحن' },
+    { href: '/sponsorship', label: 'كفالة الأيتام' },
+    { href: '/orphans', label: 'الأيتام' },
   ];
 
   return (

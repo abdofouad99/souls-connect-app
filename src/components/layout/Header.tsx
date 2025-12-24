@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Menu, X, Heart, User, LogOut } from 'lucide-react';
+import { Menu, X, User, LogOut } from 'lucide-react';
+import logo from '@/assets/logo.jpg';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import {
@@ -32,9 +33,9 @@ export function Header() {
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
         <Link to="/" className="flex items-center gap-2">
-          <Heart className="h-8 w-8 text-primary fill-primary" />
+          <img src={logo} alt="شعار جمعية الأقصى" className="h-10 w-10 rounded-full object-cover" />
           <span className="text-xl font-serif font-bold text-foreground">
-            رعاية الأيتام
+            جمعية الأقصى
           </span>
         </Link>
 

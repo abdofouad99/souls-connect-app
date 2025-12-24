@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useOrphan } from '@/hooks/useOrphans';
 import { useCreateSponsorship } from '@/hooks/useSponsorships';
 import { toast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 
 const statusLabels = {
   available: { label: 'متاح للكفالة', class: 'bg-primary text-primary-foreground' },
@@ -21,6 +22,7 @@ const statusLabels = {
 export default function OrphanDetailsPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { data: orphan, isLoading } = useOrphan(id || '');
   const createSponsorship = useCreateSponsorship();
   
@@ -47,7 +49,19 @@ export default function OrphanDetailsPage() {
         type: formData.sponsorshipType,
         paymentMethod: formData.paymentMethod,
         monthlyAmount: orphan.monthly_amount,
+        userId: user?.id,
       });
+
+      // Check if user is logged in
+      if (!user) {
+        toast({
+          title: 'يرجى تسجيل الدخول',
+          description: 'يجب تسجيل الدخول أولاً لإتمام عملية الكفالة.',
+          variant: 'destructive',
+        });
+        navigate('/auth');
+        return;
+      }
 
       const result = await createSponsorship.mutateAsync({
         sponsorData: {
@@ -56,6 +70,7 @@ export default function OrphanDetailsPage() {
           phone: formData.phone,
           country: formData.country,
           preferred_contact: formData.preferredContact,
+          user_id: user.id,
         },
         orphanId: orphan.id,
         type: formData.sponsorshipType as 'monthly' | 'yearly',

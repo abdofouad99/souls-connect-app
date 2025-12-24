@@ -41,6 +41,14 @@ export default function OrphanDetailsPage() {
     if (!orphan) return;
 
     try {
+      console.log('[Sponsorship] Starting sponsorship creation...', {
+        orphanId: orphan.id,
+        sponsorEmail: formData.email,
+        type: formData.sponsorshipType,
+        paymentMethod: formData.paymentMethod,
+        monthlyAmount: orphan.monthly_amount,
+      });
+
       const result = await createSponsorship.mutateAsync({
         sponsorData: {
           full_name: formData.fullName,
@@ -55,6 +63,8 @@ export default function OrphanDetailsPage() {
         monthlyAmount: orphan.monthly_amount,
       });
 
+      console.log('[Sponsorship] Success! Receipt:', result.receiptNumber);
+
       // Navigate to sponsor thank you page with details
       const params = new URLSearchParams({
         name: formData.fullName,
@@ -62,10 +72,40 @@ export default function OrphanDetailsPage() {
         receipt: result.receiptNumber,
       });
       navigate(`/thanks?${params.toString()}`);
-    } catch (error) {
+    } catch (error: any) {
+      // Enhanced error logging
+      console.error('[Sponsorship] Error creating sponsorship:', {
+        message: error?.message,
+        code: error?.code,
+        details: error?.details,
+        hint: error?.hint,
+        status: error?.status,
+        statusCode: error?.statusCode,
+        stack: error?.stack,
+      });
+
+      // Determine user-friendly error message
+      let errorMessage = 'لم نتمكن من إتمام الكفالة. يرجى المحاولة مرة أخرى.';
+      
+      if (error?.message?.includes('Failed to fetch') || error?.message?.includes('NetworkError')) {
+        errorMessage = 'فشل الاتصال بالخادم. يرجى التحقق من اتصالك بالإنترنت.';
+      } else if (error?.code === 'PGRST301' || error?.code === '42501') {
+        errorMessage = 'صلاحيات غير كافية. يرجى تسجيل الدخول والمحاولة مرة أخرى.';
+      } else if (error?.code === '23505') {
+        errorMessage = 'توجد كفالة مسجلة بالفعل لهذا اليتيم.';
+      } else if (error?.status === 401 || error?.statusCode === 401) {
+        errorMessage = 'يرجى تسجيل الدخول أولاً.';
+      } else if (error?.status === 403 || error?.statusCode === 403) {
+        errorMessage = 'ليس لديك صلاحية لإتمام هذه العملية.';
+      } else if (error?.status >= 500 || error?.statusCode >= 500) {
+        errorMessage = 'خطأ في الخادم. يرجى المحاولة لاحقاً.';
+      } else if (error?.message) {
+        errorMessage = `خطأ: ${error.message}`;
+      }
+
       toast({
         title: 'حدث خطأ',
-        description: 'لم نتمكن من إتمام الكفالة. يرجى المحاولة مرة أخرى.',
+        description: errorMessage,
         variant: 'destructive',
       });
     }

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Heart, MapPin, Calendar, ArrowRight } from 'lucide-react';
+import { Heart, MapPin, Calendar, ArrowRight, Upload, X, ImageIcon, Loader2 } from 'lucide-react';
 import { Layout } from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,6 +12,7 @@ import { useOrphan } from '@/hooks/useOrphans';
 import { useCreateSponsorship } from '@/hooks/useSponsorships';
 import { toast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 
 const statusLabels = {
   available: { label: 'متاح للكفالة', class: 'bg-primary text-primary-foreground' },
@@ -36,6 +37,67 @@ export default function OrphanDetailsPage() {
     sponsorshipType: 'monthly',
     paymentMethod: 'bank_transfer',
   });
+  const [receiptFile, setReceiptFile] = useState<File | null>(null);
+  const [receiptPreview, setReceiptPreview] = useState<string | null>(null);
+  const [uploadingReceipt, setUploadingReceipt] = useState(false);
+
+  const handleReceiptFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (!file.type.startsWith('image/')) {
+        toast({
+          title: 'خطأ',
+          description: 'يرجى اختيار ملف صورة فقط',
+          variant: 'destructive',
+        });
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        toast({
+          title: 'خطأ',
+          description: 'حجم الصورة يجب أن يكون أقل من 5MB',
+          variant: 'destructive',
+        });
+        return;
+      }
+      setReceiptFile(file);
+      const reader = new FileReader();
+      reader.onload = () => setReceiptPreview(reader.result as string);
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeReceiptImage = () => {
+    setReceiptFile(null);
+    setReceiptPreview(null);
+  };
+
+  const uploadReceiptImage = async (): Promise<string | null> => {
+    if (!receiptFile || !user) return null;
+    
+    setUploadingReceipt(true);
+    try {
+      const fileExt = receiptFile.name.split('.').pop();
+      const fileName = `${user.id}/${Date.now()}.${fileExt}`;
+      
+      const { error: uploadError } = await supabase.storage
+        .from('deposit-receipts')
+        .upload(fileName, receiptFile);
+      
+      if (uploadError) throw uploadError;
+      
+      const { data: { publicUrl } } = supabase.storage
+        .from('deposit-receipts')
+        .getPublicUrl(fileName);
+      
+      return publicUrl;
+    } catch (error) {
+      console.error('Error uploading receipt:', error);
+      return null;
+    } finally {
+      setUploadingReceipt(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -279,6 +341,48 @@ export default function OrphanDetailsPage() {
                           <SelectItem value="cash">نقداً</SelectItem>
                         </SelectContent>
                       </Select>
+                    </div>
+
+                    {/* Receipt Image Upload */}
+                    <div>
+                      <Label>صورة الإيصال / الحوالة</Label>
+                      <p className="text-xs text-muted-foreground mb-2">
+                        يمكنك رفع صورة إيصال الدفع أو الحوالة البنكية (اختياري)
+                      </p>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleReceiptFileChange}
+                        className="hidden"
+                        id="receipt-upload"
+                      />
+                      {receiptPreview ? (
+                        <div className="relative w-full aspect-video rounded-xl overflow-hidden bg-muted border border-border">
+                          <img
+                            src={receiptPreview}
+                            alt="صورة الإيصال"
+                            className="w-full h-full object-cover"
+                          />
+                          <Button
+                            type="button"
+                            variant="destructive"
+                            size="icon"
+                            className="absolute top-2 left-2"
+                            onClick={removeReceiptImage}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      ) : (
+                        <label
+                          htmlFor="receipt-upload"
+                          className="flex flex-col items-center justify-center w-full h-32 rounded-xl border-2 border-dashed border-border hover:border-primary/50 hover:bg-muted/50 cursor-pointer transition-colors"
+                        >
+                          <Upload className="h-8 w-8 text-muted-foreground mb-2" />
+                          <span className="text-sm text-muted-foreground">اضغط لرفع صورة الإيصال</span>
+                          <span className="text-xs text-muted-foreground">PNG, JPG (حد أقصى 5MB)</span>
+                        </label>
+                      )}
                     </div>
                   </div>
 

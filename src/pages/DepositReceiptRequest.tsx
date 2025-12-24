@@ -11,6 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, Upload, X, FileText, CheckCircle2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 
 // Schema للتحقق من البيانات
 const depositRequestSchema = z.object({
@@ -38,6 +39,7 @@ type DepositRequestForm = z.infer<typeof depositRequestSchema>;
 export default function DepositReceiptRequest() {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -103,6 +105,17 @@ export default function DepositReceiptRequest() {
 
   // إرسال النموذج
   const onSubmit = async (data: DepositRequestForm) => {
+    // التحقق من تسجيل الدخول
+    if (!user) {
+      toast({
+        variant: 'destructive',
+        title: 'يجب تسجيل الدخول',
+        description: 'يرجى تسجيل الدخول أولاً لإرسال طلب سند الإيداع',
+      });
+      navigate('/auth');
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -136,6 +149,7 @@ export default function DepositReceiptRequest() {
           deposit_amount: Number(data.depositAmount),
           bank_method: data.bankMethod,
           receipt_image_url: receiptUrl,
+          user_id: user?.id,
         });
 
       if (insertError) {

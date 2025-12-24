@@ -26,6 +26,7 @@ export type Database = {
           sponsor_name: string
           status: string
           updated_at: string
+          user_id: string | null
         }
         Insert: {
           bank_method: string
@@ -38,6 +39,7 @@ export type Database = {
           sponsor_name: string
           status?: string
           updated_at?: string
+          user_id?: string | null
         }
         Update: {
           bank_method?: string
@@ -50,6 +52,7 @@ export type Database = {
           sponsor_name?: string
           status?: string
           updated_at?: string
+          user_id?: string | null
         }
         Relationships: []
       }

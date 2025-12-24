@@ -1,12 +1,44 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 const ADMIN_EMAIL = Deno.env.get("ADMIN_EMAIL");
+const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
+const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
+
+// Create Supabase client for logging
+const supabase = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!);
+
+// Function to log notification
+async function logNotification(
+  type: string,
+  recipientEmail: string,
+  recipientName: string | null,
+  subject: string,
+  status: 'sent' | 'failed',
+  errorMessage?: string,
+  metadata?: Record<string, unknown>
+) {
+  try {
+    await supabase.from('notification_logs').insert({
+      notification_type: type,
+      recipient_email: recipientEmail,
+      recipient_name: recipientName,
+      subject: subject,
+      status: status,
+      error_message: errorMessage || null,
+      metadata: metadata || null,
+    });
+    console.log(`Notification logged: ${type} to ${recipientEmail} - ${status}`);
+  } catch (error) {
+    console.error("Failed to log notification:", error);
+  }
+}
 
 interface SponsorshipNotificationRequest {
   sponsorName: string;
@@ -368,12 +400,54 @@ const handler = async (req: Request): Promise<Response> => {
     const sponsorEmailData = await sponsorEmailResponse.json();
     console.log("Sponsor email API response:", sponsorEmailData);
 
-    if (!adminEmailResponse.ok) {
+    // Log admin email notification
+    const adminSubject = `🎉 كفالة جديدة - ${safeOrphanName}`;
+    if (adminEmailResponse.ok) {
+      await logNotification(
+        'sponsorship_admin',
+        ADMIN_EMAIL,
+        'المشرف',
+        adminSubject,
+        'sent',
+        undefined,
+        { orphanName: safeOrphanName, sponsorName: safeSponsorName, amount: totalAmount, receiptNumber: safeReceiptNumber }
+      );
+    } else {
       console.error("Failed to send admin email:", adminEmailData);
+      await logNotification(
+        'sponsorship_admin',
+        ADMIN_EMAIL,
+        'المشرف',
+        adminSubject,
+        'failed',
+        adminEmailData.message || 'فشل إرسال البريد',
+        { orphanName: safeOrphanName, sponsorName: safeSponsorName, amount: totalAmount }
+      );
     }
 
-    if (!sponsorEmailResponse.ok) {
+    // Log sponsor email notification
+    const sponsorSubject = `تأكيد كفالتك لليتيم ${safeOrphanName}`;
+    if (sponsorEmailResponse.ok) {
+      await logNotification(
+        'sponsorship_sponsor',
+        sponsorEmail,
+        safeSponsorName,
+        sponsorSubject,
+        'sent',
+        undefined,
+        { orphanName: safeOrphanName, amount: totalAmount, receiptNumber: safeReceiptNumber }
+      );
+    } else {
       console.error("Failed to send sponsor email:", sponsorEmailData);
+      await logNotification(
+        'sponsorship_sponsor',
+        sponsorEmail,
+        safeSponsorName,
+        sponsorSubject,
+        'failed',
+        sponsorEmailData.message || 'فشل إرسال البريد',
+        { orphanName: safeOrphanName, amount: totalAmount }
+      );
     }
 
     return new Response(JSON.stringify({ 

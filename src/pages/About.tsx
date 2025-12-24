@@ -1,5 +1,7 @@
 import { Heart, Package, Home, HandHeart, Sprout, ChevronLeft } from 'lucide-react';
 import { Layout } from '@/components/layout/Layout';
+import { useScrollAnimation } from '@/hooks/useScrollAnimation';
+import { cn } from '@/lib/utils';
 
 const projects = [
   { icon: Heart, title: 'مشاريع الكفالات' },
@@ -10,31 +12,62 @@ const projects = [
 ];
 
 export default function AboutPage() {
+  const visionAnim = useScrollAnimation<HTMLElement>();
+  const goalsAnim = useScrollAnimation<HTMLElement>();
+  const projectsAnim = useScrollAnimation<HTMLElement>();
+  const videoAnim = useScrollAnimation<HTMLElement>();
+
   return (
     <Layout>
-      <div className="min-h-screen bg-beige-light">
+      <div className="min-h-screen bg-background">
         <div className="container py-12 px-4 max-w-3xl mx-auto">
           
           {/* رؤيتنا */}
-          <section className="text-center mb-10">
-            <h2 className="text-3xl md:text-4xl font-serif font-bold text-brown mb-4">
+          <section 
+            ref={visionAnim.ref}
+            className="text-center mb-10"
+          >
+            <h2 
+              className={cn(
+                "text-3xl md:text-4xl font-serif font-bold mb-4 transition-all duration-700",
+                visionAnim.isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+              )}
+            >
               رؤيتنا
             </h2>
-            <p className="text-brown-light text-lg leading-relaxed">
+            <p 
+              className={cn(
+                "text-muted-foreground text-lg leading-relaxed transition-all duration-700 delay-100",
+                visionAnim.isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+              )}
+            >
               الريادة في العمل الخيري لدعم الشعب الفلسطيني محلياً وإقليمياً ودولياً
             </p>
           </section>
 
           {/* فاصل */}
-          <div className="w-full h-px bg-brown/20 my-8" />
+          <div className="w-full h-px bg-border my-8" />
 
           {/* أهدافنا */}
-          <section className="mb-10">
-            <h2 className="text-3xl md:text-4xl font-serif font-bold text-brown text-center mb-6">
+          <section 
+            ref={goalsAnim.ref}
+            className="mb-10"
+          >
+            <h2 
+              className={cn(
+                "text-3xl md:text-4xl font-serif font-bold text-center mb-6 transition-all duration-700",
+                goalsAnim.isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+              )}
+            >
               أهدافنا
             </h2>
-            <div className="bg-beige rounded-2xl p-6 shadow-card">
-              <ol className="list-decimal list-inside space-y-4 text-brown-light text-lg leading-relaxed">
+            <div 
+              className={cn(
+                "bg-card rounded-2xl p-6 shadow-card transition-all duration-700 delay-100",
+                goalsAnim.isVisible ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-8 scale-95"
+              )}
+            >
+              <ol className="list-decimal list-inside space-y-4 text-muted-foreground text-lg leading-relaxed">
                 <li>العمل في القضية الفلسطينية.</li>
                 <li>
                   دعم الشعب الفلسطيني مادياً ومعنوياً من خلال تنفيذ المشاريع الخيرية والإنسانية المختلفة.
@@ -45,40 +78,65 @@ export default function AboutPage() {
           </section>
 
           {/* فاصل */}
-          <div className="w-full h-px bg-brown/20 my-8" />
+          <div className="w-full h-px bg-border my-8" />
 
           {/* مشاريعنا */}
-          <section className="mb-10">
-            <h2 className="text-3xl md:text-4xl font-serif font-bold text-brown text-center mb-6">
+          <section 
+            ref={projectsAnim.ref}
+            className="mb-10"
+          >
+            <h2 
+              className={cn(
+                "text-3xl md:text-4xl font-serif font-bold text-center mb-6 transition-all duration-700",
+                projectsAnim.isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+              )}
+            >
               مشاريعنا
             </h2>
             <div className="space-y-4">
               {projects.map((project, index) => (
                 <button
                   key={index}
-                  className="w-full flex items-center gap-4 bg-beige rounded-xl p-4 shadow-card hover:shadow-lg hover:scale-[1.01] transition-all duration-200 group cursor-pointer"
+                  className={cn(
+                    "w-full flex items-center gap-4 bg-card rounded-xl p-4 shadow-card hover:shadow-lg hover:scale-[1.02] transition-all duration-300 group cursor-pointer",
+                    projectsAnim.isVisible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-8"
+                  )}
+                  style={{ transitionDelay: projectsAnim.isVisible ? `${100 + index * 80}ms` : '0ms' }}
                 >
-                  <div className="w-14 h-14 bg-beige-light rounded-xl flex items-center justify-center shrink-0 border border-brown/10">
-                    <project.icon className="w-7 h-7 text-brown" />
+                  <div className="w-14 h-14 bg-background rounded-xl flex items-center justify-center shrink-0 border border-border group-hover:bg-primary/5 transition-colors">
+                    <project.icon className="w-7 h-7 text-primary group-hover:scale-110 transition-transform" />
                   </div>
-                  <span className="text-lg font-medium text-brown flex-1 text-right">
+                  <span className="text-lg font-medium text-foreground flex-1 text-right">
                     {project.title}
                   </span>
-                  <ChevronLeft className="w-5 h-5 text-brown/40 group-hover:text-brown transition-colors" />
+                  <ChevronLeft className="w-5 h-5 text-muted-foreground group-hover:text-primary group-hover:-translate-x-1 transition-all" />
                 </button>
               ))}
             </div>
           </section>
 
           {/* فاصل */}
-          <div className="w-full h-px bg-brown/20 my-8" />
+          <div className="w-full h-px bg-border my-8" />
 
           {/* فيديو مونتاج الجمعية */}
-          <section className="mb-10">
-            <h2 className="text-3xl md:text-4xl font-serif font-bold text-brown text-center mb-6">
+          <section 
+            ref={videoAnim.ref}
+            className="mb-10"
+          >
+            <h2 
+              className={cn(
+                "text-3xl md:text-4xl font-serif font-bold text-center mb-6 transition-all duration-700",
+                videoAnim.isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+              )}
+            >
               فيديو مونتاج الجمعية
             </h2>
-            <div className="bg-beige rounded-2xl p-4 shadow-card">
+            <div 
+              className={cn(
+                "bg-card rounded-2xl p-4 shadow-card transition-all duration-700 delay-100",
+                videoAnim.isVisible ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-8 scale-95"
+              )}
+            >
               <div className="aspect-video w-full rounded-xl overflow-hidden">
                 <iframe
                   className="w-full h-full"

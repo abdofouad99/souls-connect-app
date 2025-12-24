@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Phone, Mail, MapPin } from 'lucide-react';
+import { Phone, Mail, MapPin, Home, Info, Heart, Users, FileText } from 'lucide-react';
 import logo from '@/assets/logo.jpg';
 
 export function Footer() {
@@ -25,32 +25,37 @@ export function Footer() {
             <nav className="flex flex-col gap-2">
               <Link
                 to="/"
-                className="text-sm text-primary-foreground/80 hover:text-secondary transition-colors"
+                className="flex items-center gap-2 text-sm text-primary-foreground/80 hover:text-secondary transition-colors"
               >
+                <Home className="h-4 w-4" />
                 الرئيسية
               </Link>
               <Link
                 to="/about"
-                className="text-sm text-primary-foreground/80 hover:text-secondary transition-colors"
+                className="flex items-center gap-2 text-sm text-primary-foreground/80 hover:text-secondary transition-colors"
               >
+                <Info className="h-4 w-4" />
                 من نحن
               </Link>
               <Link
                 to="/sponsorship"
-                className="text-sm text-primary-foreground/80 hover:text-secondary transition-colors"
+                className="flex items-center gap-2 text-sm text-primary-foreground/80 hover:text-secondary transition-colors"
               >
+                <Heart className="h-4 w-4" />
                 كفالة الأيتام
               </Link>
               <Link
                 to="/orphans"
-                className="text-sm text-primary-foreground/80 hover:text-secondary transition-colors"
+                className="flex items-center gap-2 text-sm text-primary-foreground/80 hover:text-secondary transition-colors"
               >
+                <Users className="h-4 w-4" />
                 الأيتام
               </Link>
               <Link
                 to="/deposit-request"
-                className="text-sm text-primary-foreground/80 hover:text-secondary transition-colors"
+                className="flex items-center gap-2 text-sm text-primary-foreground/80 hover:text-secondary transition-colors"
               >
+                <FileText className="h-4 w-4" />
                 طلب سند إيداع
               </Link>
             </nav>

@@ -3,10 +3,17 @@ import { Heart, Users, HandHeart, TrendingUp, Phone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Layout } from '@/components/layout/Layout';
 import { useOrphanStats } from '@/hooks/useOrphans';
+import { useScrollAnimation } from '@/hooks/useScrollAnimation';
 import heroImage from '@/assets/hero-image.jpg';
+import { cn } from '@/lib/utils';
 
 const Index = () => {
   const { data: stats } = useOrphanStats();
+  
+  // Scroll animations for sections
+  const heroAnim = useScrollAnimation<HTMLElement>();
+  const statsAnim = useScrollAnimation<HTMLElement>();
+  const missionAnim = useScrollAnimation<HTMLElement>();
 
   const statCards = [
     { icon: Users, label: 'إجمالي الأيتام', value: stats?.totalOrphans || 0, color: 'text-primary' },
@@ -24,36 +31,58 @@ const Index = () => {
   return (
     <Layout>
       {/* Hero Section */}
-      <section className="py-12 md:py-20">
+      <section 
+        ref={heroAnim.ref}
+        className="py-12 md:py-20"
+      >
         <div className="container">
           <div className="max-w-4xl mx-auto text-center">
             {/* العنوان الرئيسي */}
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-serif font-bold text-foreground mb-8 animate-fade-up">
+            <h1 
+              className={cn(
+                "text-3xl md:text-4xl lg:text-5xl font-serif font-bold text-foreground mb-8 transition-all duration-700",
+                heroAnim.isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+              )}
+            >
               جمعية الأقصى _ المكتب النسوي _ تعز
             </h1>
             
             {/* الصورة الرئيسية */}
-            <div className="mb-10 animate-fade-up" style={{ animationDelay: '0.1s' }}>
+            <div 
+              className={cn(
+                "mb-10 transition-all duration-700 delay-100",
+                heroAnim.isVisible ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-8 scale-95"
+              )}
+            >
               <img
                 src={heroImage}
                 alt="مشروع كفالة الأيتام - جمعية الأقصى"
-                className="w-full max-w-3xl mx-auto rounded-2xl shadow-xl"
+                className="w-full max-w-3xl mx-auto rounded-2xl shadow-xl hover:shadow-2xl transition-shadow duration-300"
               />
             </div>
             
             {/* قسم أرقام التواصل */}
-            <div className="bg-card rounded-2xl p-6 md:p-8 shadow-card max-w-md mx-auto animate-fade-up" style={{ animationDelay: '0.2s' }}>
+            <div 
+              className={cn(
+                "bg-card rounded-2xl p-6 md:p-8 shadow-card max-w-md mx-auto transition-all duration-700 delay-200",
+                heroAnim.isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+              )}
+            >
               <div className="flex items-center justify-center gap-3 mb-6">
                 <Phone className="h-6 w-6 text-primary" />
                 <h2 className="text-xl md:text-2xl font-bold text-foreground">أرقام التواصل</h2>
               </div>
               
               <div className="space-y-4">
-                {contactNumbers.map((number) => (
+                {contactNumbers.map((number, index) => (
                   <a
                     key={number}
                     href={`tel:${number}`}
-                    className="flex items-center justify-center gap-3 bg-primary/10 hover:bg-primary/20 text-primary font-semibold text-lg md:text-xl py-3 px-6 rounded-xl transition-colors"
+                    className={cn(
+                      "flex items-center justify-center gap-3 bg-primary/10 hover:bg-primary/20 text-primary font-semibold text-lg md:text-xl py-3 px-6 rounded-xl transition-all duration-300 hover:scale-105",
+                      heroAnim.isVisible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-8"
+                    )}
+                    style={{ transitionDelay: heroAnim.isVisible ? `${300 + index * 100}ms` : '0ms' }}
                     dir="ltr"
                   >
                     <Phone className="h-5 w-5" />
@@ -64,14 +93,19 @@ const Index = () => {
             </div>
             
             {/* أزرار الإجراء */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mt-10 animate-fade-up" style={{ animationDelay: '0.3s' }}>
-              <Button asChild variant="hero" size="xl">
+            <div 
+              className={cn(
+                "flex flex-col sm:flex-row gap-4 justify-center mt-10 transition-all duration-700 delay-500",
+                heroAnim.isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+              )}
+            >
+              <Button asChild variant="hero" size="xl" className="hover:scale-105 transition-transform">
                 <Link to="/orphans">
                   <Heart className="h-5 w-5" />
                   ابدأ كفالة يتيم الآن
                 </Link>
               </Button>
-              <Button asChild variant="outline" size="xl">
+              <Button asChild variant="outline" size="xl" className="hover:scale-105 transition-transform">
                 <Link to="/deposit-request">طلب سند إيداع</Link>
               </Button>
             </div>
@@ -80,16 +114,22 @@ const Index = () => {
       </section>
 
       {/* Stats Section */}
-      <section className="py-16 bg-card">
+      <section 
+        ref={statsAnim.ref}
+        className="py-16 bg-card"
+      >
         <div className="container">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {statCards.map((stat, index) => (
               <div
                 key={stat.label}
-                className="bg-background rounded-2xl p-6 text-center shadow-card card-hover animate-fade-up"
-                style={{ animationDelay: `${0.1 * index}s` }}
+                className={cn(
+                  "bg-background rounded-2xl p-6 text-center shadow-card card-hover transition-all duration-500",
+                  statsAnim.isVisible ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-8 scale-95"
+                )}
+                style={{ transitionDelay: statsAnim.isVisible ? `${index * 100}ms` : '0ms' }}
               >
-                <stat.icon className={`h-10 w-10 mx-auto mb-3 ${stat.color}`} />
+                <stat.icon className={`h-10 w-10 mx-auto mb-3 ${stat.color} transition-transform duration-300 group-hover:scale-110`} />
                 <div className="text-3xl md:text-4xl font-bold text-foreground mb-1">
                   {stat.value}
                 </div>
@@ -101,19 +141,39 @@ const Index = () => {
       </section>
 
       {/* Mission Section */}
-      <section className="py-20">
+      <section 
+        ref={missionAnim.ref}
+        className="py-20"
+      >
         <div className="container">
           <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-3xl md:text-4xl font-serif font-bold text-foreground mb-6">
+            <h2 
+              className={cn(
+                "text-3xl md:text-4xl font-serif font-bold text-foreground mb-6 transition-all duration-700",
+                missionAnim.isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+              )}
+            >
               رسالتنا
             </h2>
-            <p className="text-lg text-muted-foreground leading-relaxed mb-8">
+            <p 
+              className={cn(
+                "text-lg text-muted-foreground leading-relaxed mb-8 transition-all duration-700 delay-100",
+                missionAnim.isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+              )}
+            >
               نؤمن بأن كل يتيم يستحق حياة كريمة مليئة بالأمل والفرص. من خلال برامج الكفالة المتكاملة، 
               نسعى لتوفير التعليم والرعاية الصحية والدعم النفسي لكل يتيم تحت رعايتنا.
             </p>
-            <Button asChild variant="gold" size="lg">
-              <Link to="/orphans">استعرض الأيتام المتاحين للكفالة</Link>
-            </Button>
+            <div
+              className={cn(
+                "transition-all duration-700 delay-200",
+                missionAnim.isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+              )}
+            >
+              <Button asChild variant="gold" size="lg" className="hover:scale-105 transition-transform">
+                <Link to="/orphans">استعرض الأيتام المتاحين للكفالة</Link>
+              </Button>
+            </div>
           </div>
         </div>
       </section>

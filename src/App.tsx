@@ -12,6 +12,7 @@ import Orphans from "./pages/Orphans";
 import OrphanDetails from "./pages/OrphanDetails";
 import ThankYou from "./pages/ThankYou";
 import About from "./pages/About";
+import Sponsorship from "./pages/Sponsorship";
 import Auth from "./pages/Auth";
 import ReceiptPage from "./pages/ReceiptPage";
 import Profile from "./pages/Profile";
@@ -43,6 +44,7 @@ const App = () => (
             <Route path="/orphan/:id" element={<OrphanDetails />} />
             <Route path="/thank-you/:receiptNumber" element={<ThankYou />} />
             <Route path="/about" element={<About />} />
+            <Route path="/sponsorship" element={<Sponsorship />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/receipt/:receiptNumber" element={<ReceiptPage />} />
             <Route path="/profile" element={<Profile />} />

@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { useReceipt } from '@/hooks/useSponsorships';
 import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
+import logo from '@/assets/logo.jpg';
 
 export default function ReceiptPage() {
   const { receiptNumber } = useParams<{ receiptNumber: string }>();
@@ -61,7 +62,7 @@ export default function ReceiptPage() {
           {/* Header */}
           <div className="bg-gradient-to-l from-primary to-primary/80 text-primary-foreground p-8 text-center">
             <div className="flex items-center justify-center gap-3 mb-4">
-              <Heart className="h-10 w-10 fill-primary-foreground/30" />
+              <img src={logo} alt="شعار الجمعية" className="h-16 w-16 rounded-full object-cover border-2 border-primary-foreground/30" />
               <h1 className="text-3xl font-serif font-bold">رعاية الأيتام</h1>
             </div>
             <p className="text-primary-foreground/80">إيصال كفالة يتيم</p>

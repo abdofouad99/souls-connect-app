@@ -95,22 +95,21 @@ export default function AboutPage() {
             </h2>
             <div className="space-y-4">
               {projects.map((project, index) => (
-                <button
+                <div
                   key={index}
                   className={cn(
-                    "w-full flex items-center gap-4 bg-card rounded-xl p-4 shadow-card hover:shadow-lg hover:scale-[1.02] transition-all duration-300 group cursor-pointer",
+                    "w-full flex items-center gap-4 bg-card rounded-xl p-4 shadow-card transition-all duration-300",
                     projectsAnim.isVisible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-8"
                   )}
                   style={{ transitionDelay: projectsAnim.isVisible ? `${100 + index * 80}ms` : '0ms' }}
                 >
-                  <div className="w-14 h-14 bg-background rounded-xl flex items-center justify-center shrink-0 border border-border group-hover:bg-primary/5 transition-colors">
-                    <project.icon className="w-7 h-7 text-primary group-hover:scale-110 transition-transform" />
+                  <div className="w-14 h-14 bg-background rounded-xl flex items-center justify-center shrink-0 border border-border">
+                    <project.icon className="w-7 h-7 text-primary" />
                   </div>
                   <span className="text-lg font-medium text-foreground flex-1 text-right">
                     {project.title}
                   </span>
-                  <ChevronLeft className="w-5 h-5 text-muted-foreground group-hover:text-primary group-hover:-translate-x-1 transition-all" />
-                </button>
+                </div>
               ))}
             </div>
           </section>

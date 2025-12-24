@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Search, ExternalLink, Download } from 'lucide-react';
+import { Search, ExternalLink, Download, Image as ImageIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { Button } from '@/components/ui/button';
@@ -20,6 +20,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 import { useSponsorships, useUpdateSponsorshipStatus } from '@/hooks/useSponsorships';
 import { exportSponsorships } from '@/lib/exportUtils';
 import { toast } from '@/hooks/use-toast';
@@ -124,6 +131,7 @@ export default function SponsorshipsManagement() {
                     <TableHead>النوع</TableHead>
                     <TableHead>المبلغ</TableHead>
                     <TableHead>تاريخ البدء</TableHead>
+                    <TableHead>صورة الإيصال</TableHead>
                     <TableHead>الحالة</TableHead>
                     <TableHead>الإجراءات</TableHead>
                   </TableRow>
@@ -142,6 +150,44 @@ export default function SponsorshipsManagement() {
                       <TableCell>{sponsorship.monthly_amount} ر.س</TableCell>
                       <TableCell>
                         {format(new Date(sponsorship.start_date), 'dd MMM yyyy', { locale: ar })}
+                      </TableCell>
+                      <TableCell>
+                        {(sponsorship as any).receipt_image_url ? (
+                          <Dialog>
+                            <DialogTrigger asChild>
+                              <Button variant="ghost" size="sm" className="gap-1">
+                                <ImageIcon className="h-4 w-4" />
+                                عرض
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent className="max-w-2xl">
+                              <DialogHeader>
+                                <DialogTitle>صورة إيصال الكفالة</DialogTitle>
+                              </DialogHeader>
+                              <div className="mt-4">
+                                <img 
+                                  src={(sponsorship as any).receipt_image_url} 
+                                  alt="صورة الإيصال" 
+                                  className="w-full rounded-lg border border-border"
+                                />
+                              </div>
+                              <div className="flex justify-end mt-4">
+                                <Button asChild variant="outline">
+                                  <a 
+                                    href={(sponsorship as any).receipt_image_url} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                  >
+                                    <ExternalLink className="h-4 w-4 ml-2" />
+                                    فتح في نافذة جديدة
+                                  </a>
+                                </Button>
+                              </div>
+                            </DialogContent>
+                          </Dialog>
+                        ) : (
+                          <span className="text-muted-foreground text-sm">لا يوجد</span>
+                        )}
                       </TableCell>
                       <TableCell>
                         <Select

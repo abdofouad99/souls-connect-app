@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
-import { Heart, Phone, Mail, MapPin } from 'lucide-react';
+import { Phone, Mail, MapPin } from 'lucide-react';
+import logo from '@/assets/logo.jpg';
 
 export function Footer() {
   return (
@@ -9,7 +10,7 @@ export function Footer() {
           {/* About */}
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <Heart className="h-6 w-6 fill-secondary text-secondary" />
+              <img src={logo} alt="شعار الجمعية" className="h-10 w-10 rounded-full object-cover" />
               <span className="text-lg font-serif font-bold">رعاية الأيتام</span>
             </div>
             <p className="text-primary-foreground/80 text-sm leading-relaxed">

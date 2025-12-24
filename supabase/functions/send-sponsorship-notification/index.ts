@@ -137,7 +137,8 @@ const handler = async (req: Request): Promise<Response> => {
       adminEmail: ADMIN_EMAIL 
     });
 
-    const emailResponse = await fetch("https://api.resend.com/emails", {
+    // إرسال بريد للمشرف
+    const adminEmailResponse = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${RESEND_API_KEY}`,
@@ -169,7 +170,6 @@ const handler = async (req: Request): Promise<Response> => {
               .amount-label { font-size: 14px; color: #64748b; text-align: center; margin-top: -15px; }
               .receipt-badge { background: ${hasReceiptImage ? '#10b981' : '#f59e0b'}; color: white; padding: 4px 12px; border-radius: 12px; font-size: 12px; }
               .footer { background: #f8fafc; padding: 20px; text-align: center; color: #64748b; font-size: 12px; }
-              .cta-button { display: inline-block; background: #4D3116; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; margin-top: 20px; }
             </style>
           </head>
           <body>
@@ -249,14 +249,138 @@ const handler = async (req: Request): Promise<Response> => {
       }),
     });
 
-    const emailData = await emailResponse.json();
-    console.log("Email API response:", emailData);
+    const adminEmailData = await adminEmailResponse.json();
+    console.log("Admin email API response:", adminEmailData);
 
-    if (!emailResponse.ok) {
-      throw new Error(emailData.message || "Failed to send email");
+    // إرسال بريد تأكيد للكفيل
+    const sponsorEmailResponse = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${RESEND_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        from: "نظام الكفالة <onboarding@resend.dev>",
+        to: [sponsorEmail],
+        subject: `تأكيد كفالتك لليتيم ${safeOrphanName}`,
+        html: `
+          <!DOCTYPE html>
+          <html dir="rtl" lang="ar">
+          <head>
+            <meta charset="UTF-8">
+            <style>
+              body { font-family: 'Segoe UI', Tahoma, Arial, sans-serif; background-color: #FBFBF0; margin: 0; padding: 20px; direction: rtl; }
+              .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+              .header { background: linear-gradient(135deg, #4D3116, #6B4423); color: white; padding: 40px 30px; text-align: center; }
+              .header h1 { margin: 0; font-size: 28px; }
+              .header p { margin: 15px 0 0; opacity: 0.9; font-size: 16px; }
+              .content { padding: 30px; }
+              .thank-you { text-align: center; padding: 20px 0; }
+              .thank-you h2 { color: #4D3116; font-size: 24px; margin: 0; }
+              .thank-you p { color: #64748b; font-size: 16px; line-height: 1.8; margin: 15px 0 0; }
+              .hadith-box { background: linear-gradient(135deg, #fef3c7, #fde68a); border-radius: 12px; padding: 25px; margin: 25px 0; text-align: center; border: 2px solid #f59e0b; }
+              .hadith-text { font-size: 20px; color: #92400e; font-weight: bold; line-height: 1.8; }
+              .hadith-source { font-size: 14px; color: #b45309; margin-top: 10px; }
+              .info-box { background: #f8fafc; border-radius: 8px; padding: 20px; margin: 20px 0; border-right: 4px solid #10b981; }
+              .info-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #e2e8f0; }
+              .info-row:last-child { border-bottom: none; }
+              .info-label { color: #64748b; font-size: 14px; }
+              .info-value { color: #1e293b; font-weight: 600; font-size: 14px; }
+              .amount-box { background: linear-gradient(135deg, #4D3116, #6B4423); color: white; border-radius: 12px; padding: 25px; margin: 25px 0; text-align: center; }
+              .amount { font-size: 36px; font-weight: bold; margin: 0; }
+              .amount-label { font-size: 14px; opacity: 0.9; margin-top: 5px; }
+              .receipt-box { background: #ecfdf5; border: 2px dashed #10b981; border-radius: 8px; padding: 15px; text-align: center; margin: 20px 0; }
+              .receipt-number { font-size: 18px; font-weight: bold; color: #059669; font-family: monospace; }
+              .footer { background: #f8fafc; padding: 25px; text-align: center; color: #64748b; font-size: 12px; }
+              .social-note { background: #eff6ff; border-radius: 8px; padding: 15px; margin: 20px 0; text-align: center; color: #1e40af; }
+            </style>
+          </head>
+          <body>
+            <div class="container">
+              <div class="header">
+                <h1>🤲 جزاك الله خيراً</h1>
+                <p>تم تسجيل كفالتك بنجاح</p>
+              </div>
+              <div class="content">
+                <div class="thank-you">
+                  <h2>شكراً لك ${safeSponsorName}</h2>
+                  <p>
+                    بارك الله فيك وفي مالك، وجعل كفالتك لليتيم ${safeOrphanName} في ميزان حسناتك.
+                    <br>
+                    أنت الآن شريك في إعادة البسمة لطفل يتيم في غزة.
+                  </p>
+                </div>
+
+                <div class="hadith-box">
+                  <p class="hadith-text">«أنا وكافل اليتيم في الجنة هكذا»</p>
+                  <p class="hadith-text">وأشار بالسبابة والوسطى</p>
+                  <p class="hadith-source">- رواه البخاري</p>
+                </div>
+
+                <div class="amount-box">
+                  <p class="amount">${totalAmount.toLocaleString('ar-SA')} ر.س</p>
+                  <p class="amount-label">قيمة الكفالة ${getSponsorshipTypeLabel(sponsorshipType)}</p>
+                </div>
+
+                <div class="receipt-box">
+                  <p style="margin: 0 0 5px; color: #059669; font-size: 14px;">رقم الإيصال</p>
+                  <p class="receipt-number">${safeReceiptNumber}</p>
+                </div>
+
+                <div class="info-box">
+                  <h3 style="margin-top: 0; color: #10b981;">تفاصيل الكفالة</h3>
+                  <div class="info-row">
+                    <span class="info-label">اسم اليتيم</span>
+                    <span class="info-value">${safeOrphanName}</span>
+                  </div>
+                  <div class="info-row">
+                    <span class="info-label">نوع الكفالة</span>
+                    <span class="info-value">${getSponsorshipTypeLabel(sponsorshipType)}</span>
+                  </div>
+                  <div class="info-row">
+                    <span class="info-label">طريقة الدفع</span>
+                    <span class="info-value">${getPaymentMethodLabel(paymentMethod)}</span>
+                  </div>
+                  <div class="info-row">
+                    <span class="info-label">تاريخ الكفالة</span>
+                    <span class="info-value">${new Date().toLocaleDateString('ar-SA', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                  </div>
+                </div>
+
+                <div class="social-note">
+                  <p style="margin: 0;">💝 شارك أجر الكفالة مع أحبابك وادعهم للمشاركة في هذا العمل الخيري</p>
+                </div>
+              </div>
+              <div class="footer">
+                <p style="font-size: 14px; color: #4D3116; margin-bottom: 10px;">
+                  نسأل الله أن يتقبل منك ويجعلها في موازين حسناتك
+                </p>
+                <p>هذا البريد تم إرساله تلقائياً من نظام إدارة الكفالات</p>
+                <p style="margin-top: 10px;">جميع الحقوق محفوظة © ${new Date().getFullYear()}</p>
+              </div>
+            </div>
+          </body>
+          </html>
+        `,
+      }),
+    });
+
+    const sponsorEmailData = await sponsorEmailResponse.json();
+    console.log("Sponsor email API response:", sponsorEmailData);
+
+    if (!adminEmailResponse.ok) {
+      console.error("Failed to send admin email:", adminEmailData);
     }
 
-    return new Response(JSON.stringify({ success: true, emailId: emailData.id }), {
+    if (!sponsorEmailResponse.ok) {
+      console.error("Failed to send sponsor email:", sponsorEmailData);
+    }
+
+    return new Response(JSON.stringify({ 
+      success: true, 
+      adminEmailId: adminEmailData.id,
+      sponsorEmailId: sponsorEmailData.id 
+    }), {
       status: 200,
       headers: { "Content-Type": "application/json", ...corsHeaders },
     });

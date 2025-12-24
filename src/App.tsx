@@ -33,6 +33,7 @@ const SponsorsManagement = lazy(() => import("./pages/admin/SponsorsManagement")
 const SponsorshipsManagement = lazy(() => import("./pages/admin/SponsorshipsManagement"));
 const ReceiptsManagement = lazy(() => import("./pages/admin/ReceiptsManagement"));
 const DepositRequestsManagement = lazy(() => import("./pages/admin/DepositRequestsManagement"));
+const NotificationsLog = lazy(() => import("./pages/admin/NotificationsLog"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -107,6 +108,11 @@ const App = () => (
               <Route path="/admin/deposit-requests" element={
                 <ProtectedAdminRoute>
                   <LazyRoute><DepositRequestsManagement /></LazyRoute>
+                </ProtectedAdminRoute>
+              } />
+              <Route path="/admin/notifications" element={
+                <ProtectedAdminRoute>
+                  <LazyRoute><NotificationsLog /></LazyRoute>
                 </ProtectedAdminRoute>
               } />
 

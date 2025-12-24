@@ -89,6 +89,7 @@ interface CreateSponsorshipData {
     phone?: string;
     country?: string;
     preferred_contact: string;
+    user_id?: string;
   };
   orphanId: string;
   type: 'monthly' | 'yearly';

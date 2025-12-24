@@ -222,6 +222,7 @@ export type Database = {
           monthly_amount: number
           orphan_id: string
           payment_method: string
+          receipt_image_url: string | null
           receipt_number: string
           sponsor_id: string
           start_date: string
@@ -236,6 +237,7 @@ export type Database = {
           monthly_amount: number
           orphan_id: string
           payment_method: string
+          receipt_image_url?: string | null
           receipt_number: string
           sponsor_id: string
           start_date?: string
@@ -250,6 +252,7 @@ export type Database = {
           monthly_amount?: number
           orphan_id?: string
           payment_method?: string
+          receipt_image_url?: string | null
           receipt_number?: string
           sponsor_id?: string
           start_date?: string

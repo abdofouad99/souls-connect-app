@@ -250,6 +250,17 @@
   background: hsl(var(--primary) / 0.7);
 }
 
+/* Hide Lovable badge */
+#lovable-badge,
+.lovable-badge,
+a[aria-label*="Lovable"],
+iframe[title*="Lovable"],
+div:has(> a[href*="lovable.dev"]) {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
 /* Print styles for receipts */
 @media print {
   body {

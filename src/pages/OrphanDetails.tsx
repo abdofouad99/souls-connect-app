@@ -151,6 +151,7 @@ export default function OrphanDetailsPage() {
           user_id: user.id,
         },
         orphanId: orphan.id,
+        orphanName: orphan.full_name,
         type: formData.sponsorshipType as 'monthly' | 'yearly',
         paymentMethod: formData.paymentMethod,
         monthlyAmount: orphan.monthly_amount,

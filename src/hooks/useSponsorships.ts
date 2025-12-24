@@ -92,6 +92,7 @@ interface CreateSponsorshipData {
     user_id?: string;
   };
   orphanId: string;
+  orphanName: string;
   type: 'monthly' | 'yearly';
   paymentMethod: string;
   monthlyAmount: number;
@@ -238,6 +239,28 @@ export function useCreateSponsorship() {
         .from('orphans')
         .update({ status: newStatus })
         .eq('id', data.orphanId);
+
+      // Send notification email to admin
+      console.log('[useCreateSponsorship] Sending admin notification...');
+      try {
+        await supabase.functions.invoke('send-sponsorship-notification', {
+          body: {
+            sponsorName: data.sponsorData.full_name,
+            sponsorEmail: data.sponsorData.email,
+            sponsorPhone: data.sponsorData.phone,
+            orphanName: data.orphanName,
+            sponsorshipType: data.type,
+            paymentMethod: data.paymentMethod,
+            monthlyAmount: data.monthlyAmount,
+            receiptNumber: receiptNumber,
+            hasReceiptImage: !!data.receiptImageUrl,
+          },
+        });
+        console.log('[useCreateSponsorship] Admin notification sent');
+      } catch (notificationError) {
+        // Don't fail the sponsorship if notification fails
+        console.error('[useCreateSponsorship] Failed to send admin notification:', notificationError);
+      }
 
       console.log('[useCreateSponsorship] Completed successfully!');
       return { receiptNumber, sponsorship };

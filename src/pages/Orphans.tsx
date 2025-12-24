@@ -6,7 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { useOrphans } from '@/hooks/useOrphans';
-
+import { LazyImage } from '@/components/common/LazyImage';
+import { SkeletonCard } from '@/components/common/LoadingSpinner';
 const statusLabels = {
   available: { label: 'متاح للكفالة', class: 'bg-primary text-primary-foreground' },
   partial: { label: 'كفالة جزئية', class: 'bg-secondary text-secondary-foreground' },
@@ -56,7 +57,7 @@ export default function OrphansPage() {
           {isLoading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {[...Array(8)].map((_, i) => (
-                <div key={i} className="bg-card rounded-2xl h-80 animate-pulse" />
+                <SkeletonCard key={i} />
               ))}
             </div>
           ) : filteredOrphans.length === 0 ? (
@@ -74,10 +75,15 @@ export default function OrphansPage() {
                 >
                   <div className="aspect-square bg-muted relative">
                     {orphan.photo_url ? (
-                      <img
+                      <LazyImage
                         src={orphan.photo_url}
-                        alt={orphan.full_name}
-                        className="w-full h-full object-cover"
+                        alt={`صورة اليتيم ${orphan.full_name}`}
+                        className="w-full h-full"
+                        fallback={
+                          <div className="w-full h-full flex items-center justify-center bg-muted">
+                            <Heart className="h-16 w-16 text-muted-foreground/50" />
+                          </div>
+                        }
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">

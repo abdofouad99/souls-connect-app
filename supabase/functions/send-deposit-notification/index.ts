@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
+const ADMIN_EMAIL = Deno.env.get("ADMIN_EMAIL");
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -12,8 +13,42 @@ interface DepositNotificationRequest {
   phoneNumber: string;
   depositAmount: number;
   bankMethod: string;
-  adminEmail: string;
 }
+
+// دالة لتنظيف المدخلات ومنع XSS
+const escapeHtml = (text: string): string => {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+};
+
+// دالة للتحقق من صحة المدخلات
+const validateInput = (data: DepositNotificationRequest): { valid: boolean; error?: string } => {
+  // التحقق من اسم الكفيل
+  if (!data.sponsorName || data.sponsorName.length < 3 || data.sponsorName.length > 100) {
+    return { valid: false, error: "اسم الكفيل غير صالح" };
+  }
+  
+  // التحقق من رقم الجوال
+  if (!data.phoneNumber || !/^[0-9]{10,15}$/.test(data.phoneNumber)) {
+    return { valid: false, error: "رقم الجوال غير صالح" };
+  }
+  
+  // التحقق من المبلغ
+  if (!data.depositAmount || data.depositAmount <= 0 || data.depositAmount > 10000000) {
+    return { valid: false, error: "مبلغ الإيداع غير صالح" };
+  }
+  
+  // التحقق من طريقة التحويل
+  if (!data.bankMethod || data.bankMethod.length < 2 || data.bankMethod.length > 200) {
+    return { valid: false, error: "طريقة التحويل غير صالحة" };
+  }
+  
+  return { valid: true };
+};
 
 const handler = async (req: Request): Promise<Response> => {
   console.log("Received request to send deposit notification");
@@ -24,9 +59,39 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { sponsorName, phoneNumber, depositAmount, bankMethod, adminEmail }: DepositNotificationRequest = await req.json();
+    // التحقق من وجود بريد المسؤول
+    if (!ADMIN_EMAIL) {
+      console.error("ADMIN_EMAIL environment variable is not set");
+      return new Response(
+        JSON.stringify({ error: "Server configuration error" }),
+        { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
 
-    console.log("Sending notification for deposit request:", { sponsorName, depositAmount, adminEmail });
+    const requestData: DepositNotificationRequest = await req.json();
+    
+    // التحقق من صحة المدخلات
+    const validation = validateInput(requestData);
+    if (!validation.valid) {
+      console.error("Validation failed:", validation.error);
+      return new Response(
+        JSON.stringify({ error: validation.error }),
+        { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
+    const { sponsorName, phoneNumber, depositAmount, bankMethod } = requestData;
+
+    // تنظيف المدخلات لمنع XSS في البريد الإلكتروني
+    const safeSponsorName = escapeHtml(sponsorName);
+    const safePhoneNumber = escapeHtml(phoneNumber);
+    const safeBankMethod = escapeHtml(bankMethod);
+
+    console.log("Sending notification for deposit request:", { 
+      sponsorName: safeSponsorName, 
+      depositAmount, 
+      adminEmail: ADMIN_EMAIL 
+    });
 
     // Send email using Resend API directly
     const emailResponse = await fetch("https://api.resend.com/emails", {
@@ -37,7 +102,7 @@ const handler = async (req: Request): Promise<Response> => {
       },
       body: JSON.stringify({
         from: "نظام الكفالة <onboarding@resend.dev>",
-        to: [adminEmail],
+        to: [ADMIN_EMAIL], // استخدام متغير البيئة بدلاً من مدخلات العميل
         subject: "طلب سند إيداع جديد",
         html: `
           <!DOCTYPE html>
@@ -72,15 +137,15 @@ const handler = async (req: Request): Promise<Response> => {
                 <div class="info-box">
                   <div class="info-row">
                     <span class="info-label">اسم الكفيل</span>
-                    <span class="info-value">${sponsorName}</span>
+                    <span class="info-value">${safeSponsorName}</span>
                   </div>
                   <div class="info-row">
                     <span class="info-label">رقم الجوال</span>
-                    <span class="info-value" dir="ltr">${phoneNumber}</span>
+                    <span class="info-value" dir="ltr">${safePhoneNumber}</span>
                   </div>
                   <div class="info-row">
                     <span class="info-label">طريقة التحويل</span>
-                    <span class="info-value">${bankMethod}</span>
+                    <span class="info-value">${safeBankMethod}</span>
                   </div>
                   <div class="info-row">
                     <span class="info-label">تاريخ الطلب</span>
@@ -116,7 +181,7 @@ const handler = async (req: Request): Promise<Response> => {
   } catch (error: any) {
     console.error("Error in send-deposit-notification function:", error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: "حدث خطأ أثناء إرسال الإشعار" }),
       {
         status: 500,
         headers: { "Content-Type": "application/json", ...corsHeaders },

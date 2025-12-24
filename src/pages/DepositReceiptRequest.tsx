@@ -150,7 +150,7 @@ export default function DepositReceiptRequest() {
             phoneNumber: data.phoneNumber,
             depositAmount: Number(data.depositAmount),
             bankMethod: data.bankMethod,
-            adminEmail: 'admin@example.com', // يمكن تغييره لبريد المسؤول الفعلي
+            // لم يعد يتم إرسال adminEmail - يتم استخدام متغير البيئة ADMIN_EMAIL
           },
         });
         console.log('Email notification sent');

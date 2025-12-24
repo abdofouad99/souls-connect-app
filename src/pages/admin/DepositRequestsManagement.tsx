@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { Button } from '@/components/ui/button';
@@ -27,9 +27,79 @@ import {
 } from '@/components/ui/dialog';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Search, Eye, CheckCircle, XCircle, Clock, ExternalLink } from 'lucide-react';
+import { Search, Eye, CheckCircle, XCircle, Clock, ExternalLink, Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
+
+// Component لعرض صورة الإيصال باستخدام signed URL
+const ReceiptImageViewer = ({ imageUrl }: { imageUrl: string }) => {
+  const [signedUrl, setSignedUrl] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const getSignedUrl = async () => {
+      try {
+        // استخراج اسم الملف من URL
+        const urlParts = imageUrl.split('/deposit-receipts/');
+        if (urlParts.length < 2) {
+          setError('رابط الصورة غير صالح');
+          setIsLoading(false);
+          return;
+        }
+        
+        const filePath = urlParts[1];
+        
+        // الحصول على signed URL صالح لمدة ساعة
+        const { data, error: signedUrlError } = await supabase.storage
+          .from('deposit-receipts')
+          .createSignedUrl(filePath, 3600); // صالح لمدة ساعة
+
+        if (signedUrlError) {
+          console.error('Error creating signed URL:', signedUrlError);
+          setError('فشل في تحميل الصورة');
+        } else {
+          setSignedUrl(data.signedUrl);
+        }
+      } catch (err) {
+        console.error('Error:', err);
+        setError('حدث خطأ أثناء تحميل الصورة');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    getSignedUrl();
+  }, [imageUrl]);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center gap-2 text-muted-foreground">
+        <Loader2 className="h-4 w-4 animate-spin" />
+        جاري تحميل الصورة...
+      </div>
+    );
+  }
+
+  if (error) {
+    return <p className="text-sm text-destructive">{error}</p>;
+  }
+
+  return (
+    <div>
+      <p className="text-sm text-muted-foreground mb-2">صورة الإيصال</p>
+      <a
+        href={signedUrl || '#'}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-flex items-center gap-2 text-primary hover:underline"
+      >
+        <ExternalLink className="h-4 w-4" />
+        عرض الصورة
+      </a>
+    </div>
+  );
+};
 
 interface DepositRequest {
   id: string;
@@ -286,18 +356,7 @@ export default function DepositRequestsManagement() {
                 </div>
 
                 {selectedRequest.receipt_image_url && (
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-2">صورة الإيصال</p>
-                    <a
-                      href={selectedRequest.receipt_image_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 text-primary hover:underline"
-                    >
-                      <ExternalLink className="h-4 w-4" />
-                      عرض الصورة
-                    </a>
-                  </div>
+                  <ReceiptImageViewer imageUrl={selectedRequest.receipt_image_url} />
                 )}
 
                 {selectedRequest.status === 'pending' && (

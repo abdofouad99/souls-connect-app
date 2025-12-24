@@ -125,6 +125,16 @@ export default function OrphanDetailsPage() {
         return;
       }
 
+      // Validate receipt image for bank transfer
+      if (formData.paymentMethod === 'bank_transfer' && !receiptFile) {
+        toast({
+          title: 'صورة الإيصال مطلوبة',
+          description: 'يرجى رفع صورة إيصال التحويل البنكي',
+          variant: 'destructive',
+        });
+        return;
+      }
+
       // Upload receipt image if exists
       let receiptImageUrl: string | null = null;
       if (receiptFile) {
@@ -352,9 +362,14 @@ export default function OrphanDetailsPage() {
 
                     {/* Receipt Image Upload */}
                     <div>
-                      <Label>صورة الإيصال / الحوالة</Label>
+                      <Label>
+                        صورة الإيصال / الحوالة
+                        {formData.paymentMethod === 'bank_transfer' && <span className="text-destructive mr-1">*</span>}
+                      </Label>
                       <p className="text-xs text-muted-foreground mb-2">
-                        يمكنك رفع صورة إيصال الدفع أو الحوالة البنكية (اختياري)
+                        {formData.paymentMethod === 'bank_transfer' 
+                          ? 'يرجى رفع صورة إيصال التحويل البنكي (إلزامي)'
+                          : 'يمكنك رفع صورة إيصال الدفع أو الحوالة البنكية (اختياري)'}
                       </p>
                       <input
                         type="file"

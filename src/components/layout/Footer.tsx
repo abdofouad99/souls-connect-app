@@ -10,8 +10,8 @@ export function Footer() {
           {/* About */}
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <img src={logo} alt="شعار الجمعية" className="h-10 w-10 rounded-full object-cover" />
-              <span className="text-lg font-serif font-bold">رعاية الأيتام</span>
+              <img src={logo} alt="شعار جمعية الأقصى" className="h-10 w-10 rounded-full object-cover" />
+              <span className="text-lg font-serif font-bold">جمعية الأقصى لرعاية الأيتام</span>
             </div>
             <p className="text-primary-foreground/80 text-sm leading-relaxed">
               نسعى لتوفير حياة كريمة للأيتام من خلال برامج الكفالة والدعم المستمر.

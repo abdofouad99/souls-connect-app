@@ -125,6 +125,12 @@ export default function OrphanDetailsPage() {
         return;
       }
 
+      // Upload receipt image if exists
+      let receiptImageUrl: string | null = null;
+      if (receiptFile) {
+        receiptImageUrl = await uploadReceiptImage();
+      }
+
       const result = await createSponsorship.mutateAsync({
         sponsorData: {
           full_name: formData.fullName,
@@ -138,6 +144,7 @@ export default function OrphanDetailsPage() {
         type: formData.sponsorshipType as 'monthly' | 'yearly',
         paymentMethod: formData.paymentMethod,
         monthlyAmount: orphan.monthly_amount,
+        receiptImageUrl: receiptImageUrl || undefined,
       });
 
       console.log('[Sponsorship] Success! Receipt:', result.receiptNumber);

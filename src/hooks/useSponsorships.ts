@@ -95,6 +95,7 @@ interface CreateSponsorshipData {
   type: 'monthly' | 'yearly';
   paymentMethod: string;
   monthlyAmount: number;
+  receiptImageUrl?: string;
 }
 
 export function useCreateSponsorship() {
@@ -186,6 +187,7 @@ export function useCreateSponsorship() {
           payment_method: data.paymentMethod,
           receipt_number: receiptNumber,
           status: 'active',
+          receipt_image_url: data.receiptImageUrl || null,
         })
         .select()
         .single();

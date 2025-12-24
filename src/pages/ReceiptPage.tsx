@@ -181,7 +181,7 @@ export default function ReceiptPage() {
             {/* Footer */}
             <div className="mt-8 pt-6 border-t border-border text-center text-sm text-muted-foreground">
               <p>جزاكم الله خيراً على مساهمتكم في رعاية الأيتام</p>
-              <p className="mt-2">للاستفسارات: info@orphan-care.org</p>
+              <p className="mt-2">للاستفسارات: 0595765498 - 0597865987</p>
             </div>
           </div>
         </div>

@@ -42,7 +42,7 @@ export default function ReceiptPage() {
   const sponsor = sponsorship?.sponsor;
 
   return (
-    <div className="min-h-screen bg-muted py-8">
+    <div className="min-h-screen bg-gradient-to-b from-primary/5 to-background py-8">
       {/* Print Controls - Hidden when printing */}
       <div className="no-print container max-w-3xl mb-6 flex items-center justify-between">
         <Button variant="ghost" onClick={() => navigate(-1)}>
@@ -57,14 +57,14 @@ export default function ReceiptPage() {
 
       {/* Receipt */}
       <div className="container max-w-3xl">
-        <div className="bg-card rounded-2xl shadow-card overflow-hidden print:shadow-none print:rounded-none">
+        <div className="bg-card border-2 border-primary/30 rounded-2xl shadow-card overflow-hidden print:shadow-none print:rounded-none print:border-0">
           {/* Header */}
-          <div className="bg-gradient-to-l from-emerald-600 to-teal-500 text-white p-8 text-center">
+          <div className="bg-gradient-to-l from-primary to-primary/80 text-primary-foreground p-8 text-center">
             <div className="flex items-center justify-center gap-3 mb-4">
-              <Heart className="h-10 w-10 fill-white/30" />
+              <Heart className="h-10 w-10 fill-primary-foreground/30" />
               <h1 className="text-3xl font-serif font-bold">رعاية الأيتام</h1>
             </div>
-            <p className="text-white/80">إيصال كفالة يتيم</p>
+            <p className="text-primary-foreground/80">إيصال كفالة يتيم</p>
           </div>
 
           {/* Content */}

@@ -4,6 +4,13 @@ import { Quote, Heart } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
 
+import thankYou1 from "@/assets/thank-you-1.jpg";
+import thankYou2 from "@/assets/thank-you-2.jpg";
+import thankYou3 from "@/assets/thank-you-3.jpg";
+import thankYou4 from "@/assets/thank-you-4.jpg";
+import thankYou5 from "@/assets/thank-you-5.jpg";
+import thankYou6 from "@/assets/thank-you-6.jpg";
+
 const Sponsorship = () => {
   const heroAnimation = useScrollAnimation();
   const textAnimation = useScrollAnimation();
@@ -11,14 +18,13 @@ const Sponsorship = () => {
   const mediaAnimation = useScrollAnimation();
   const ctaAnimation = useScrollAnimation();
 
-  // Placeholder images for thank you section
   const thankYouImages = [
-    "/placeholder.svg",
-    "/placeholder.svg",
-    "/placeholder.svg",
-    "/placeholder.svg",
-    "/placeholder.svg",
-    "/placeholder.svg",
+    thankYou1,
+    thankYou2,
+    thankYou3,
+    thankYou4,
+    thankYou5,
+    thankYou6,
   ];
 
   return (

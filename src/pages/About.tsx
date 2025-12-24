@@ -1,69 +1,97 @@
-import { Heart, Phone, Mail, MapPin } from 'lucide-react';
+import { Heart, Package, Home, HandHeart, Sprout, ChevronLeft } from 'lucide-react';
 import { Layout } from '@/components/layout/Layout';
-import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom';
+
+const projects = [
+  { icon: Heart, title: 'مشاريع الكفالات' },
+  { icon: Package, title: 'مشاريع الإغاثة' },
+  { icon: Home, title: 'مشاريع الإعمار' },
+  { icon: HandHeart, title: 'مشاريع الإغاثية' },
+  { icon: Sprout, title: 'مشاريع التنموية' },
+];
 
 export default function AboutPage() {
   return (
     <Layout>
-      <div className="min-h-screen bg-background">
-        {/* Header */}
-        <section className="bg-gradient-to-l from-primary/10 to-accent/10 py-20">
-          <div className="container text-center">
-            <Heart className="h-16 w-16 mx-auto text-primary fill-primary/20 mb-6" />
-            <h1 className="text-4xl md:text-5xl font-serif font-bold text-foreground mb-4">من نحن</h1>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              نسعى لتوفير حياة كريمة للأيتام من خلال برامج الكفالة والدعم المستمر
+      <div className="min-h-screen bg-beige-light">
+        <div className="container py-12 px-4 max-w-3xl mx-auto">
+          
+          {/* رؤيتنا */}
+          <section className="text-center mb-10">
+            <h2 className="text-3xl md:text-4xl font-serif font-bold text-brown mb-4">
+              رؤيتنا
+            </h2>
+            <p className="text-brown-light text-lg leading-relaxed">
+              الريادة في العمل الخيري لدعم الشعب الفلسطيني محلياً وإقليمياً ودولياً
             </p>
-          </div>
-        </section>
+          </section>
 
-        {/* Mission */}
-        <section className="py-16">
-          <div className="container max-w-4xl">
-            <div className="prose prose-lg mx-auto text-center">
-              <h2 className="text-3xl font-serif font-bold text-foreground mb-6">رسالتنا</h2>
-              <p className="text-muted-foreground leading-relaxed mb-8">
-                نؤمن بأن كل يتيم يستحق حياة كريمة مليئة بالأمل والفرص. من خلال برامج الكفالة المتكاملة،
-                نسعى لتوفير التعليم والرعاية الصحية والدعم النفسي لكل يتيم تحت رعايتنا.
-                هدفنا هو بناء جيل واعٍ قادر على المساهمة في بناء مجتمعه.
-              </p>
-            </div>
-          </div>
-        </section>
+          {/* فاصل */}
+          <div className="w-full h-px bg-brown/20 my-8" />
 
-        {/* Contact */}
-        <section className="py-16 bg-card">
-          <div className="container max-w-4xl">
-            <h2 className="text-3xl font-serif font-bold text-foreground text-center mb-10">تواصل معنا</h2>
-            
-            <div className="grid md:grid-cols-3 gap-6">
-              <div className="bg-background rounded-2xl p-6 text-center shadow-card">
-                <Phone className="h-10 w-10 mx-auto text-primary mb-4" />
-                <h3 className="font-bold text-foreground mb-2">الهاتف</h3>
-                <p className="text-muted-foreground" dir="ltr">+966 50 123 4567</p>
-              </div>
-              
-              <div className="bg-background rounded-2xl p-6 text-center shadow-card">
-                <Mail className="h-10 w-10 mx-auto text-primary mb-4" />
-                <h3 className="font-bold text-foreground mb-2">البريد الإلكتروني</h3>
-                <p className="text-muted-foreground">info@orphan-care.org</p>
-              </div>
-              
-              <div className="bg-background rounded-2xl p-6 text-center shadow-card">
-                <MapPin className="h-10 w-10 mx-auto text-primary mb-4" />
-                <h3 className="font-bold text-foreground mb-2">العنوان</h3>
-                <p className="text-muted-foreground">المملكة العربية السعودية</p>
-              </div>
+          {/* أهدافنا */}
+          <section className="mb-10">
+            <h2 className="text-3xl md:text-4xl font-serif font-bold text-brown text-center mb-6">
+              أهدافنا
+            </h2>
+            <div className="bg-beige rounded-2xl p-6 shadow-card">
+              <ol className="list-decimal list-inside space-y-4 text-brown-light text-lg leading-relaxed">
+                <li>العمل في القضية الفلسطينية.</li>
+                <li>
+                  دعم الشعب الفلسطيني مادياً ومعنوياً من خلال تنفيذ المشاريع الخيرية والإنسانية المختلفة.
+                </li>
+                <li>مساندة قضية الأقصى والقدس الشريف.</li>
+              </ol>
             </div>
+          </section>
 
-            <div className="text-center mt-10">
-              <Button asChild variant="hero" size="lg">
-                <Link to="/orphans">ابدأ الكفالة الآن</Link>
-              </Button>
+          {/* فاصل */}
+          <div className="w-full h-px bg-brown/20 my-8" />
+
+          {/* مشاريعنا */}
+          <section className="mb-10">
+            <h2 className="text-3xl md:text-4xl font-serif font-bold text-brown text-center mb-6">
+              مشاريعنا
+            </h2>
+            <div className="space-y-4">
+              {projects.map((project, index) => (
+                <button
+                  key={index}
+                  className="w-full flex items-center gap-4 bg-beige rounded-xl p-4 shadow-card hover:shadow-lg hover:scale-[1.01] transition-all duration-200 group cursor-pointer"
+                >
+                  <div className="w-14 h-14 bg-beige-light rounded-xl flex items-center justify-center shrink-0 border border-brown/10">
+                    <project.icon className="w-7 h-7 text-brown" />
+                  </div>
+                  <span className="text-lg font-medium text-brown flex-1 text-right">
+                    {project.title}
+                  </span>
+                  <ChevronLeft className="w-5 h-5 text-brown/40 group-hover:text-brown transition-colors" />
+                </button>
+              ))}
             </div>
-          </div>
-        </section>
+          </section>
+
+          {/* فاصل */}
+          <div className="w-full h-px bg-brown/20 my-8" />
+
+          {/* فيديو مونتاج الجمعية */}
+          <section className="mb-10">
+            <h2 className="text-3xl md:text-4xl font-serif font-bold text-brown text-center mb-6">
+              فيديو مونتاج الجمعية
+            </h2>
+            <div className="bg-beige rounded-2xl p-4 shadow-card">
+              <div className="aspect-video w-full rounded-xl overflow-hidden">
+                <iframe
+                  className="w-full h-full"
+                  src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+                  title="فيديو مونتاج الجمعية"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              </div>
+            </div>
+          </section>
+
+        </div>
       </div>
     </Layout>
   );

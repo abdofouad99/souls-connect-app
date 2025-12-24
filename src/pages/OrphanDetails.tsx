@@ -55,7 +55,13 @@ export default function OrphanDetailsPage() {
         monthlyAmount: orphan.monthly_amount,
       });
 
-      navigate(`/thank-you/${result.receiptNumber}`);
+      // Navigate to sponsor thank you page with details
+      const params = new URLSearchParams({
+        name: formData.fullName,
+        amount: (formData.sponsorshipType === 'yearly' ? orphan.monthly_amount * 12 : orphan.monthly_amount).toString(),
+        receipt: result.receiptNumber,
+      });
+      navigate(`/thanks?${params.toString()}`);
     } catch (error) {
       toast({
         title: 'حدث خطأ',

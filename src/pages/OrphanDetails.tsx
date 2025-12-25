@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Heart, MapPin, Calendar, ArrowRight, Upload, X, ImageIcon, Loader2 } from 'lucide-react';
+import { Heart, MapPin, Calendar, ArrowRight, Upload, X, ImageIcon, Loader2, Copy, Check } from 'lucide-react';
 import { Layout } from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -19,6 +19,82 @@ const statusLabels = {
   partial: { label: 'كفالة جزئية', class: 'bg-secondary text-secondary-foreground' },
   full: { label: 'مكفول', class: 'bg-muted text-muted-foreground' },
 };
+
+// Bank accounts data - replace placeholders with actual data later
+const bankAccounts = [
+  {
+    bankName: 'BANK_NAME_1',
+    accountName: 'ACCOUNT_NAME_1',
+    iban: 'SA00 0000 0000 0000 0000 0000',
+  },
+  {
+    bankName: 'BANK_NAME_2',
+    accountName: 'ACCOUNT_NAME_2',
+    iban: 'SA00 0000 0000 0000 0000 0001',
+  },
+  {
+    bankName: 'BANK_NAME_3',
+    accountName: 'ACCOUNT_NAME_3',
+    iban: 'SA00 0000 0000 0000 0000 0002',
+  },
+];
+
+function BankAccountsSection() {
+  const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
+
+  const copyToClipboard = async (text: string, index: number) => {
+    try {
+      await navigator.clipboard.writeText(text.replace(/\s/g, ''));
+      setCopiedIndex(index);
+      setTimeout(() => setCopiedIndex(null), 2000);
+    } catch (err) {
+      console.error('Failed to copy:', err);
+    }
+  };
+
+  return (
+    <div className="bg-muted/50 rounded-xl p-4 border border-border">
+      <h3 className="font-bold text-foreground mb-3">بيانات الحسابات البنكية</h3>
+      <div className="space-y-4">
+        {bankAccounts.map((account, index) => (
+          <div key={index} className="bg-card rounded-lg p-3 border border-border">
+            <div className="text-sm text-muted-foreground mb-1">اسم البنك</div>
+            <div className="font-medium text-foreground mb-2 select-all">{account.bankName}</div>
+            
+            <div className="text-sm text-muted-foreground mb-1">اسم الحساب</div>
+            <div className="font-medium text-foreground mb-2 select-all">{account.accountName}</div>
+            
+            <div className="text-sm text-muted-foreground mb-1">رقم الحساب / IBAN</div>
+            <div className="flex items-center gap-2">
+              <code className="flex-1 bg-muted px-2 py-1 rounded text-sm font-mono select-all" dir="ltr">
+                {account.iban}
+              </code>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => copyToClipboard(account.iban, index)}
+                className="shrink-0"
+              >
+                {copiedIndex === index ? (
+                  <>
+                    <Check className="h-4 w-4 text-green-500" />
+                    <span className="mr-1 text-green-500">تم النسخ</span>
+                  </>
+                ) : (
+                  <>
+                    <Copy className="h-4 w-4" />
+                    <span className="mr-1">نسخ</span>
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 export default function OrphanDetailsPage() {
   const { id } = useParams<{ id: string }>();
@@ -351,15 +427,13 @@ export default function OrphanDetailsPage() {
 
                     <div>
                       <Label>طريقة الدفع *</Label>
-                      <Select value={formData.paymentMethod} onValueChange={(v) => setFormData({ ...formData, paymentMethod: v })}>
-                        <SelectTrigger className="mt-2"><SelectValue /></SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="bank_transfer">تحويل بنكي</SelectItem>
-                          <SelectItem value="credit_card">بطاقة ائتمان</SelectItem>
-                          <SelectItem value="cash">نقداً</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <div className="mt-2 px-3 py-2 bg-muted rounded-md text-foreground">
+                        تحويل بنكي
+                      </div>
                     </div>
+
+                    {/* Bank Account Details Section */}
+                    <BankAccountsSection />
 
                     {/* Receipt Image Upload */}
                     <div>

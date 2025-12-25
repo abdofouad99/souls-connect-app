@@ -65,7 +65,8 @@ export function useCreateSponsorshipRequest() {
 
   return useMutation({
     mutationFn: async (data: CreateSponsorshipRequestData) => {
-      const { data: result, error } = await supabase
+      // Use minimal insert without .select() to avoid RLS SELECT permission requirement
+      const { error } = await supabase
         .from('sponsorship_requests')
         .insert({
           sponsor_full_name: data.sponsor_full_name,
@@ -78,12 +79,10 @@ export function useCreateSponsorshipRequest() {
           payment_method: 'تحويل بنكي',
           transfer_receipt_image: data.transfer_receipt_image || null,
           admin_status: 'pending',
-        })
-        .select()
-        .single();
+        });
 
       if (error) throw error;
-      return result;
+      return { success: true };
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['sponsorship-requests'] });

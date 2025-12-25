@@ -1,4 +1,5 @@
 import { useParams, useNavigate } from 'react-router-dom';
+import { useRef } from 'react';
 import { Printer, ArrowRight, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useReceipt } from '@/hooks/useSponsorships';
@@ -10,6 +11,7 @@ export default function ReceiptPage() {
   const { receiptNumber } = useParams<{ receiptNumber: string }>();
   const navigate = useNavigate();
   const { data: receipt, isLoading, error } = useReceipt(receiptNumber || '');
+  const receiptRef = useRef<HTMLDivElement>(null);
 
   const handlePrint = () => {
     window.print();
@@ -57,8 +59,8 @@ export default function ReceiptPage() {
       </div>
 
       {/* Receipt */}
-      <div className="container max-w-3xl">
-        <div className="bg-card border-2 border-primary/30 rounded-2xl shadow-card overflow-hidden print:shadow-none print:rounded-none print:border-0">
+      <div className="container max-w-3xl" ref={receiptRef}>
+        <div className="bg-card border-2 border-primary/30 rounded-2xl shadow-card overflow-hidden print:shadow-none print:rounded-none print:border-0 print-receipt">
           {/* Header */}
           <div className="bg-gradient-to-l from-primary to-primary/80 text-primary-foreground p-8 text-center">
             <div className="flex items-center justify-center gap-3 mb-4">
@@ -182,13 +184,15 @@ export default function ReceiptPage() {
             <div className="mt-8 pt-6 border-t border-border text-center text-sm text-muted-foreground">
               <p>جزاكم الله خيراً على مساهمتكم في رعاية الأيتام</p>
               <p className="mt-2">للاستفسارات: 77243079 - 04251675 - 784665006</p>
-              <Button 
-                variant="hero" 
-                className="mt-6 no-print" 
-                onClick={() => navigate('/')}
-              >
-                العودة للصفحة الرئيسية
-              </Button>
+              <div className="no-print">
+                <Button 
+                  variant="hero" 
+                  className="mt-6" 
+                  onClick={() => navigate('/')}
+                >
+                  العودة للصفحة الرئيسية
+                </Button>
+              </div>
             </div>
           </div>
         </div>

@@ -139,9 +139,9 @@ export default function AboutPage() {
               <div className="aspect-video w-full rounded-xl overflow-hidden">
                 <iframe
                   className="w-full h-full"
-                  src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+                  src="https://drive.google.com/file/d/1FLVCVSlCuTczk3d4YpBfGD6NkRQkGDwV/preview"
                   title="فيديو مونتاج الجمعية"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allow="autoplay; encrypted-media"
                   allowFullScreen
                 />
               </div>

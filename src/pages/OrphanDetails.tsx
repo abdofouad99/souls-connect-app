@@ -217,9 +217,31 @@ export default function OrphanDetailsPage() {
       navigate(`/thanks?${params.toString()}`);
     } catch (error: any) {
       console.error('[SponsorshipRequest] Error:', error);
+      console.error('[SponsorshipRequest] Error details:', {
+        message: error?.message,
+        code: error?.code,
+        status: error?.status,
+        details: error?.details,
+      });
+      
+      // Better error messages based on error type
+      let errorMessage = 'لم نتمكن من إرسال طلب الكفالة. يرجى المحاولة مرة أخرى.';
+      
+      if (error?.message?.includes('fetch') || error?.message?.includes('network')) {
+        errorMessage = 'تعذر الاتصال بالخادم. يرجى التحقق من اتصالك بالإنترنت.';
+      } else if (error?.code === '23505') {
+        errorMessage = 'يوجد طلب كفالة سابق بنفس البيانات.';
+      } else if (error?.code === '42501' || error?.status === 403 || error?.status === 401) {
+        errorMessage = 'لا تملك صلاحية تنفيذ هذه العملية.';
+      } else if (error?.code === '413' || error?.message?.includes('too large')) {
+        errorMessage = 'حجم الملف كبير جداً. الحد الأقصى 5MB.';
+      } else if (error?.code?.startsWith('22') || error?.status === 400) {
+        errorMessage = 'تأكد من إدخال جميع البيانات المطلوبة بشكل صحيح.';
+      }
+      
       toast({
         title: 'حدث خطأ',
-        description: 'لم نتمكن من إرسال طلب الكفالة. يرجى المحاولة مرة أخرى.',
+        description: errorMessage,
         variant: 'destructive',
       });
     } finally {

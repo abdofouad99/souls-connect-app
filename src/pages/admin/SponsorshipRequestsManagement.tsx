@@ -75,13 +75,24 @@ export default function SponsorshipRequestsManagement() {
 
   const handleApprove = async (request: SponsorshipRequest) => {
     try {
+      console.log('[Approve] Approving request:', request.id);
       await updateStatus.mutateAsync({
         id: request.id,
         admin_status: 'approved',
       });
+      console.log('[Approve] Success');
       toast({ title: 'تم اعتماد الطلب بنجاح' });
-    } catch (error) {
-      toast({ title: 'حدث خطأ', variant: 'destructive' });
+      // Close details dialog if open
+      if (selectedRequest?.id === request.id) {
+        setShowDetailsDialog(false);
+      }
+    } catch (error: any) {
+      console.error('[Approve] Error:', error);
+      let errorMsg = 'حدث خطأ أثناء اعتماد الطلب';
+      if (error?.code === '42501' || error?.message?.includes('policy')) {
+        errorMsg = 'لا تملك صلاحية اعتماد الطلبات';
+      }
+      toast({ title: errorMsg, variant: 'destructive' });
     }
   };
 
@@ -92,17 +103,24 @@ export default function SponsorshipRequestsManagement() {
     }
 
     try {
+      console.log('[Reject] Rejecting request:', selectedRequest.id);
       await updateStatus.mutateAsync({
         id: selectedRequest.id,
         admin_status: 'rejected',
         admin_notes: rejectNotes,
       });
+      console.log('[Reject] Success');
       toast({ title: 'تم رفض الطلب' });
       setShowRejectDialog(false);
       setRejectNotes('');
       setSelectedRequest(null);
-    } catch (error) {
-      toast({ title: 'حدث خطأ', variant: 'destructive' });
+    } catch (error: any) {
+      console.error('[Reject] Error:', error);
+      let errorMsg = 'حدث خطأ أثناء رفض الطلب';
+      if (error?.code === '42501' || error?.message?.includes('policy')) {
+        errorMsg = 'لا تملك صلاحية رفض الطلبات';
+      }
+      toast({ title: errorMsg, variant: 'destructive' });
     }
   };
 
@@ -114,22 +132,34 @@ export default function SponsorshipRequestsManagement() {
 
     setUploading(true);
     try {
+      console.log('[UploadReceipt] Uploading receipt for:', selectedRequest.id);
+      
       // Upload to storage
       const fileExt = receiptFile.name.split('.').pop();
       const fileName = `${selectedRequest.id}/${Date.now()}.${fileExt}`;
 
-      const { error: uploadError } = await supabase.storage
+      const { error: uploadError, data: uploadData } = await supabase.storage
         .from('cash-receipts')
         .upload(fileName, receiptFile);
 
-      if (uploadError) throw uploadError;
+      if (uploadError) {
+        console.error('[UploadReceipt] Storage upload error:', uploadError);
+        throw uploadError;
+      }
+      
+      console.log('[UploadReceipt] File uploaded:', uploadData);
 
       // Get signed URL (private bucket)
-      const { data: signedData } = await supabase.storage
+      const { data: signedData, error: signedError } = await supabase.storage
         .from('cash-receipts')
         .createSignedUrl(fileName, 60 * 60 * 24 * 365); // 1 year
 
-      if (!signedData?.signedUrl) throw new Error('Failed to get signed URL');
+      if (signedError || !signedData?.signedUrl) {
+        console.error('[UploadReceipt] Signed URL error:', signedError);
+        throw new Error('فشل في إنشاء رابط الصورة');
+      }
+      
+      console.log('[UploadReceipt] Got signed URL');
 
       // Update request
       await uploadCashReceipt.mutateAsync({
@@ -139,15 +169,22 @@ export default function SponsorshipRequestsManagement() {
         cash_receipt_date: receiptDate || undefined,
       });
 
+      console.log('[UploadReceipt] Success');
       toast({ title: 'تم رفع سند القبض بنجاح' });
       setShowReceiptDialog(false);
       setReceiptFile(null);
       setReceiptNumber('');
       setReceiptDate('');
       setSelectedRequest(null);
-    } catch (error) {
-      console.error('Error uploading receipt:', error);
-      toast({ title: 'حدث خطأ أثناء رفع السند', variant: 'destructive' });
+    } catch (error: any) {
+      console.error('[UploadReceipt] Error:', error);
+      let errorMsg = 'حدث خطأ أثناء رفع السند';
+      if (error?.message?.includes('policy') || error?.statusCode === 403) {
+        errorMsg = 'لا تملك صلاحية رفع الملفات';
+      } else if (error?.message?.includes('too large') || error?.statusCode === 413) {
+        errorMsg = 'حجم الملف كبير جداً';
+      }
+      toast({ title: errorMsg, variant: 'destructive' });
     } finally {
       setUploading(false);
     }
@@ -396,7 +433,7 @@ export default function SponsorshipRequestsManagement() {
                 </div>
               )}
 
-              {selectedRequest.cash_receipt_image && (
+              {selectedRequest.cash_receipt_image ? (
                 <div>
                   <Label className="text-muted-foreground mb-2 block">سند القبض</Label>
                   <img
@@ -407,6 +444,116 @@ export default function SponsorshipRequestsManagement() {
                   {selectedRequest.cash_receipt_number && (
                     <p className="mt-2 text-sm">رقم السند: {selectedRequest.cash_receipt_number}</p>
                   )}
+                  {selectedRequest.cash_receipt_date && (
+                    <p className="text-sm">تاريخ السند: {selectedRequest.cash_receipt_date}</p>
+                  )}
+                  <div className="mt-3 flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => window.open(selectedRequest.cash_receipt_image!, '_blank')}
+                    >
+                      <Eye className="h-4 w-4 ml-1" />
+                      فتح
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      asChild
+                    >
+                      <a href={selectedRequest.cash_receipt_image!} download>
+                        تحميل
+                      </a>
+                    </Button>
+                  </div>
+                </div>
+              ) : selectedRequest.admin_status === 'approved' && (
+                <div className="bg-muted/50 p-4 rounded-lg border border-dashed">
+                  <Label className="text-muted-foreground mb-3 block">رفع سند القبض</Label>
+                  <div className="space-y-3">
+                    <div>
+                      <Label className="text-sm">صورة السند *</Label>
+                      <Input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => setReceiptFile(e.target.files?.[0] || null)}
+                        className="mt-1"
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <Label className="text-sm">رقم السند</Label>
+                        <Input
+                          value={receiptNumber}
+                          onChange={(e) => setReceiptNumber(e.target.value)}
+                          placeholder="اختياري"
+                          className="mt-1"
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-sm">تاريخ السند</Label>
+                        <Input
+                          type="date"
+                          value={receiptDate}
+                          onChange={(e) => setReceiptDate(e.target.value)}
+                          className="mt-1"
+                        />
+                      </div>
+                    </div>
+                    <Button
+                      onClick={() => {
+                        if (receiptFile) {
+                          handleUploadReceipt();
+                        } else {
+                          toast({ title: 'يرجى اختيار صورة السند', variant: 'destructive' });
+                        }
+                      }}
+                      disabled={uploading || !receiptFile}
+                      className="w-full"
+                    >
+                      {uploading ? (
+                        <>
+                          <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+                          جاري الرفع...
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="h-4 w-4 ml-2" />
+                          حفظ السند
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              {/* Action buttons for pending requests in dialog */}
+              {selectedRequest.admin_status === 'pending' && (
+                <div className="flex gap-3 pt-4 border-t">
+                  <Button
+                    variant="default"
+                    className="flex-1 bg-green-600 hover:bg-green-700"
+                    onClick={() => handleApprove(selectedRequest)}
+                    disabled={updateStatus.isPending}
+                  >
+                    {updateStatus.isPending ? (
+                      <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+                    ) : (
+                      <CheckCircle2 className="h-4 w-4 ml-2" />
+                    )}
+                    اعتماد الطلب
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    className="flex-1"
+                    onClick={() => {
+                      setShowDetailsDialog(false);
+                      openRejectDialog(selectedRequest);
+                    }}
+                  >
+                    <XCircle className="h-4 w-4 ml-2" />
+                    رفض الطلب
+                  </Button>
                 </div>
               )}
             </div>

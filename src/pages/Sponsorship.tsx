@@ -9,7 +9,6 @@ import thankYou2 from "@/assets/thank-you-2.jpg";
 import thankYou3 from "@/assets/thank-you-3.jpg";
 import thankYou4 from "@/assets/thank-you-4.jpg";
 import thankYou5 from "@/assets/thank-you-5.jpg";
-import thankYou6 from "@/assets/thank-you-6.jpg";
 
 const Sponsorship = () => {
   const heroAnimation = useScrollAnimation();
@@ -24,7 +23,6 @@ const Sponsorship = () => {
     thankYou3,
     thankYou4,
     thankYou5,
-    thankYou6,
   ];
 
   return (

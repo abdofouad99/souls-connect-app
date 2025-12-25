@@ -65,7 +65,7 @@ export default function ReceiptPage() {
           <div className="bg-gradient-to-l from-primary to-primary/80 text-primary-foreground p-8 text-center">
             <div className="flex items-center justify-center gap-3 mb-4">
               <img src={logo} alt="شعار الجمعية" className="h-16 w-16 rounded-full object-cover border-2 border-primary-foreground/30" />
-              <h1 className="text-3xl font-serif font-bold">رعاية الأيتام</h1>
+              <h1 className="text-3xl font-serif font-bold text-white opacity-100" style={{ color: '#FFFFFF' }}>رعاية الأيتام</h1>
             </div>
             <p className="text-primary-foreground/80">إيصال كفالة يتيم</p>
           </div>

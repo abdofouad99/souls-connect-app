@@ -250,6 +250,80 @@ export type Database = {
         }
         Relationships: []
       }
+      sponsorship_requests: {
+        Row: {
+          admin_notes: string | null
+          admin_status: string
+          amount: number
+          approved_at: string | null
+          approved_by: string | null
+          cash_receipt_date: string | null
+          cash_receipt_image: string | null
+          cash_receipt_number: string | null
+          created_at: string
+          id: string
+          orphan_id: string
+          payment_method: string
+          sponsor_country: string | null
+          sponsor_email: string | null
+          sponsor_full_name: string
+          sponsor_phone: string
+          sponsorship_type: string
+          transfer_receipt_image: string | null
+          updated_at: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          admin_status?: string
+          amount: number
+          approved_at?: string | null
+          approved_by?: string | null
+          cash_receipt_date?: string | null
+          cash_receipt_image?: string | null
+          cash_receipt_number?: string | null
+          created_at?: string
+          id?: string
+          orphan_id: string
+          payment_method?: string
+          sponsor_country?: string | null
+          sponsor_email?: string | null
+          sponsor_full_name: string
+          sponsor_phone: string
+          sponsorship_type: string
+          transfer_receipt_image?: string | null
+          updated_at?: string
+        }
+        Update: {
+          admin_notes?: string | null
+          admin_status?: string
+          amount?: number
+          approved_at?: string | null
+          approved_by?: string | null
+          cash_receipt_date?: string | null
+          cash_receipt_image?: string | null
+          cash_receipt_number?: string | null
+          created_at?: string
+          id?: string
+          orphan_id?: string
+          payment_method?: string
+          sponsor_country?: string | null
+          sponsor_email?: string | null
+          sponsor_full_name?: string
+          sponsor_phone?: string
+          sponsorship_type?: string
+          transfer_receipt_image?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sponsorship_requests_orphan_id_fkey"
+            columns: ["orphan_id"]
+            isOneToOne: false
+            referencedRelation: "orphans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sponsorships: {
         Row: {
           created_at: string

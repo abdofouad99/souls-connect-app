@@ -25,12 +25,14 @@ const ReceiptPage = lazy(() => import("./pages/ReceiptPage"));
 const Profile = lazy(() => import("./pages/Profile"));
 const MyReceipts = lazy(() => import("./pages/MyReceipts"));
 const DepositReceiptRequest = lazy(() => import("./pages/DepositReceiptRequest"));
+const ReceiptLookup = lazy(() => import("./pages/ReceiptLookup"));
 
 // Lazy load admin pages
 const AdminDashboard = lazy(() => import("./pages/admin/Dashboard"));
 const OrphansManagement = lazy(() => import("./pages/admin/OrphansManagement"));
 const SponsorsManagement = lazy(() => import("./pages/admin/SponsorsManagement"));
 const SponsorshipsManagement = lazy(() => import("./pages/admin/SponsorshipsManagement"));
+const SponsorshipRequestsManagement = lazy(() => import("./pages/admin/SponsorshipRequestsManagement"));
 const ReceiptsManagement = lazy(() => import("./pages/admin/ReceiptsManagement"));
 const DepositRequestsManagement = lazy(() => import("./pages/admin/DepositRequestsManagement"));
 const NotificationsLog = lazy(() => import("./pages/admin/NotificationsLog"));
@@ -78,7 +80,7 @@ const App = () => (
               <Route path="/profile" element={<LazyRoute><Profile /></LazyRoute>} />
               <Route path="/my-receipts" element={<LazyRoute><MyReceipts /></LazyRoute>} />
               <Route path="/deposit-request" element={<LazyRoute><DepositReceiptRequest /></LazyRoute>} />
-
+              <Route path="/receipt-lookup" element={<LazyRoute><ReceiptLookup /></LazyRoute>} />
               {/* Admin Routes - Lazy loaded with protection */}
               <Route path="/admin" element={
                 <ProtectedAdminRoute>
@@ -98,6 +100,11 @@ const App = () => (
               <Route path="/admin/sponsorships" element={
                 <ProtectedAdminRoute>
                   <LazyRoute><SponsorshipsManagement /></LazyRoute>
+                </ProtectedAdminRoute>
+              } />
+              <Route path="/admin/sponsorship-requests" element={
+                <ProtectedAdminRoute>
+                  <LazyRoute><SponsorshipRequestsManagement /></LazyRoute>
                 </ProtectedAdminRoute>
               } />
               <Route path="/admin/receipts" element={

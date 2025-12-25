@@ -1,17 +1,15 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Heart, MapPin, Calendar, ArrowRight, Upload, X, ImageIcon, Loader2, Copy, Check } from 'lucide-react';
+import { Heart, MapPin, Calendar, ArrowRight, Upload, X, Loader2, Copy, Check } from 'lucide-react';
 import { Layout } from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useOrphan } from '@/hooks/useOrphans';
-import { useCreateSponsorship } from '@/hooks/useSponsorships';
+import { useCreateSponsorshipRequest } from '@/hooks/useSponsorshipRequests';
 import { toast } from '@/hooks/use-toast';
-import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 
 const statusLabels = {
@@ -99,23 +97,20 @@ function BankAccountsSection() {
 export default function OrphanDetailsPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { user } = useAuth();
   const { data: orphan, isLoading } = useOrphan(id || '');
-  const createSponsorship = useCreateSponsorship();
+  const createSponsorshipRequest = useCreateSponsorshipRequest();
   
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
     fullName: '',
-    email: '',
     phone: '',
+    email: '',
     country: '',
-    preferredContact: 'email',
     sponsorshipType: 'monthly',
-    paymentMethod: 'bank_transfer',
   });
   const [receiptFile, setReceiptFile] = useState<File | null>(null);
   const [receiptPreview, setReceiptPreview] = useState<string | null>(null);
-  const [uploadingReceipt, setUploadingReceipt] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const handleReceiptFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -149,12 +144,11 @@ export default function OrphanDetailsPage() {
   };
 
   const uploadReceiptImage = async (): Promise<string | null> => {
-    if (!receiptFile || !user) return null;
+    if (!receiptFile) return null;
     
-    setUploadingReceipt(true);
     try {
       const fileExt = receiptFile.name.split('.').pop();
-      const fileName = `${user.id}/${Date.now()}.${fileExt}`;
+      const fileName = `public/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
       
       const { error: uploadError } = await supabase.storage
         .from('deposit-receipts')
@@ -170,8 +164,6 @@ export default function OrphanDetailsPage() {
     } catch (error) {
       console.error('Error uploading receipt:', error);
       return null;
-    } finally {
-      setUploadingReceipt(false);
     }
   };
 
@@ -180,105 +172,58 @@ export default function OrphanDetailsPage() {
     
     if (!orphan) return;
 
-    try {
-      console.log('[Sponsorship] Starting sponsorship creation...', {
-        orphanId: orphan.id,
-        sponsorEmail: formData.email,
-        type: formData.sponsorshipType,
-        paymentMethod: formData.paymentMethod,
-        monthlyAmount: orphan.monthly_amount,
-        userId: user?.id,
+    // Validate required fields
+    if (!formData.fullName.trim() || !formData.phone.trim()) {
+      toast({
+        title: 'بيانات ناقصة',
+        description: 'يرجى إدخال الاسم ورقم الهاتف',
+        variant: 'destructive',
       });
+      return;
+    }
 
-      // Check if user is logged in
-      if (!user) {
-        toast({
-          title: 'يرجى تسجيل الدخول',
-          description: 'يجب تسجيل الدخول أولاً لإتمام عملية الكفالة.',
-          variant: 'destructive',
-        });
-        navigate('/auth');
-        return;
-      }
+    setSubmitting(true);
 
-      // Validate receipt image for bank transfer
-      if (formData.paymentMethod === 'bank_transfer' && !receiptFile) {
-        toast({
-          title: 'صورة الإيصال مطلوبة',
-          description: 'يرجى رفع صورة إيصال التحويل البنكي',
-          variant: 'destructive',
-        });
-        return;
-      }
-
+    try {
       // Upload receipt image if exists
       let receiptImageUrl: string | null = null;
       if (receiptFile) {
         receiptImageUrl = await uploadReceiptImage();
       }
 
-      const result = await createSponsorship.mutateAsync({
-        sponsorData: {
-          full_name: formData.fullName,
-          email: formData.email,
-          phone: formData.phone,
-          country: formData.country,
-          preferred_contact: formData.preferredContact,
-          user_id: user.id,
-        },
-        orphanId: orphan.id,
-        orphanName: orphan.full_name,
-        type: formData.sponsorshipType as 'monthly' | 'yearly',
-        paymentMethod: formData.paymentMethod,
-        monthlyAmount: orphan.monthly_amount,
-        receiptImageUrl: receiptImageUrl || undefined,
+      // Calculate amount
+      const amount = formData.sponsorshipType === 'yearly' 
+        ? orphan.monthly_amount * 12 
+        : orphan.monthly_amount;
+
+      // Create sponsorship request (pending status)
+      await createSponsorshipRequest.mutateAsync({
+        sponsor_full_name: formData.fullName,
+        sponsor_phone: formData.phone,
+        sponsor_email: formData.email || undefined,
+        sponsor_country: formData.country || undefined,
+        orphan_id: orphan.id,
+        sponsorship_type: formData.sponsorshipType as 'monthly' | 'yearly',
+        amount,
+        transfer_receipt_image: receiptImageUrl || undefined,
       });
 
-      console.log('[Sponsorship] Success! Receipt:', result.receiptNumber);
-
-      // Navigate to sponsor thank you page with details
+      // Navigate to thank you page with pending message
       const params = new URLSearchParams({
         name: formData.fullName,
-        amount: (formData.sponsorshipType === 'yearly' ? orphan.monthly_amount * 12 : orphan.monthly_amount).toString(),
-        receipt: result.receiptNumber,
+        amount: amount.toString(),
+        status: 'pending',
       });
       navigate(`/thanks?${params.toString()}`);
     } catch (error: any) {
-      // Enhanced error logging
-      console.error('[Sponsorship] Error creating sponsorship:', {
-        message: error?.message,
-        code: error?.code,
-        details: error?.details,
-        hint: error?.hint,
-        status: error?.status,
-        statusCode: error?.statusCode,
-        stack: error?.stack,
-      });
-
-      // Determine user-friendly error message
-      let errorMessage = 'لم نتمكن من إتمام الكفالة. يرجى المحاولة مرة أخرى.';
-      
-      if (error?.message?.includes('Failed to fetch') || error?.message?.includes('NetworkError')) {
-        errorMessage = 'فشل الاتصال بالخادم. يرجى التحقق من اتصالك بالإنترنت.';
-      } else if (error?.code === 'PGRST301' || error?.code === '42501') {
-        errorMessage = 'صلاحيات غير كافية. يرجى تسجيل الدخول والمحاولة مرة أخرى.';
-      } else if (error?.code === '23505') {
-        errorMessage = 'توجد كفالة مسجلة بالفعل لهذا اليتيم.';
-      } else if (error?.status === 401 || error?.statusCode === 401) {
-        errorMessage = 'يرجى تسجيل الدخول أولاً.';
-      } else if (error?.status === 403 || error?.statusCode === 403) {
-        errorMessage = 'ليس لديك صلاحية لإتمام هذه العملية.';
-      } else if (error?.status >= 500 || error?.statusCode >= 500) {
-        errorMessage = 'خطأ في الخادم. يرجى المحاولة لاحقاً.';
-      } else if (error?.message) {
-        errorMessage = `خطأ: ${error.message}`;
-      }
-
+      console.error('[SponsorshipRequest] Error:', error);
       toast({
         title: 'حدث خطأ',
-        description: errorMessage,
+        description: 'لم نتمكن من إرسال طلب الكفالة. يرجى المحاولة مرة أخرى.',
         variant: 'destructive',
       });
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -438,13 +383,10 @@ export default function OrphanDetailsPage() {
                     {/* Receipt Image Upload */}
                     <div>
                       <Label>
-                        صورة الإيصال / الحوالة
-                        {formData.paymentMethod === 'bank_transfer' && <span className="text-destructive mr-1">*</span>}
+                        صورة الإيصال / الحوالة (اختياري)
                       </Label>
                       <p className="text-xs text-muted-foreground mb-2">
-                        {formData.paymentMethod === 'bank_transfer' 
-                          ? 'يرجى رفع صورة إيصال التحويل البنكي (إلزامي)'
-                          : 'يمكنك رفع صورة إيصال الدفع أو الحوالة البنكية (اختياري)'}
+                        يمكنك رفع صورة إيصال التحويل البنكي لتسريع المراجعة
                       </p>
                       <input
                         type="file"
@@ -485,8 +427,15 @@ export default function OrphanDetailsPage() {
 
                   <div className="flex gap-4">
                     <Button type="button" variant="outline" onClick={() => setShowForm(false)} className="flex-1">إلغاء</Button>
-                    <Button type="submit" variant="hero" className="flex-1" disabled={createSponsorship.isPending}>
-                      {createSponsorship.isPending ? 'جاري الإرسال...' : 'تأكيد الكفالة'}
+                    <Button type="submit" variant="hero" className="flex-1" disabled={submitting}>
+                      {submitting ? (
+                        <>
+                          <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+                          جاري الإرسال...
+                        </>
+                      ) : (
+                        'إرسال طلب الكفالة'
+                      )}
                     </Button>
                   </div>
                 </form>

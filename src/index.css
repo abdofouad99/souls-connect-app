@@ -294,10 +294,30 @@ div:has(> a[href*="lovable.dev"]) {
     background: white !important;
   }
   
-  /* Reset page margins */
+  /* Reset page margins and hide browser URL/headers/footers */
   @page {
-    margin: 1cm;
+    margin: 0.5cm;
     size: A4;
+  }
+  
+  @page :first {
+    margin-top: 1cm;
+  }
+  
+  /* Hide browser-generated headers and footers (URL, date, page number) */
+  html {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  
+  /* Force hide any URL text that might appear */
+  @page {
+    @top-left { content: none !important; }
+    @top-right { content: none !important; }
+    @bottom-left { content: none !important; }
+    @bottom-right { content: none !important; }
+    @top-center { content: none !important; }
+    @bottom-center { content: none !important; }
   }
   
   /* Hide backgrounds for cleaner print */

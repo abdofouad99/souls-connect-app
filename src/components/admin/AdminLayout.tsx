@@ -26,6 +26,7 @@ const navItems = [
   { href: '/admin/orphans', label: 'الأيتام', icon: Heart },
   { href: '/admin/sponsors', label: 'الكفلاء', icon: Users },
   { href: '/admin/sponsorships', label: 'الكفالات', icon: HandHeart },
+  { href: '/admin/sponsorship-requests', label: 'طلبات الكفالة', icon: FileText },
   { href: '/admin/receipts', label: 'الإيصالات', icon: Receipt },
   { href: '/admin/deposit-requests', label: 'طلبات الإيداع', icon: FileText },
   { href: '/admin/notifications', label: 'سجل الإشعارات', icon: Bell },

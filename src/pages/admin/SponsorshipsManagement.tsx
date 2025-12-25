@@ -163,10 +163,25 @@ export default function SponsorshipsManagement() {
                         {(sponsorship as any).receipt_image_url ? (
                           <Dialog>
                             <DialogTrigger asChild>
-                              <Button variant="ghost" size="sm" className="gap-1">
-                                <ImageIcon className="h-4 w-4" />
-                                عرض
-                              </Button>
+                              <button className="group relative w-12 h-12 rounded-lg overflow-hidden border border-border hover:border-primary transition-colors cursor-pointer">
+                                {imageErrors[sponsorship.id] ? (
+                                  <div className="w-full h-full flex items-center justify-center bg-muted">
+                                    <AlertCircle className="h-5 w-5 text-muted-foreground" />
+                                  </div>
+                                ) : (
+                                  <>
+                                    <img 
+                                      src={(sponsorship as any).receipt_image_url} 
+                                      alt="صورة الإيصال" 
+                                      className="w-full h-full object-cover"
+                                      onError={() => handleImageError(sponsorship.id, (sponsorship as any).receipt_image_url)}
+                                    />
+                                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+                                      <ImageIcon className="h-4 w-4 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                                    </div>
+                                  </>
+                                )}
+                              </button>
                             </DialogTrigger>
                             <DialogContent className="max-w-2xl">
                               <DialogHeader>

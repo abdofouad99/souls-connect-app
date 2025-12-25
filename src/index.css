@@ -266,13 +266,42 @@ div:has(> a[href*="lovable.dev"]) {
   body {
     direction: rtl;
     font-family: 'Tajawal', sans-serif;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
   
+  /* Hide URL after links */
+  a:after,
+  a[href]:after {
+    content: none !important;
+  }
+  
+  /* Hide non-printable elements */
   .no-print {
     display: none !important;
   }
   
+  /* Show print-only elements */
   .print-only {
     display: block !important;
+  }
+  
+  /* Clean receipt container for print */
+  .print-receipt {
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    background: white !important;
+  }
+  
+  /* Reset page margins */
+  @page {
+    margin: 1cm;
+    size: A4;
+  }
+  
+  /* Hide backgrounds for cleaner print */
+  .print-no-bg {
+    background: transparent !important;
   }
 }

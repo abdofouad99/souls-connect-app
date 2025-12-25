@@ -88,7 +88,7 @@ export default function AdminDashboard() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-3xl font-bold text-primary">
+                <p className="text-3xl font-bold text-foreground opacity-100">
                   {chartData.totalMonthlyAmount.toLocaleString('ar-SA')} ر.س
                 </p>
                 <p className="text-sm text-muted-foreground">لجميع الأيتام</p>
@@ -102,7 +102,7 @@ export default function AdminDashboard() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-3xl font-bold text-accent">
+                <p className="text-3xl font-bold text-foreground opacity-100">
                   {chartData.totalReceivedAmount.toLocaleString('ar-SA')} ر.س
                 </p>
                 <p className="text-sm text-muted-foreground">من جميع الإيصالات</p>

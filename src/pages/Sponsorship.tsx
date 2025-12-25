@@ -1,8 +1,10 @@
+import { useState } from "react";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { Button } from "@/components/ui/button";
-import { Quote, Heart } from "lucide-react";
+import { Quote, Heart, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 import thankYou1 from "@/assets/thank-you-1.jpg";
 import thankYou2 from "@/assets/thank-you-2.jpg";
@@ -11,6 +13,7 @@ import thankYou4 from "@/assets/thank-you-4.jpg";
 import thankYou5 from "@/assets/thank-you-5.jpg";
 
 const Sponsorship = () => {
+  const [selectedImage, setSelectedImage] = useState<number | null>(null);
   const heroAnimation = useScrollAnimation();
   const textAnimation = useScrollAnimation();
   const calloutAnimation = useScrollAnimation();
@@ -24,6 +27,18 @@ const Sponsorship = () => {
     thankYou4,
     thankYou5,
   ];
+
+  const handlePrevImage = () => {
+    if (selectedImage !== null) {
+      setSelectedImage(selectedImage === 0 ? thankYouImages.length - 1 : selectedImage - 1);
+    }
+  };
+
+  const handleNextImage = () => {
+    if (selectedImage !== null) {
+      setSelectedImage(selectedImage === thankYouImages.length - 1 ? 0 : selectedImage + 1);
+    }
+  };
 
   return (
     <Layout>
@@ -156,7 +171,8 @@ const Sponsorship = () => {
                   {thankYouImages.map((img, index) => (
                     <div 
                       key={index}
-                      className="aspect-square bg-surface rounded-lg border border-border overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300"
+                      onClick={() => setSelectedImage(index)}
+                      className="aspect-square bg-surface rounded-lg border border-border overflow-hidden shadow-sm hover:shadow-lg hover:scale-105 transition-all duration-300 cursor-pointer"
                     >
                       <img 
                         src={img} 
@@ -214,6 +230,49 @@ const Sponsorship = () => {
           </div>
         </section>
       </div>
+
+      {/* Image Lightbox */}
+      <Dialog open={selectedImage !== null} onOpenChange={() => setSelectedImage(null)}>
+        <DialogContent className="max-w-4xl w-[95vw] h-[90vh] p-0 bg-background/95 backdrop-blur-sm border-none">
+          <div className="relative w-full h-full flex items-center justify-center">
+            {/* Close Button */}
+            <button
+              onClick={() => setSelectedImage(null)}
+              className="absolute top-4 left-4 z-50 p-2 rounded-full bg-background/80 hover:bg-background text-foreground transition-colors"
+            >
+              <X className="w-6 h-6" />
+            </button>
+
+            {/* Navigation Buttons */}
+            <button
+              onClick={handleNextImage}
+              className="absolute right-4 z-50 p-3 rounded-full bg-background/80 hover:bg-background text-foreground transition-colors"
+            >
+              <ChevronRight className="w-8 h-8" />
+            </button>
+            <button
+              onClick={handlePrevImage}
+              className="absolute left-4 z-50 p-3 rounded-full bg-background/80 hover:bg-background text-foreground transition-colors"
+            >
+              <ChevronLeft className="w-8 h-8" />
+            </button>
+
+            {/* Image */}
+            {selectedImage !== null && (
+              <img
+                src={thankYouImages[selectedImage]}
+                alt={`نموذج شكر ${selectedImage + 1}`}
+                className="max-w-full max-h-full object-contain animate-scale-in"
+              />
+            )}
+
+            {/* Image Counter */}
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-background/80 px-4 py-2 rounded-full text-sm text-foreground">
+              {selectedImage !== null ? `${selectedImage + 1} / ${thankYouImages.length}` : ''}
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Layout>
   );
 };

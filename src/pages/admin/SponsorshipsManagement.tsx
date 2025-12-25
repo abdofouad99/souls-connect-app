@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { Search, ExternalLink, Download, Image as ImageIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { AdminLayout } from '@/components/admin/AdminLayout';
@@ -23,10 +23,12 @@ import {
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
+import { AlertCircle } from 'lucide-react';
 import { useSponsorships, useUpdateSponsorshipStatus } from '@/hooks/useSponsorships';
 import { exportSponsorships } from '@/lib/exportUtils';
 import { toast } from '@/hooks/use-toast';
@@ -50,6 +52,12 @@ export default function SponsorshipsManagement() {
   const updateStatus = useUpdateSponsorshipStatus();
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
+
+  const handleImageError = useCallback((sponsorshipId: string, url: string) => {
+    console.error(`[ImageError] Failed to load image for sponsorship ${sponsorshipId}:`, url);
+    setImageErrors(prev => ({ ...prev, [sponsorshipId]: true }));
+  }, []);
 
   const filteredSponsorships = sponsorships?.filter(sponsorship => {
     const matchesSearch = 
@@ -163,26 +171,53 @@ export default function SponsorshipsManagement() {
                             <DialogContent className="max-w-2xl">
                               <DialogHeader>
                                 <DialogTitle>صورة إيصال الكفالة</DialogTitle>
+                                <DialogDescription>
+                                  رقم الإيصال: {sponsorship.receipt_number}
+                                </DialogDescription>
                               </DialogHeader>
                               <div className="mt-4">
-                                <img 
-                                  src={(sponsorship as any).receipt_image_url} 
-                                  alt="صورة الإيصال" 
-                                  className="w-full rounded-lg border border-border"
-                                />
+                                {imageErrors[sponsorship.id] ? (
+                                  <div className="flex flex-col items-center justify-center p-8 border border-destructive/30 bg-destructive/5 rounded-lg">
+                                    <AlertCircle className="h-12 w-12 text-destructive mb-4" />
+                                    <p className="text-destructive font-medium mb-2">تعذر تحميل الصورة</p>
+                                    <p className="text-muted-foreground text-sm mb-4 text-center">
+                                      قد تكون الصورة محذوفة أو الرابط غير صالح
+                                    </p>
+                                    <Button asChild variant="outline" size="sm">
+                                      <a 
+                                        href={(sponsorship as any).receipt_image_url} 
+                                        target="_blank" 
+                                        rel="noopener noreferrer"
+                                      >
+                                        <ExternalLink className="h-4 w-4 ml-2" />
+                                        فتح الرابط مباشرة
+                                      </a>
+                                    </Button>
+                                  </div>
+                                ) : (
+                                  <img 
+                                    src={(sponsorship as any).receipt_image_url} 
+                                    alt="صورة الإيصال" 
+                                    className="w-full rounded-lg border border-border"
+                                    onError={() => handleImageError(sponsorship.id, (sponsorship as any).receipt_image_url)}
+                                    onLoad={() => console.log(`[ImageLoad] Successfully loaded image for ${sponsorship.id}`)}
+                                  />
+                                )}
                               </div>
-                              <div className="flex justify-end mt-4">
-                                <Button asChild variant="outline">
-                                  <a 
-                                    href={(sponsorship as any).receipt_image_url} 
-                                    target="_blank" 
-                                    rel="noopener noreferrer"
-                                  >
-                                    <ExternalLink className="h-4 w-4 ml-2" />
-                                    فتح في نافذة جديدة
-                                  </a>
-                                </Button>
-                              </div>
+                              {!imageErrors[sponsorship.id] && (
+                                <div className="flex justify-end mt-4">
+                                  <Button asChild variant="outline">
+                                    <a 
+                                      href={(sponsorship as any).receipt_image_url} 
+                                      target="_blank" 
+                                      rel="noopener noreferrer"
+                                    >
+                                      <ExternalLink className="h-4 w-4 ml-2" />
+                                      فتح في نافذة جديدة
+                                    </a>
+                                  </Button>
+                                </div>
+                              )}
                             </DialogContent>
                           </Dialog>
                         ) : (

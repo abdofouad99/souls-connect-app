@@ -343,7 +343,7 @@ export type Database = {
           sponsor_country: string | null
           sponsor_email: string | null
           sponsor_full_name: string | null
-          sponsor_id: string
+          sponsor_id: string | null
           sponsor_phone: string | null
           start_date: string
           status: string
@@ -369,7 +369,7 @@ export type Database = {
           sponsor_country?: string | null
           sponsor_email?: string | null
           sponsor_full_name?: string | null
-          sponsor_id: string
+          sponsor_id?: string | null
           sponsor_phone?: string | null
           start_date?: string
           status?: string
@@ -395,7 +395,7 @@ export type Database = {
           sponsor_country?: string | null
           sponsor_email?: string | null
           sponsor_full_name?: string | null
-          sponsor_id?: string
+          sponsor_id?: string | null
           sponsor_phone?: string | null
           start_date?: string
           status?: string

@@ -146,7 +146,9 @@ export function useUpdateSponsorshipRequestStatus() {
             .insert({
               request_id: id,
               orphan_id: updatedRequest.orphan_id,
-              sponsor_id: user?.id || updatedRequest.approved_by, // Use approver as fallback
+              // IMPORTANT: sponsor_id is a FK to sponsors.id (not auth.users.id).
+              // For migrated requests we store sponsor details directly on the sponsorship record.
+              sponsor_id: null,
               sponsor_full_name: updatedRequest.sponsor_full_name,
               sponsor_phone: updatedRequest.sponsor_phone,
               sponsor_email: updatedRequest.sponsor_email,

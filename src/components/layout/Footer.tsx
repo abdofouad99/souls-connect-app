@@ -1,6 +1,6 @@
-import { Link } from 'react-router-dom';
-import { Phone, Mail, MapPin, Home, Info, Heart, Users, FileText } from 'lucide-react';
-import logo from '@/assets/logo.jpg';
+import { Link } from "react-router-dom";
+import { Phone, Mail, MapPin, Home, Info, Heart, Users, FileText } from "lucide-react";
+import logo from "@/assets/logo.jpg";
 
 export function Footer() {
   return (
@@ -14,8 +14,7 @@ export function Footer() {
               <span className="text-lg font-serif font-bold">جمعية الأقصى لرعاية الأيتام</span>
             </div>
             <p className="text-primary-foreground/80 text-sm leading-relaxed">
-              نسعى لتوفير حياة كريمة للأيتام من خلال برامج الكفالة والدعم المستمر.
-              ساهم معنا في رسم البسمة على وجوههم.
+              نسعى لتوفير حياة كريمة للأيتام من خلال برامج الكفالة والدعم المستمر. ساهم معنا في رسم البسمة على وجوههم.
             </p>
           </div>
 
@@ -71,11 +70,14 @@ export function Footer() {
               </div>
               <div className="flex items-center gap-2 text-sm text-primary-foreground/80">
                 <Mail className="h-4 w-4 text-secondary" />
-                <span>aqsa.orphan.1@gmail.com</span>
+                <span>https://www.facebook.com/share/1a6MtvyzUw/</span>
               </div>
               <div className="flex items-center gap-2 text-sm text-primary-foreground/80">
                 <MapPin className="h-4 w-4 text-secondary" />
-                <span>غزة - فلسطين</span>
+                <span>
+                  {" "}
+                  شارع جمال -جولة المسبح -مقابل الكريمي الرئيس-فوق محلات مرح-فوق عيادة د.سميرة الخليدي Taiz, Yemen{" "}
+                </span>
               </div>
             </div>
           </div>

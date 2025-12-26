@@ -126,6 +126,53 @@ export default function SponsorSearch({ sponsors }) {
   };
 
   return (
+    import { useState } from "react";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Search } from "lucide-react";
+
+export default function SponsorSearch({ sponsors }) {
+  const [searchData, setSearchData] = useState({
+    sponsorName: "",
+    sponsorPhone: "",
+    sponsorAmount: "",
+  });
+  const [isLoading, setIsLoading] = useState(false);
+  const [shouldSearch, setShouldSearch] = useState(false);
+  const [result, setResult] = useState(null);
+
+  const resetSearch = () => {
+    setSearchData({ sponsorName: "", sponsorPhone: "", sponsorAmount: "" });
+    setResult(null);
+    setShouldSearch(false);
+  };
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    // التحقق الصارم من التطابق
+    const matchedSponsor = sponsors.find(
+      (sponsor) =>
+        sponsor.name.trim() === searchData.sponsorName.trim() &&
+        sponsor.phone.trim() === searchData.sponsorPhone.trim() &&
+        String(sponsor.amount) === String(searchData.sponsorAmount)
+    );
+
+    if (matchedSponsor) {
+      setResult(matchedSponsor); // عرض البيانات إذا كانت متطابقة
+      setShouldSearch(true);
+    } else {
+      setResult(null); // لا تعرض أي بيانات
+      alert("⚠️ لا توجد بيانات مطابقة للمدخلات");
+    }
+
+    setIsLoading(false);
+  };
+
+  return (
     <Card className="mb-8">
       <CardHeader>
         <CardTitle className="text-lg">بيانات البحث</CardTitle>
@@ -200,6 +247,9 @@ export default function SponsorSearch({ sponsors }) {
         )}
       </CardContent>
     </Card>
+  );
+}
+
   );
 }
 

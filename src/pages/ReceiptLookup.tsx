@@ -257,18 +257,18 @@ export default function ReceiptLookup() {
                         <ExternalLink className="h-4 w-4 ml-2" />
                         فتح
                       </Button>
-                      <Button
-                        className="flex-1"
-                        onClick={handleDownload}
-                        disabled={downloading || !receipt.cash_receipt_image}
-                      >
-                        {downloading ? (
-                          <Loader2 className="h-4 w-4 ml-2 animate-spin" />
-                        ) : (
-                          <Download className="h-4 w-4 ml-2" />
-                        )}
-                        {downloading ? 'جاري التحميل...' : 'تحميل'}
-                      </Button>
+                     // <Button
+                      //  className="flex-1"
+                      //  onClick={handleDownload}
+                     //   disabled={downloading || !receipt.cash_receipt_image}
+                   //   >
+                  //      {downloading ? (
+                     //     <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+                     //   ) : (
+                    //      <Download className="h-4 w-4 ml-2" />
+                     //   )}
+                    //    {downloading ? 'جاري التحميل...' : 'تحميل'}
+                    //  </Button>
                     </div>
                   </CardContent>
                 </Card>

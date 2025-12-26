@@ -1,39 +1,39 @@
-import { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Heart, MapPin, Calendar, ArrowRight, Upload, X, Loader2, Copy, Check } from 'lucide-react';
-import { Layout } from '@/components/layout/Layout';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { useOrphan } from '@/hooks/useOrphans';
-import { useCreateSponsorshipRequest } from '@/hooks/useSponsorshipRequests';
-import { toast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
+import { useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { Heart, MapPin, Calendar, ArrowRight, Upload, X, Loader2, Copy, Check } from "lucide-react";
+import { Layout } from "@/components/layout/Layout";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { useOrphan } from "@/hooks/useOrphans";
+import { useCreateSponsorshipRequest } from "@/hooks/useSponsorshipRequests";
+import { toast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const statusLabels = {
-  available: { label: 'متاح للكفالة', class: 'bg-primary text-primary-foreground' },
-  partial: { label: 'كفالة جزئية', class: 'bg-secondary text-secondary-foreground' },
-  full: { label: 'مكفول', class: 'bg-muted text-muted-foreground' },
+  available: { label: "متاح للكفالة", class: "bg-primary text-primary-foreground" },
+  partial: { label: "كفالة جزئية", class: "bg-secondary text-secondary-foreground" },
+  full: { label: "مكفول", class: "bg-muted text-muted-foreground" },
 };
 
 // Bank accounts data - replace placeholders with actual data later
 const bankAccounts = [
   {
-    bankName: 'BANK_NAME_1',
-    accountName: 'ACCOUNT_NAME_1',
-    iban: 'SA00 0000 0000 0000 0000 0000',
+    bankName: "بنك الكريمي",
+    accountName: "ACCOUNT_NAME_1",
+    iban: "SA00 0000 0000 0000 0000 0000",
   },
   {
-    bankName: 'BANK_NAME_2',
-    accountName: 'ACCOUNT_NAME_2',
-    iban: 'SA00 0000 0000 0000 0000 0001',
+    bankName: "BANK_NAME_2",
+    accountName: "ACCOUNT_NAME_2",
+    iban: "SA00 0000 0000 0000 0000 0001",
   },
   {
-    bankName: 'BANK_NAME_3',
-    accountName: 'ACCOUNT_NAME_3',
-    iban: 'SA00 0000 0000 0000 0000 0002',
+    bankName: "BANK_NAME_3",
+    accountName: "ACCOUNT_NAME_3",
+    iban: "SA00 0000 0000 0000 0000 0002",
   },
 ];
 
@@ -42,11 +42,11 @@ function BankAccountsSection() {
 
   const copyToClipboard = async (text: string, index: number) => {
     try {
-      await navigator.clipboard.writeText(text.replace(/\s/g, ''));
+      await navigator.clipboard.writeText(text.replace(/\s/g, ""));
       setCopiedIndex(index);
       setTimeout(() => setCopiedIndex(null), 2000);
     } catch (err) {
-      console.error('Failed to copy:', err);
+      console.error("Failed to copy:", err);
     }
   };
 
@@ -58,10 +58,10 @@ function BankAccountsSection() {
           <div key={index} className="bg-card rounded-lg p-3 border border-border">
             <div className="text-sm text-muted-foreground mb-1">اسم البنك</div>
             <div className="font-medium text-foreground mb-2 select-all">{account.bankName}</div>
-            
+
             <div className="text-sm text-muted-foreground mb-1">اسم الحساب</div>
             <div className="font-medium text-foreground mb-2 select-all">{account.accountName}</div>
-            
+
             <div className="text-sm text-muted-foreground mb-1">رقم الحساب / IBAN</div>
             <div className="flex items-center gap-2">
               <code className="flex-1 bg-muted px-2 py-1 rounded text-sm font-mono select-all" dir="ltr">
@@ -97,16 +97,16 @@ function BankAccountsSection() {
 export default function OrphanDetailsPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { data: orphan, isLoading } = useOrphan(id || '');
+  const { data: orphan, isLoading } = useOrphan(id || "");
   const createSponsorshipRequest = useCreateSponsorshipRequest();
-  
+
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
-    fullName: '',
-    phone: '',
-    email: '',
-    country: '',
-    sponsorshipType: 'monthly',
+    fullName: "",
+    phone: "",
+    email: "",
+    country: "",
+    sponsorshipType: "monthly",
   });
   const [receiptFile, setReceiptFile] = useState<File | null>(null);
   const [receiptPreview, setReceiptPreview] = useState<string | null>(null);
@@ -115,19 +115,19 @@ export default function OrphanDetailsPage() {
   const handleReceiptFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (!file.type.startsWith('image/')) {
+      if (!file.type.startsWith("image/")) {
         toast({
-          title: 'خطأ',
-          description: 'يرجى اختيار ملف صورة فقط',
-          variant: 'destructive',
+          title: "خطأ",
+          description: "يرجى اختيار ملف صورة فقط",
+          variant: "destructive",
         });
         return;
       }
       if (file.size > 5 * 1024 * 1024) {
         toast({
-          title: 'خطأ',
-          description: 'حجم الصورة يجب أن يكون أقل من 5MB',
-          variant: 'destructive',
+          title: "خطأ",
+          description: "حجم الصورة يجب أن يكون أقل من 5MB",
+          variant: "destructive",
         });
         return;
       }
@@ -145,39 +145,37 @@ export default function OrphanDetailsPage() {
 
   const uploadReceiptImage = async (): Promise<string | null> => {
     if (!receiptFile) return null;
-    
+
     try {
-      const fileExt = receiptFile.name.split('.').pop();
+      const fileExt = receiptFile.name.split(".").pop();
       const fileName = `public/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
-      
-      const { error: uploadError } = await supabase.storage
-        .from('deposit-receipts')
-        .upload(fileName, receiptFile);
-      
+
+      const { error: uploadError } = await supabase.storage.from("deposit-receipts").upload(fileName, receiptFile);
+
       if (uploadError) throw uploadError;
-      
-      const { data: { publicUrl } } = supabase.storage
-        .from('deposit-receipts')
-        .getPublicUrl(fileName);
-      
+
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from("deposit-receipts").getPublicUrl(fileName);
+
       return publicUrl;
     } catch (error) {
-      console.error('Error uploading receipt:', error);
+      console.error("Error uploading receipt:", error);
       return null;
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!orphan) return;
 
     // Validate required fields
     if (!formData.fullName.trim() || !formData.phone.trim()) {
       toast({
-        title: 'بيانات ناقصة',
-        description: 'يرجى إدخال الاسم ورقم الهاتف',
-        variant: 'destructive',
+        title: "بيانات ناقصة",
+        description: "يرجى إدخال الاسم ورقم الهاتف",
+        variant: "destructive",
       });
       return;
     }
@@ -192,9 +190,7 @@ export default function OrphanDetailsPage() {
       }
 
       // Calculate amount
-      const amount = formData.sponsorshipType === 'yearly' 
-        ? orphan.monthly_amount * 12 
-        : orphan.monthly_amount;
+      const amount = formData.sponsorshipType === "yearly" ? orphan.monthly_amount * 12 : orphan.monthly_amount;
 
       // Create sponsorship request (pending status)
       await createSponsorshipRequest.mutateAsync({
@@ -203,7 +199,7 @@ export default function OrphanDetailsPage() {
         sponsor_email: formData.email || undefined,
         sponsor_country: formData.country || undefined,
         orphan_id: orphan.id,
-        sponsorship_type: formData.sponsorshipType as 'monthly' | 'yearly',
+        sponsorship_type: formData.sponsorshipType as "monthly" | "yearly",
         amount,
         transfer_receipt_image: receiptImageUrl || undefined,
       });
@@ -212,37 +208,37 @@ export default function OrphanDetailsPage() {
       const params = new URLSearchParams({
         name: formData.fullName,
         amount: amount.toString(),
-        status: 'pending',
+        status: "pending",
       });
       navigate(`/thanks?${params.toString()}`);
     } catch (error: any) {
-      console.error('[SponsorshipRequest] Error:', error);
-      console.error('[SponsorshipRequest] Error details:', {
+      console.error("[SponsorshipRequest] Error:", error);
+      console.error("[SponsorshipRequest] Error details:", {
         message: error?.message,
         code: error?.code,
         status: error?.status,
         details: error?.details,
       });
-      
+
       // Better error messages based on error type
-      let errorMessage = 'لم نتمكن من إرسال طلب الكفالة. يرجى المحاولة مرة أخرى.';
-      
-      if (error?.message?.includes('fetch') || error?.message?.includes('network')) {
-        errorMessage = 'تعذر الاتصال بالخادم. يرجى التحقق من اتصالك بالإنترنت.';
-      } else if (error?.code === '23505') {
-        errorMessage = 'يوجد طلب كفالة سابق بنفس البيانات.';
-      } else if (error?.code === '42501' || error?.status === 403 || error?.status === 401) {
-        errorMessage = 'لا تملك صلاحية تنفيذ هذه العملية.';
-      } else if (error?.code === '413' || error?.message?.includes('too large')) {
-        errorMessage = 'حجم الملف كبير جداً. الحد الأقصى 5MB.';
-      } else if (error?.code?.startsWith('22') || error?.status === 400) {
-        errorMessage = 'تأكد من إدخال جميع البيانات المطلوبة بشكل صحيح.';
+      let errorMessage = "لم نتمكن من إرسال طلب الكفالة. يرجى المحاولة مرة أخرى.";
+
+      if (error?.message?.includes("fetch") || error?.message?.includes("network")) {
+        errorMessage = "تعذر الاتصال بالخادم. يرجى التحقق من اتصالك بالإنترنت.";
+      } else if (error?.code === "23505") {
+        errorMessage = "يوجد طلب كفالة سابق بنفس البيانات.";
+      } else if (error?.code === "42501" || error?.status === 403 || error?.status === 401) {
+        errorMessage = "لا تملك صلاحية تنفيذ هذه العملية.";
+      } else if (error?.code === "413" || error?.message?.includes("too large")) {
+        errorMessage = "حجم الملف كبير جداً. الحد الأقصى 5MB.";
+      } else if (error?.code?.startsWith("22") || error?.status === 400) {
+        errorMessage = "تأكد من إدخال جميع البيانات المطلوبة بشكل صحيح.";
       }
-      
+
       toast({
-        title: 'حدث خطأ',
+        title: "حدث خطأ",
         description: errorMessage,
-        variant: 'destructive',
+        variant: "destructive",
       });
     } finally {
       setSubmitting(false);
@@ -304,7 +300,9 @@ export default function OrphanDetailsPage() {
                   <div className="grid grid-cols-2 gap-4 mb-6">
                     <div className="flex items-center gap-2 text-muted-foreground">
                       <MapPin className="h-5 w-5" />
-                      <span>{orphan.city}، {orphan.country}</span>
+                      <span>
+                        {orphan.city}، {orphan.country}
+                      </span>
                     </div>
                     <div className="flex items-center gap-2 text-muted-foreground">
                       <Calendar className="h-5 w-5" />
@@ -345,7 +343,7 @@ export default function OrphanDetailsPage() {
                   <p className="text-muted-foreground mb-6">
                     ساهم في توفير حياة كريمة لهذا اليتيم من خلال كفالتك الشهرية أو السنوية
                   </p>
-                  {orphan.status !== 'full' ? (
+                  {orphan.status !== "full" ? (
                     <Button variant="hero" size="xl" onClick={() => setShowForm(true)} className="w-full">
                       أكفل هذا اليتيم الآن
                     </Button>
@@ -360,27 +358,50 @@ export default function OrphanDetailsPage() {
                   <div className="space-y-4">
                     <div>
                       <Label htmlFor="fullName">الاسم الكامل *</Label>
-                      <Input id="fullName" required value={formData.fullName} onChange={(e) => setFormData({ ...formData, fullName: e.target.value })} />
+                      <Input
+                        id="fullName"
+                        required
+                        value={formData.fullName}
+                        onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                      />
                     </div>
 
                     <div>
                       <Label htmlFor="email">البريد الإلكتروني *</Label>
-                      <Input id="email" type="email" required value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
+                      <Input
+                        id="email"
+                        type="email"
+                        required
+                        value={formData.email}
+                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      />
                     </div>
 
                     <div>
                       <Label htmlFor="phone">رقم الهاتف</Label>
-                      <Input id="phone" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} />
+                      <Input
+                        id="phone"
+                        value={formData.phone}
+                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                      />
                     </div>
 
                     <div>
                       <Label htmlFor="country">البلد</Label>
-                      <Input id="country" value={formData.country} onChange={(e) => setFormData({ ...formData, country: e.target.value })} />
+                      <Input
+                        id="country"
+                        value={formData.country}
+                        onChange={(e) => setFormData({ ...formData, country: e.target.value })}
+                      />
                     </div>
 
                     <div>
                       <Label>نوع الكفالة *</Label>
-                      <RadioGroup value={formData.sponsorshipType} onValueChange={(v) => setFormData({ ...formData, sponsorshipType: v })} className="flex gap-4 mt-2">
+                      <RadioGroup
+                        value={formData.sponsorshipType}
+                        onValueChange={(v) => setFormData({ ...formData, sponsorshipType: v })}
+                        className="flex gap-4 mt-2"
+                      >
                         <div className="flex items-center space-x-2 space-x-reverse">
                           <RadioGroupItem value="monthly" id="monthly" />
                           <Label htmlFor="monthly">شهرية ({orphan.monthly_amount} ر.س)</Label>
@@ -394,9 +415,7 @@ export default function OrphanDetailsPage() {
 
                     <div>
                       <Label>طريقة الدفع *</Label>
-                      <div className="mt-2 px-3 py-2 bg-muted rounded-md text-foreground">
-                        تحويل بنكي
-                      </div>
+                      <div className="mt-2 px-3 py-2 bg-muted rounded-md text-foreground">تحويل بنكي</div>
                     </div>
 
                     {/* Bank Account Details Section */}
@@ -404,9 +423,7 @@ export default function OrphanDetailsPage() {
 
                     {/* Receipt Image Upload */}
                     <div>
-                      <Label>
-                        صورة الإيصال / الحوالة (اختياري)
-                      </Label>
+                      <Label>صورة الإيصال / الحوالة (اختياري)</Label>
                       <p className="text-xs text-muted-foreground mb-2">
                         يمكنك رفع صورة إيصال التحويل البنكي لتسريع المراجعة
                       </p>
@@ -419,11 +436,7 @@ export default function OrphanDetailsPage() {
                       />
                       {receiptPreview ? (
                         <div className="relative w-full aspect-video rounded-xl overflow-hidden bg-muted border border-border">
-                          <img
-                            src={receiptPreview}
-                            alt="صورة الإيصال"
-                            className="w-full h-full object-cover"
-                          />
+                          <img src={receiptPreview} alt="صورة الإيصال" className="w-full h-full object-cover" />
                           <Button
                             type="button"
                             variant="destructive"
@@ -448,7 +461,9 @@ export default function OrphanDetailsPage() {
                   </div>
 
                   <div className="flex gap-4">
-                    <Button type="button" variant="outline" onClick={() => setShowForm(false)} className="flex-1">إلغاء</Button>
+                    <Button type="button" variant="outline" onClick={() => setShowForm(false)} className="flex-1">
+                      إلغاء
+                    </Button>
                     <Button type="submit" variant="hero" className="flex-1" disabled={submitting}>
                       {submitting ? (
                         <>
@@ -456,7 +471,7 @@ export default function OrphanDetailsPage() {
                           جاري الإرسال...
                         </>
                       ) : (
-                        'إرسال طلب الكفالة'
+                        "إرسال طلب الكفالة"
                       )}
                     </Button>
                   </div>

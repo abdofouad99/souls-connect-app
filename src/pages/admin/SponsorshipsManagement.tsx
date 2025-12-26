@@ -60,9 +60,14 @@ export default function SponsorshipsManagement() {
   }, []);
 
   const filteredSponsorships = sponsorships?.filter(sponsorship => {
+    // Get sponsor name from direct field or relation
+    const sponsorName = (sponsorship as any).sponsor_full_name || sponsorship.sponsor?.full_name || '';
+    const sponsorPhone = (sponsorship as any).sponsor_phone || sponsorship.sponsor?.phone || '';
+    
     const matchesSearch = 
       sponsorship.orphan?.full_name.includes(search) ||
-      sponsorship.sponsor?.full_name.includes(search) ||
+      sponsorName.includes(search) ||
+      sponsorPhone.includes(search) ||
       sponsorship.receipt_number.includes(search);
     
     const matchesStatus = statusFilter === 'all' || sponsorship.status === statusFilter;
@@ -153,7 +158,18 @@ export default function SponsorshipsManagement() {
                       <TableCell className="font-medium">
                         {sponsorship.orphan?.full_name || '-'}
                       </TableCell>
-                      <TableCell>{sponsorship.sponsor?.full_name || '-'}</TableCell>
+                      <TableCell>
+                        <div>
+                          <div className="font-medium">
+                            {(sponsorship as any).sponsor_full_name || sponsorship.sponsor?.full_name || '-'}
+                          </div>
+                          {((sponsorship as any).sponsor_phone || sponsorship.sponsor?.phone) && (
+                            <div className="text-sm text-muted-foreground" dir="ltr">
+                              {(sponsorship as any).sponsor_phone || sponsorship.sponsor?.phone}
+                            </div>
+                          )}
+                        </div>
+                      </TableCell>
                       <TableCell>{typeLabels[sponsorship.type]}</TableCell>
                       <TableCell>{sponsorship.monthly_amount} ر.س</TableCell>
                       <TableCell>

@@ -78,85 +78,57 @@ export default function ReceiptLookup() {
             <p className="text-muted-foreground">أدخل بياناتك للاستعلام عن سند القبض الخاص بكفالتك</p>
           </div>
 
-        
-  return (
-    <Card className="mb-8">
-      <CardHeader>
-        <CardTitle className="text-lg">بيانات البحث</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSearch} className="space-y-4">
-          <div>
-            <Label htmlFor="sponsorName">اسم الكافل *</Label>
-            <Input
-              id="sponsorName"
-              required
-              value={searchData.sponsorName}
-              onChange={(e) => {
-                setSearchData({ ...searchData, sponsorName: e.target.value });
-                setShouldSearch(false);
-              }}
-              placeholder="أدخل اسمك الكامل"
-            />
-          </div>
+          {/* Search Form */}
+          <Card className="mb-8">
+            <CardHeader>
+              <CardTitle className="text-lg">بيانات البحث</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleSearch} className="space-y-4">
+                <div>
+                  <Label htmlFor="sponsorName">اسم الكافل *</Label>
+                  <Input
+                    id="sponsorName"
+                    required
+                    value={searchData.sponsorName}
+                    onChange={(e) => {
+                      setSearchData({ ...searchData, sponsorName: e.target.value });
+                      setShouldSearch(false);
+                    }}
+                    placeholder="أدخل اسمك الكامل"
+                  />
+                </div>
 
-          <div>
-            <Label htmlFor="sponsorPhone">رقم الجوال *</Label>
-            <Input
-              id="sponsorPhone"
-              required
-              value={searchData.sponsorPhone}
-              onChange={(e) => {
-                setSearchData({ ...searchData, sponsorPhone: e.target.value });
-                setShouldSearch(false);
-              }}
-              placeholder="05xxxxxxxx"
-              dir="ltr"
-              className="text-left"
-            />
-          </div>
+                <div>
+                  <Label htmlFor="sponsorPhone">رقم الجوال *</Label>
+                  <Input
+                    id="sponsorPhone"
+                    required
+                    value={searchData.sponsorPhone}
+                    onChange={(e) => {
+                      setSearchData({ ...searchData, sponsorPhone: e.target.value });
+                      setShouldSearch(false);
+                    }}
+                    placeholder="05xxxxxxxx"
+                    dir="ltr"
+                    className="text-left"
+                  />
+                </div>
 
-          <div>
-            <Label htmlFor="sponsorAmount">مبلغ الكفالة *</Label>
-            <Input
-              id="sponsorAmount"
-              type="number"
-              required
-              value={searchData.sponsorAmount}
-              onChange={(e) => {
-                setSearchData({ ...searchData, sponsorAmount: e.target.value });
-                setShouldSearch(false);
-              }}
-              placeholder="أدخل مبلغ الكفالة"
-            />
-          </div>
-
-          <div className="flex gap-3">
-            <Button type="submit" className="flex-1" disabled={isLoading}>
-              <Search className="h-4 w-4 ml-2" />
-              {isLoading ? "جاري البحث..." : "بحث"}
-            </Button>
-            {shouldSearch && (
-              <Button type="button" variant="outline" onClick={resetSearch}>
-                بحث جديد
-              </Button>
-            )}
-          </div>
-        </form>
-
-        {/* عرض النتيجة إذا كانت موجودة */}
-        {result && (
-          <div className="mt-6 p-4 border rounded bg-surface/20">
-            <p><strong>اسم الكافل:</strong> {result.name}</p>
-            <p><strong>رقم الجوال:</strong> {result.phone}</p>
-            <p><strong>مبلغ الكفالة:</strong> {result.amount}</p>
-          </div>
-        )}
-      </CardContent>
-    </Card>
-  );
-}
-
+                <div className="flex gap-3">
+                  <Button type="submit" className="flex-1" disabled={isLoading}>
+                    <Search className="h-4 w-4 ml-2" />
+                    {isLoading ? "جاري البحث..." : "بحث"}
+                  </Button>
+                  {shouldSearch && (
+                    <Button type="button" variant="outline" onClick={resetSearch}>
+                      بحث جديد
+                    </Button>
+                  )}
+                </div>
+              </form>
+            </CardContent>
+          </Card>
 
           {/* Results */}
           {shouldSearch && !isLoading && (
@@ -181,7 +153,7 @@ export default function ReceiptLookup() {
                     </p>
                   </CardContent>
                 </Card>
-              )}
+              );}
 
               {receipt && !receipt.cash_receipt_image && (
                 <Card className="border-primary/50 bg-primary/5">

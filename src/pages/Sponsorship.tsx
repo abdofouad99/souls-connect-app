@@ -178,6 +178,7 @@ const Sponsorship = () => {
                 </div>
               </div> 
             </div>
+        </div>
          </section>
 
         {/* CTA Section */}

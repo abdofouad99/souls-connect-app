@@ -165,7 +165,7 @@ const Sponsorship = () => {
               </div>
 
               {/* Video Section */}
-              <div>
+              <div className="aspect-video w-full rounded-xl overflow-hidden">
                 <iframe
                   className="w-full h-full"
                   src="https://drive.google.com/file/d/1MPaZdrcRqXXR_5lWNnXeCz_rhRxddjfN/preview"

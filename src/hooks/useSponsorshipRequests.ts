@@ -102,29 +102,87 @@ export function useUpdateSponsorshipRequestStatus() {
 
   return useMutation({
     mutationFn: async ({ id, admin_status, admin_notes }: UpdateSponsorshipRequestData) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      
       const updateData: any = {
         admin_status,
         admin_notes: admin_notes || null,
       };
 
       if (admin_status === 'approved') {
-        const { data: { user } } = await supabase.auth.getUser();
         updateData.approved_at = new Date().toISOString();
         updateData.approved_by = user?.id;
       }
 
-      const { data, error } = await supabase
+      // Update the request status
+      const { data: updatedRequest, error: updateError } = await supabase
         .from('sponsorship_requests')
         .update(updateData)
         .eq('id', id)
-        .select()
+        .select(`
+          *,
+          orphan:orphans(id, full_name, monthly_amount)
+        `)
         .single();
 
-      if (error) throw error;
-      return data;
+      if (updateError) throw updateError;
+
+      // If approved, also create a sponsorship record
+      if (admin_status === 'approved' && updatedRequest) {
+        // Check if sponsorship already exists for this request
+        const { data: existingSponsorship } = await supabase
+          .from('sponsorships')
+          .select('id')
+          .eq('request_id', id)
+          .maybeSingle();
+
+        // Only insert if not already exists
+        if (!existingSponsorship) {
+          // Generate receipt number
+          const { data: receiptNumber } = await supabase.rpc('generate_receipt_number');
+
+          const { error: insertError } = await supabase
+            .from('sponsorships')
+            .insert({
+              request_id: id,
+              orphan_id: updatedRequest.orphan_id,
+              sponsor_id: user?.id || updatedRequest.approved_by, // Use approver as fallback
+              sponsor_full_name: updatedRequest.sponsor_full_name,
+              sponsor_phone: updatedRequest.sponsor_phone,
+              sponsor_email: updatedRequest.sponsor_email,
+              sponsor_country: updatedRequest.sponsor_country,
+              type: updatedRequest.sponsorship_type,
+              monthly_amount: updatedRequest.amount,
+              payment_method: updatedRequest.payment_method,
+              transfer_receipt_image: updatedRequest.transfer_receipt_image,
+              cash_receipt_image: updatedRequest.cash_receipt_image,
+              cash_receipt_number: updatedRequest.cash_receipt_number,
+              cash_receipt_date: updatedRequest.cash_receipt_date,
+              approved_at: updateData.approved_at,
+              approved_by: updateData.approved_by,
+              receipt_number: receiptNumber || `RCP-${Date.now()}`,
+              status: 'active',
+            });
+
+          if (insertError) {
+            console.error('[Approve] Error creating sponsorship:', insertError);
+            // Don't throw - the request is already approved
+          }
+
+          // Update orphan status to sponsored
+          await supabase
+            .from('orphans')
+            .update({ status: 'sponsored' })
+            .eq('id', updatedRequest.orphan_id);
+        }
+      }
+
+      return updatedRequest;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['sponsorship-requests'] });
+      queryClient.invalidateQueries({ queryKey: ['sponsorships'] });
+      queryClient.invalidateQueries({ queryKey: ['orphans'] });
     },
   });
 }

@@ -326,6 +326,11 @@ export type Database = {
       }
       sponsorships: {
         Row: {
+          approved_at: string | null
+          approved_by: string | null
+          cash_receipt_date: string | null
+          cash_receipt_image: string | null
+          cash_receipt_number: string | null
           created_at: string
           end_date: string | null
           id: string
@@ -334,13 +339,24 @@ export type Database = {
           payment_method: string
           receipt_image_url: string | null
           receipt_number: string
+          request_id: string | null
+          sponsor_country: string | null
+          sponsor_email: string | null
+          sponsor_full_name: string | null
           sponsor_id: string
+          sponsor_phone: string | null
           start_date: string
           status: string
+          transfer_receipt_image: string | null
           type: string
           updated_at: string
         }
         Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          cash_receipt_date?: string | null
+          cash_receipt_image?: string | null
+          cash_receipt_number?: string | null
           created_at?: string
           end_date?: string | null
           id?: string
@@ -349,13 +365,24 @@ export type Database = {
           payment_method: string
           receipt_image_url?: string | null
           receipt_number: string
+          request_id?: string | null
+          sponsor_country?: string | null
+          sponsor_email?: string | null
+          sponsor_full_name?: string | null
           sponsor_id: string
+          sponsor_phone?: string | null
           start_date?: string
           status?: string
+          transfer_receipt_image?: string | null
           type: string
           updated_at?: string
         }
         Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          cash_receipt_date?: string | null
+          cash_receipt_image?: string | null
+          cash_receipt_number?: string | null
           created_at?: string
           end_date?: string | null
           id?: string
@@ -364,9 +391,15 @@ export type Database = {
           payment_method?: string
           receipt_image_url?: string | null
           receipt_number?: string
+          request_id?: string | null
+          sponsor_country?: string | null
+          sponsor_email?: string | null
+          sponsor_full_name?: string | null
           sponsor_id?: string
+          sponsor_phone?: string | null
           start_date?: string
           status?: string
+          transfer_receipt_image?: string | null
           type?: string
           updated_at?: string
         }
@@ -376,6 +409,13 @@ export type Database = {
             columns: ["orphan_id"]
             isOneToOne: false
             referencedRelation: "orphans"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sponsorships_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: true
+            referencedRelation: "sponsorship_requests"
             referencedColumns: ["id"]
           },
           {

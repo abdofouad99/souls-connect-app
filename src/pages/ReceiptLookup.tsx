@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Search, FileCheck, Clock, Download, ExternalLink, Heart } from 'lucide-react';
+import { Search, FileCheck, Clock, Download, ExternalLink, Heart, Loader2 } from 'lucide-react';
 import { Layout } from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,13 +8,15 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useLookupReceipt } from '@/hooks/useSponsorshipRequests';
 import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
-
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/hooks/use-toast';
 export default function ReceiptLookup() {
   const [searchData, setSearchData] = useState({
     sponsorName: '',
     sponsorPhone: '',
   });
   const [shouldSearch, setShouldSearch] = useState(false);
+  const [downloading, setDownloading] = useState(false);
 
   const { data: receipt, isLoading, error } = useLookupReceipt(
     searchData.sponsorName,
@@ -32,6 +34,38 @@ export default function ReceiptLookup() {
   const resetSearch = () => {
     setShouldSearch(false);
     setSearchData({ sponsorName: '', sponsorPhone: '' });
+  };
+
+  // Download receipt using blob for cross-origin support
+  const handleDownload = async () => {
+    if (!receipt?.cash_receipt_image) return;
+
+    setDownloading(true);
+    try {
+      // Fetch the image as blob
+      const response = await fetch(receipt.cash_receipt_image);
+      if (!response.ok) throw new Error('فشل في تحميل الصورة');
+      
+      const blob = await response.blob();
+      const objectUrl = URL.createObjectURL(blob);
+
+      // Create hidden link and trigger download
+      const link = document.createElement('a');
+      link.href = objectUrl;
+      link.download = `سند-قبض-${receipt.cash_receipt_number || receipt.id}.jpg`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      // Cleanup
+      URL.revokeObjectURL(objectUrl);
+      toast({ title: 'تم بدء التحميل' });
+    } catch (error: any) {
+      console.error('Download error:', error);
+      toast({ title: 'فشل في تحميل السند', variant: 'destructive' });
+    } finally {
+      setDownloading(false);
+    }
   };
 
   return (
@@ -225,15 +259,15 @@ export default function ReceiptLookup() {
                       </Button>
                       <Button
                         className="flex-1"
-                        onClick={() => {
-                          const link = document.createElement('a');
-                          link.href = receipt.cash_receipt_image!;
-                          link.download = `سند-قبض-${receipt.sponsor_full_name}.jpg`;
-                          link.click();
-                        }}
+                        onClick={handleDownload}
+                        disabled={downloading || !receipt.cash_receipt_image}
                       >
-                        <Download className="h-4 w-4 ml-2" />
-                        تحميل
+                        {downloading ? (
+                          <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+                        ) : (
+                          <Download className="h-4 w-4 ml-2" />
+                        )}
+                        {downloading ? 'جاري التحميل...' : 'تحميل'}
                       </Button>
                     </div>
                   </CardContent>

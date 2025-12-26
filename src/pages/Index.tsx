@@ -105,9 +105,6 @@ const Index = () => {
                   ابدأ كفالة يتيم الآن
                 </Link>
               </Button>
-              <Button asChild variant="outline" size="xl" className="hover:scale-105 transition-transform">
-                <Link to="/deposit-request">طلب سند إيداع</Link>
-              </Button>
             </div>
           </div>
         </div>

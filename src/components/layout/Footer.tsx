@@ -70,7 +70,16 @@ export function Footer() {
               </div>
               <div className="flex items-center gap-2 text-sm text-primary-foreground/80">
                 <Mail className="h-4 w-4 text-secondary" />
-                <span>https://www.facebook.com/share/1a6MtvyzUw/</span>
+                <span>
+                  {" "}
+                  <Link
+                    to="/sponsorship"
+                    className="flex items-center gap-2 text-sm text-primary-foreground/80 hover:text-secondary transition-colors"
+                  >
+                    <Heart className="h-4 w-4" />
+                    https://www.facebook.com/share/1a6MtvyzUw/
+                  </Link>
+                </span>
               </div>
               <div className="flex items-center gap-2 text-sm text-primary-foreground/80">
                 <MapPin className="h-4 w-4 text-secondary" />

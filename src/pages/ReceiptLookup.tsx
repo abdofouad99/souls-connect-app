@@ -111,7 +111,20 @@ export default function ReceiptLookup() {
                     }}
                     placeholder="05xxxxxxxx"
                     dir="ltr"
-                    className="text-left"
+                    className="text-right"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="deposit_amount"> مبلغ الكفالة *</Label>
+                  <Input
+                    id="deposit_amount"
+                    required
+                    value={searchData.deposit_amount}
+                    onChange={(e) => {
+                      setSearchData({ ...searchData, deposit_amount: e.target.value });
+                      setShouldSearch(false);
+                    }}
+                    placeholder="أدخل مبلغ الكفالة"
                   />
                 </div>
 

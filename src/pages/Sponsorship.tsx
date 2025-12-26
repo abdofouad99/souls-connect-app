@@ -166,14 +166,16 @@ const Sponsorship = () => {
 
               {/* Video Section */}
               <div>
-               <iframe
-  className="w-full h-full"
-  src="https://drive.google.com/file/d/1MPaZdrcRqXXR_5lWNnXeCz_rhRxddjfN/preview"
-  title="فيديو كفالة الأيتام"
-  allow="autoplay; encrypted-media"
-  allowFullScreen
-/>
-
+                <h3 className="text-xl md:text-2xl font-bold text-primary mb-6 text-center">فيديو الكفالة</h3>
+                <div className="bg-surface rounded-xl border border-border overflow-hidden shadow-elegant">
+                  <div className="aspect-video relative">
+                    <iframe
+                      className="w-full h-full"
+                      src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+                      title="فيديو كفالة الأيتام"
+                      allow="autoplay; encrypted-media"
+                      allowFullScreen
+                    />
                   </div>
                 </div>
               </div>

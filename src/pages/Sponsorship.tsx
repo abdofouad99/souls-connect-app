@@ -168,7 +168,7 @@ const Sponsorship = () => {
               <div>
                 <iframe
                   className="w-full h-full"
-                  src="https://drive.google.com/file/d/1MPaZdrcRqXXR_5lWNnXeCz_rhRxddjfN/view?usp=sharing"
+                  src="https://drive.google.com/file/d/1MPaZdrcRqXXR_5lWNnXeCz_rhRxddjfN/preview"
                   title="فيديو كفالة الأيتام"
                   allow="autoplay; encrypted-media"
                   allowFullScreen

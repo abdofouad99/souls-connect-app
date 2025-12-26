@@ -171,9 +171,9 @@ const Sponsorship = () => {
                   <div className="aspect-video relative">
                     <iframe
                       className="w-full h-full"
-                      src="https://drive.google.com/file/d/1MPaZdrcRqXXR_5lWNnXeCz_rhRxddjfN/view?usp=sharing"
+                      src="https://www.youtube.com/embed/dQw4w9WgXcQ"
                       title="فيديو كفالة الأيتام"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allow="autoplay; encrypted-media"
                       allowFullScreen
                     />
                   </div>

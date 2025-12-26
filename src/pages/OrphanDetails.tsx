@@ -22,13 +22,33 @@ const statusLabels = {
 const bankAccounts = [
   {
     bankName: "بنك الكريمي",
-    // accountName: "ACCOUNT_NAME_1",
-    iban: "3073854128 YER",
-    iban: "3137559853 SAR",
-    iban: "3153152739 USD",
-    iban: "3063750157 YER",
-    iban: "3131509811 SAR",
-    iban: "3164552135 USD",
+    accountName: "الحساب اليمني",
+    iban: "3073854128",
+  },
+  {
+    bankName: "بنك الكريمي",
+    accountName: "الحساب السعودي",
+    iban: "3137559853",
+  },
+  {
+    bankName: "بنك الكريمي",
+    accountName: "الحساب الدولار",
+    iban: "3153152739",
+  },
+  {
+    bankName: "بنك الكريمي",
+    accountName: "الحساب اليمني",
+    iban: "3063750157",
+  },
+  {
+    bankName: "بنك الكريمي",
+    accountName: "الحساب السعودي",
+    iban: "3131509811",
+  },
+  {
+    bankName: "بنك الكريمي",
+    accountName: "الحساب الدولار",
+    iban: "3164552135",
   },
 ];
 

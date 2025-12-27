@@ -134,7 +134,15 @@ const Index = () => {
               className={cn(
                 "text-3xl md:text-4xl font-serif font-bold text-foreground mb-6 transition-all duration-700",
                 missionAnim.isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-              
+              )}
+            >
+              رسالتنا
+            </h2>
+            <div 
+              className={cn(
+                "mt-8 transition-all duration-700 delay-200",
+                missionAnim.isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+              )}
             >
               <Button asChild variant="gold" size="lg" className="hover:scale-105 transition-transform">
                 <Link to="/orphans">استعرض الأيتام المتاحين للكفالة</Link>

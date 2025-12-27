@@ -1,57 +1,50 @@
-import { Link } from 'react-router-dom';
-import { Heart, Users, HandHeart, TrendingUp, Phone } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Layout } from '@/components/layout/Layout';
-import { useOrphanStats } from '@/hooks/useOrphans';
-import { useScrollAnimation } from '@/hooks/useScrollAnimation';
-import heroImage from '@/assets/hero-image.jpg';
-import { cn } from '@/lib/utils';
+import { Link } from "react-router-dom";
+import { Heart, Users, HandHeart, TrendingUp, Phone } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Layout } from "@/components/layout/Layout";
+import { useOrphanStats } from "@/hooks/useOrphans";
+import { useScrollAnimation } from "@/hooks/useScrollAnimation";
+import heroImage from "@/assets/hero-image.jpg";
+import { cn } from "@/lib/utils";
 
 const Index = () => {
   const { data: stats } = useOrphanStats();
-  
+
   // Scroll animations for sections
   const heroAnim = useScrollAnimation<HTMLElement>();
   const statsAnim = useScrollAnimation<HTMLElement>();
   const missionAnim = useScrollAnimation<HTMLElement>();
 
   const statCards = [
-    { icon: Users, label: 'إجمالي الأيتام', value: stats?.totalOrphans || 0, color: 'text-primary' },
-    { icon: Heart, label: 'يتيم مكفول', value: stats?.sponsoredOrphans || 0, color: 'text-secondary' },
-    { icon: HandHeart, label: 'كافل كريم', value: stats?.totalSponsors || 0, color: 'text-accent' },
-    { icon: TrendingUp, label: 'كفالة نشطة', value: stats?.activeSponsorships || 0, color: 'text-primary' },
+    { icon: Users, label: "إجمالي الأيتام", value: stats?.totalOrphans || 0, color: "text-primary" },
+    { icon: Heart, label: "يتيم مكفول", value: stats?.sponsoredOrphans || 0, color: "text-secondary" },
+    { icon: HandHeart, label: "كافل كريم", value: stats?.totalSponsors || 0, color: "text-accent" },
+    { icon: TrendingUp, label: "كفالة نشطة", value: stats?.activeSponsorships || 0, color: "text-primary" },
   ];
 
-  const contactNumbers = [
-    '77243079',
-    '04251675',
-    '784665006',
-  ];
+  const contactNumbers = ["77243079", "04251675", "784665006"];
 
   return (
     <Layout>
       {/* Hero Section */}
-      <section 
-        ref={heroAnim.ref}
-        className="py-12 md:py-20"
-      >
+      <section ref={heroAnim.ref} className="py-12 md:py-20">
         <div className="container">
           <div className="max-w-4xl mx-auto text-center">
             {/* العنوان الرئيسي */}
-            <h1 
+            <h1
               className={cn(
                 "text-3xl md:text-4xl lg:text-5xl font-serif font-bold text-foreground mb-8 transition-all duration-700",
-                heroAnim.isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+                heroAnim.isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8",
               )}
             >
               جمعية الأقصى _ المكتب النسوي _ تعز
             </h1>
-            
+
             {/* الصورة الرئيسية */}
-            <div 
+            <div
               className={cn(
                 "mb-10 transition-all duration-700 delay-100",
-                heroAnim.isVisible ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-8 scale-95"
+                heroAnim.isVisible ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-8 scale-95",
               )}
             >
               <img
@@ -60,19 +53,19 @@ const Index = () => {
                 className="w-full max-w-3xl mx-auto rounded-2xl shadow-xl hover:shadow-2xl transition-shadow duration-300"
               />
             </div>
-            
+
             {/* قسم أرقام التواصل */}
-            <div 
+            <div
               className={cn(
                 "bg-card rounded-2xl p-6 md:p-8 shadow-card max-w-md mx-auto transition-all duration-700 delay-200",
-                heroAnim.isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+                heroAnim.isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8",
               )}
             >
               <div className="flex items-center justify-center gap-3 mb-6">
                 <Phone className="h-6 w-6 text-primary" />
                 <h2 className="text-xl md:text-2xl font-bold text-foreground">أرقام التواصل</h2>
               </div>
-              
+
               <div className="space-y-4">
                 {contactNumbers.map((number, index) => (
                   <a
@@ -80,9 +73,9 @@ const Index = () => {
                     href={`tel:${number}`}
                     className={cn(
                       "flex items-center justify-center gap-3 bg-primary/10 hover:bg-primary/20 text-primary font-semibold text-lg md:text-xl py-3 px-6 rounded-xl transition-all duration-300 hover:scale-105",
-                      heroAnim.isVisible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-8"
+                      heroAnim.isVisible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-8",
                     )}
-                    style={{ transitionDelay: heroAnim.isVisible ? `${300 + index * 100}ms` : '0ms' }}
+                    style={{ transitionDelay: heroAnim.isVisible ? `${300 + index * 100}ms` : "0ms" }}
                     dir="ltr"
                   >
                     <Phone className="h-5 w-5" />
@@ -91,16 +84,12 @@ const Index = () => {
                 ))}
               </div>
             </div>
-            
           </div>
         </div>
       </section>
 
       {/* Stats Section */}
-      <section 
-        ref={statsAnim.ref}
-        className="py-16 bg-card"
-      >
+      <section ref={statsAnim.ref} className="py-16 bg-card">
         <div className="container">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {statCards.map((stat, index) => (
@@ -108,14 +97,14 @@ const Index = () => {
                 key={stat.label}
                 className={cn(
                   "bg-background rounded-2xl p-6 text-center shadow-card card-hover transition-all duration-500",
-                  statsAnim.isVisible ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-8 scale-95"
+                  statsAnim.isVisible ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-8 scale-95",
                 )}
-                style={{ transitionDelay: statsAnim.isVisible ? `${index * 100}ms` : '0ms' }}
+                style={{ transitionDelay: statsAnim.isVisible ? `${index * 100}ms` : "0ms" }}
               >
-                <stat.icon className={`h-10 w-10 mx-auto mb-3 ${stat.color} transition-transform duration-300 group-hover:scale-110`} />
-                <div className="text-3xl md:text-4xl font-bold text-foreground mb-1">
-                  {stat.value}
-                </div>
+                <stat.icon
+                  className={`h-10 w-10 mx-auto mb-3 ${stat.color} transition-transform duration-300 group-hover:scale-110`}
+                />
+                <div className="text-3xl md:text-4xl font-bold text-foreground mb-1">{stat.value}</div>
                 <div className="text-sm text-muted-foreground">{stat.label}</div>
               </div>
             ))}
@@ -124,24 +113,19 @@ const Index = () => {
       </section>
 
       {/* Mission Section */}
-      <section 
-        ref={missionAnim.ref}
-        className="py-20"
-      >
+      <section ref={missionAnim.ref} className="py-20">
         <div className="container">
           <div className="max-w-3xl mx-auto text-center">
-            <h2 
+            <h2
               className={cn(
                 "text-3xl md:text-4xl font-serif font-bold text-foreground mb-6 transition-all duration-700",
-                missionAnim.isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+                missionAnim.isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8",
               )}
-            >
-              رسالتنا
-            </h2>
-            <div 
+            ></h2>
+            <div
               className={cn(
                 "mt-8 transition-all duration-700 delay-200",
-                missionAnim.isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+                missionAnim.isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8",
               )}
             >
               <Button asChild variant="gold" size="lg" className="hover:scale-105 transition-transform">

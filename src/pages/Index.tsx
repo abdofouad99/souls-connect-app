@@ -92,8 +92,8 @@ const Index = () => {
               </div>
             </div>
             
-            {/* أزرار الإجراء */}
-            
+          </div>
+        </div>
       </section>
 
       {/* Stats Section */}

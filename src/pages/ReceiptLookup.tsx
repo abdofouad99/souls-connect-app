@@ -114,19 +114,6 @@ export default function ReceiptLookup() {
                     className="text-right"
                   />
                 </div>
-                <div>
-                  <Label htmlFor="deposit_amount"> مبلغ الكفالة *</Label>
-                  <Input
-                    id="deposit_amount"
-                    required
-                    value={searchData.deposit_amount}
-                    onChange={(e) => {
-                      setSearchData({ ...searchData, deposit_amount: e.target.value });
-                      setShouldSearch(false);
-                    }}
-                    placeholder="أدخل مبلغ الكفالة"
-                  />
-                </div>
 
                 <div className="flex gap-3">
                   <Button type="submit" className="flex-1" disabled={isLoading}>

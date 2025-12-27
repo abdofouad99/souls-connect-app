@@ -93,21 +93,7 @@ const Index = () => {
             </div>
             
             {/* أزرار الإجراء */}
-            <div 
-              className={cn(
-                "flex flex-col sm:flex-row gap-4 justify-center mt-10 transition-all duration-700 delay-500",
-                heroAnim.isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-              )}
-            >
-              <Button asChild variant="hero" size="xl" className="hover:scale-105 transition-transform">
-                <Link to="/orphans">
-                  <Heart className="h-5 w-5" />
-                  ابدأ كفالة يتيم الآن
-                </Link>
-              </Button>
-            </div>
-          </div>
-        </div>
+            
       </section>
 
       {/* Stats Section */}

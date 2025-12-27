@@ -134,24 +134,7 @@ const Index = () => {
               className={cn(
                 "text-3xl md:text-4xl font-serif font-bold text-foreground mb-6 transition-all duration-700",
                 missionAnim.isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-              )}
-            >
-              رسالتنا
-            </h2>
-            <p 
-              className={cn(
-                "text-lg text-muted-foreground leading-relaxed mb-8 transition-all duration-700 delay-100",
-                missionAnim.isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-              )}
-            >
-              نؤمن بأن كل يتيم يستحق حياة كريمة مليئة بالأمل والفرص. من خلال برامج الكفالة المتكاملة، 
-              نسعى لتوفير التعليم والرعاية الصحية والدعم النفسي لكل يتيم تحت رعايتنا.
-            </p>
-            <div
-              className={cn(
-                "transition-all duration-700 delay-200",
-                missionAnim.isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-              )}
+              
             >
               <Button asChild variant="gold" size="lg" className="hover:scale-105 transition-transform">
                 <Link to="/orphans">استعرض الأيتام المتاحين للكفالة</Link>

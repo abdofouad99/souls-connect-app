@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, MapPin, Heart } from 'lucide-react';
+import { Search, MapPin, Heart, X } from 'lucide-react';
 import { Layout } from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,21 +8,39 @@ import { Badge } from '@/components/ui/badge';
 import { useOrphans } from '@/hooks/useOrphans';
 import { LazyImage } from '@/components/common/LazyImage';
 import { SkeletonCard } from '@/components/common/LoadingSpinner';
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+} from '@/components/ui/dialog';
+
 const statusLabels = {
   available: { label: 'متاح للكفالة', class: 'bg-primary text-primary-foreground' },
   partial: { label: 'كفالة جزئية', class: 'bg-secondary text-secondary-foreground' },
   full: { label: 'مكفول', class: 'bg-muted text-muted-foreground' },
 };
 
+interface SelectedImage {
+  url: string;
+  name: string;
+}
+
 export default function OrphansPage() {
   const { data: orphans, isLoading } = useOrphans();
   const [search, setSearch] = useState('');
+  const [selectedImage, setSelectedImage] = useState<SelectedImage | null>(null);
 
   const filteredOrphans = orphans?.filter(orphan =>
     orphan.full_name.includes(search) ||
     orphan.city.includes(search) ||
     orphan.country.includes(search)
   ) || [];
+
+  const handleImageClick = (e: React.MouseEvent, photoUrl: string, name: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setSelectedImage({ url: photoUrl, name });
+  };
 
   return (
     <Layout>
@@ -75,16 +93,21 @@ export default function OrphansPage() {
                 >
                   <div className="aspect-square bg-muted relative">
                     {orphan.photo_url ? (
-                      <LazyImage
-                        src={orphan.photo_url}
-                        alt={`صورة اليتيم ${orphan.full_name}`}
-                        className="w-full h-full"
-                        fallback={
-                          <div className="w-full h-full flex items-center justify-center bg-muted">
-                            <Heart className="h-16 w-16 text-muted-foreground/50" />
-                          </div>
-                        }
-                      />
+                      <div 
+                        className="w-full h-full cursor-pointer"
+                        onClick={(e) => handleImageClick(e, orphan.photo_url!, orphan.full_name)}
+                      >
+                        <LazyImage
+                          src={orphan.photo_url}
+                          alt={`صورة اليتيم ${orphan.full_name}`}
+                          className="w-full h-full"
+                          fallback={
+                            <div className="w-full h-full flex items-center justify-center bg-muted">
+                              <Heart className="h-16 w-16 text-muted-foreground/50" />
+                            </div>
+                          }
+                        />
+                      </div>
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
                         <Heart className="h-16 w-16 text-muted-foreground/50" />
@@ -131,6 +154,32 @@ export default function OrphansPage() {
           )}
         </section>
       </div>
+
+      {/* Image Modal */}
+      <Dialog open={!!selectedImage} onOpenChange={() => setSelectedImage(null)}>
+        <DialogContent className="max-w-4xl w-[95vw] max-h-[95vh] p-0 overflow-hidden">
+          <DialogTitle className="sr-only">
+            {selectedImage?.name ? `صورة ${selectedImage.name}` : 'صورة اليتيم'}
+          </DialogTitle>
+          <div className="relative">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute top-2 left-2 z-10 bg-background/80 hover:bg-background"
+              onClick={() => setSelectedImage(null)}
+            >
+              <X className="h-5 w-5" />
+            </Button>
+            {selectedImage && (
+              <img
+                src={selectedImage.url}
+                alt={`صورة ${selectedImage.name}`}
+                className="w-full h-auto max-h-[90vh] object-contain"
+              />
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </Layout>
   );
 }

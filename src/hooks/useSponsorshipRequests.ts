@@ -222,10 +222,10 @@ export function useUploadCashReceipt() {
   });
 }
 
-// Lookup approved request by name and phone (public)
-export function useLookupReceipt(sponsorName: string, sponsorPhone: string, enabled: boolean) {
+// Lookup approved request by name, phone and amount (public)
+export function useLookupReceipt(sponsorName: string, sponsorPhone: string, amount: number, enabled: boolean) {
   return useQuery({
-    queryKey: ['receipt-lookup', sponsorName, sponsorPhone],
+    queryKey: ['receipt-lookup', sponsorName, sponsorPhone, amount],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('sponsorship_requests')
@@ -234,8 +234,9 @@ export function useLookupReceipt(sponsorName: string, sponsorPhone: string, enab
           orphan:orphans(id, full_name, photo_url)
         `)
         .eq('admin_status', 'approved')
-        .ilike('sponsor_full_name', `%${sponsorName}%`)
-        .eq('sponsor_phone', sponsorPhone)
+        .eq('sponsor_full_name', sponsorName.trim())
+        .eq('sponsor_phone', sponsorPhone.trim())
+        .eq('amount', amount)
         .order('approved_at', { ascending: false })
         .limit(1)
         .maybeSingle();

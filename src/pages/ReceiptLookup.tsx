@@ -10,30 +10,45 @@ import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+
 export default function ReceiptLookup() {
   const [searchData, setSearchData] = useState({
     sponsorName: "",
     sponsorPhone: "",
+    depositAmount: "",
   });
   const [shouldSearch, setShouldSearch] = useState(false);
   const [downloading, setDownloading] = useState(false);
+
+  const amount = parseFloat(searchData.depositAmount) || 0;
 
   const {
     data: receipt,
     isLoading,
     error,
-  } = useLookupReceipt(searchData.sponsorName, searchData.sponsorPhone, shouldSearch);
+  } = useLookupReceipt(searchData.sponsorName, searchData.sponsorPhone, amount, shouldSearch && amount > 0);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    if (searchData.sponsorName.trim() && searchData.sponsorPhone.trim()) {
-      setShouldSearch(true);
+    
+    // Validate all fields
+    if (!searchData.sponsorName.trim() || !searchData.sponsorPhone.trim()) {
+      toast({ title: "الرجاء إدخال الاسم ورقم الجوال", variant: "destructive" });
+      return;
     }
+    
+    const parsedAmount = parseFloat(searchData.depositAmount);
+    if (!searchData.depositAmount.trim() || isNaN(parsedAmount) || parsedAmount <= 0) {
+      toast({ title: "الرجاء إدخال مبلغ الكفالة بشكل صحيح", variant: "destructive" });
+      return;
+    }
+    
+    setShouldSearch(true);
   };
 
   const resetSearch = () => {
     setShouldSearch(false);
-    setSearchData({ sponsorName: "", sponsorPhone: "" });
+    setSearchData({ sponsorName: "", sponsorPhone: "", depositAmount: "" });
   };
 
   // Download receipt using blob for cross-origin support
@@ -115,6 +130,25 @@ export default function ReceiptLookup() {
                   />
                 </div>
 
+                <div>
+                  <Label htmlFor="depositAmount">مبلغ الكفالة *</Label>
+                  <Input
+                    id="depositAmount"
+                    required
+                    type="number"
+                    min="1"
+                    step="0.01"
+                    value={searchData.depositAmount}
+                    onChange={(e) => {
+                      setSearchData({ ...searchData, depositAmount: e.target.value });
+                      setShouldSearch(false);
+                    }}
+                    placeholder="أدخل مبلغ الكفالة بالريال"
+                    dir="ltr"
+                    className="text-right"
+                  />
+                </div>
+
                 <div className="flex gap-3">
                   <Button type="submit" className="flex-1" disabled={isLoading}>
                     <Search className="h-4 w-4 ml-2" />
@@ -145,11 +179,11 @@ export default function ReceiptLookup() {
                 <Card>
                   <CardContent className="p-8 text-center">
                     <Clock className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                    <h3 className="text-lg font-bold text-foreground mb-2">لا يوجد سند حتى الآن</h3>
+                    <h3 className="text-lg font-bold text-foreground mb-2">لا يوجد سند بهذه البيانات</h3>
                     <p className="text-muted-foreground">
-                      قد يكون طلب الكفالة قيد المراجعة من الإدارة.
+                      تأكد من الاسم ورقم الجوال ومبلغ الكفالة.
                       <br />
-                      يرجى التحقق من البيانات المدخلة أو المحاولة لاحقًا.
+                      قد يكون طلب الكفالة قيد المراجعة من الإدارة.
                     </p>
                   </CardContent>
                 </Card>

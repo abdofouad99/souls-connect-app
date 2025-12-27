@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedAdminRoute } from "@/components/admin/ProtectedAdminRoute";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { ErrorBoundary } from "@/components/common/ErrorBoundary";
 import { PageLoading } from "@/components/common/LoadingSpinner";
 
@@ -64,23 +65,56 @@ const App = () => (
           <Sonner />
           <BrowserRouter>
             <Routes>
-              {/* Critical Routes - Eagerly loaded */}
+              {/* Public Routes - No auth required */}
               <Route path="/" element={<Index />} />
               <Route path="/auth" element={<Auth />} />
-
-              {/* Public Routes - Lazy loaded */}
-              <Route path="/orphans" element={<LazyRoute><Orphans /></LazyRoute>} />
-              <Route path="/orphan/:id" element={<LazyRoute><OrphanDetails /></LazyRoute>} />
-              <Route path="/thank-you/:receiptNumber" element={<LazyRoute><ThankYou /></LazyRoute>} />
-              <Route path="/thanks" element={<LazyRoute><SponsorThankYou /></LazyRoute>} />
               <Route path="/about" element={<LazyRoute><About /></LazyRoute>} />
-              <Route path="/sponsorship" element={<LazyRoute><Sponsorship /></LazyRoute>} />
-              <Route path="/receipt/:receiptNumber" element={<LazyRoute><ReceiptPage /></LazyRoute>} />
-              <Route path="/profile" element={<LazyRoute><Profile /></LazyRoute>} />
-              <Route path="/my-receipts" element={<LazyRoute><MyReceipts /></LazyRoute>} />
-              <Route path="/deposit-request" element={<LazyRoute><ReceiptLookup /></LazyRoute>} />
-              <Route path="/receipt-lookup" element={<LazyRoute><ReceiptLookup /></LazyRoute>} />
-              {/* Admin Routes - Lazy loaded with protection */}
+              <Route path="/thanks" element={<LazyRoute><SponsorThankYou /></LazyRoute>} />
+              <Route path="/thank-you/:receiptNumber" element={<LazyRoute><ThankYou /></LazyRoute>} />
+
+              {/* Protected Routes - Auth required */}
+              <Route path="/orphans" element={
+                <ProtectedRoute>
+                  <LazyRoute><Orphans /></LazyRoute>
+                </ProtectedRoute>
+              } />
+              <Route path="/orphan/:id" element={
+                <ProtectedRoute>
+                  <LazyRoute><OrphanDetails /></LazyRoute>
+                </ProtectedRoute>
+              } />
+              <Route path="/sponsorship" element={
+                <ProtectedRoute>
+                  <LazyRoute><Sponsorship /></LazyRoute>
+                </ProtectedRoute>
+              } />
+              <Route path="/receipt/:receiptNumber" element={
+                <ProtectedRoute>
+                  <LazyRoute><ReceiptPage /></LazyRoute>
+                </ProtectedRoute>
+              } />
+              <Route path="/profile" element={
+                <ProtectedRoute>
+                  <LazyRoute><Profile /></LazyRoute>
+                </ProtectedRoute>
+              } />
+              <Route path="/my-receipts" element={
+                <ProtectedRoute>
+                  <LazyRoute><MyReceipts /></LazyRoute>
+                </ProtectedRoute>
+              } />
+              <Route path="/deposit-request" element={
+                <ProtectedRoute>
+                  <LazyRoute><ReceiptLookup /></LazyRoute>
+                </ProtectedRoute>
+              } />
+              <Route path="/receipt-lookup" element={
+                <ProtectedRoute>
+                  <LazyRoute><ReceiptLookup /></LazyRoute>
+                </ProtectedRoute>
+              } />
+
+              {/* Admin Routes - Admin/Staff auth required */}
               <Route path="/admin" element={
                 <ProtectedAdminRoute>
                   <LazyRoute><AdminDashboard /></LazyRoute>

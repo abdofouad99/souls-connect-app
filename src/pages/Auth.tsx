@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,12 +15,17 @@ export default function AuthPage() {
   const [loading, setLoading] = useState(false);
   const { signIn, signUp, user } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  const redirectPath = searchParams.get('redirect');
 
   useEffect(() => {
     if (user) {
-      navigate('/');
+      // Redirect to saved path or home
+      const destination = redirectPath ? decodeURIComponent(redirectPath) : '/';
+      navigate(destination, { replace: true });
     }
-  }, [user, navigate]);
+  }, [user, navigate, redirectPath]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,12 +36,14 @@ export default function AuthPage() {
         const { error } = await signIn(email, password);
         if (error) throw error;
         toast({ title: 'تم تسجيل الدخول بنجاح' });
-        navigate('/');
+        const destination = redirectPath ? decodeURIComponent(redirectPath) : '/';
+        navigate(destination, { replace: true });
       } else {
         const { error } = await signUp(email, password, fullName);
         if (error) throw error;
         toast({ title: 'تم إنشاء الحساب بنجاح' });
-        navigate('/');
+        const destination = redirectPath ? decodeURIComponent(redirectPath) : '/';
+        navigate(destination, { replace: true });
       }
     } catch (error: any) {
       toast({
@@ -58,6 +65,11 @@ export default function AuthPage() {
             <h1 className="text-2xl font-serif font-bold text-foreground">
               {isLogin ? 'تسجيل الدخول' : 'إنشاء حساب جديد'}
             </h1>
+            {redirectPath && (
+              <p className="text-sm text-muted-foreground mt-2">
+                الرجاء تسجيل الدخول أولاً لإتمام الكفالة أو استخدام خدمات الموقع
+              </p>
+            )}
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Search, FileCheck, Clock, Download, ExternalLink, Heart, Loader2 } from "lucide-react";
+import { Search, FileCheck, Clock, ExternalLink, Heart, AlertCircle } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,8 +10,12 @@ import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function ReceiptLookup() {
+  const { user } = useAuth();
+  const userFullName = user?.user_metadata?.full_name || "";
+
   const [searchData, setSearchData] = useState({
     sponsorName: "",
     sponsorPhone: "",
@@ -19,21 +23,38 @@ export default function ReceiptLookup() {
   });
   const [shouldSearch, setShouldSearch] = useState(false);
   const [downloading, setDownloading] = useState(false);
+  const [nameError, setNameError] = useState("");
 
   const amount = parseFloat(searchData.depositAmount) || 0;
 
+  // Use the user's account name for the query, not the input field
   const {
     data: receipt,
     isLoading,
     error,
-  } = useLookupReceipt(searchData.sponsorName, searchData.sponsorPhone, amount, shouldSearch && amount > 0);
+  } = useLookupReceipt(userFullName, searchData.sponsorPhone, amount, shouldSearch && amount > 0 && !nameError);
+
+  // Normalize names for comparison (trim whitespace)
+  const normalizeNameForComparison = (name: string) => {
+    return name.trim().replace(/\s+/g, ' ');
+  };
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
+    setNameError("");
     
     // Validate all fields
     if (!searchData.sponsorName.trim() || !searchData.sponsorPhone.trim()) {
       toast({ title: "الرجاء إدخال الاسم ورقم الجوال", variant: "destructive" });
+      return;
+    }
+    
+    // Validate that entered name matches account name
+    const normalizedInput = normalizeNameForComparison(searchData.sponsorName);
+    const normalizedAccount = normalizeNameForComparison(userFullName);
+    
+    if (normalizedInput !== normalizedAccount) {
+      setNameError("يجب أن يكون اسم الكافل مطابقًا لاسم حسابك في الموقع، الرجاء كتابة الاسم كما هو في الحساب.");
       return;
     }
     
@@ -48,6 +69,7 @@ export default function ReceiptLookup() {
 
   const resetSearch = () => {
     setShouldSearch(false);
+    setNameError("");
     setSearchData({ sponsorName: "", sponsorPhone: "", depositAmount: "" });
   };
 
@@ -109,9 +131,22 @@ export default function ReceiptLookup() {
                     onChange={(e) => {
                       setSearchData({ ...searchData, sponsorName: e.target.value });
                       setShouldSearch(false);
+                      setNameError("");
                     }}
-                    placeholder="أدخل اسمك الكامل"
+                    placeholder="أدخل اسمك الكامل كما هو في حسابك"
+                    className={nameError ? "border-destructive" : ""}
                   />
+                  {nameError && (
+                    <div className="flex items-start gap-2 mt-2 text-destructive text-sm">
+                      <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
+                      <span>{nameError}</span>
+                    </div>
+                  )}
+                  {userFullName && (
+                    <p className="text-xs text-muted-foreground mt-1">
+                      اسم حسابك: {userFullName}
+                    </p>
+                  )}
                 </div>
 
                 <div>

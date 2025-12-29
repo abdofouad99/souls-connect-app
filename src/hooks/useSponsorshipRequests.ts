@@ -153,87 +153,100 @@ export function useUpdateSponsorshipRequestStatus() {
 
       if (updateError) throw updateError;
 
-      // If approved, also create a sponsorship record
+      // If approved, also create/update a sponsorship record using upsert
       if (admin_status === 'approved' && updatedRequest) {
-        // Check if sponsorship already exists for this request
-        const { data: existingSponsorship } = await supabase
-          .from('sponsorships')
-          .select('id')
-          .eq('request_id', id)
-          .maybeSingle();
+        // Generate receipt number
+        const { data: receiptNumber } = await supabase.rpc('generate_receipt_number');
 
-        // Only insert if not already exists
-        if (!existingSponsorship) {
-          // Generate receipt number
-          const { data: receiptNumber } = await supabase.rpc('generate_receipt_number');
+        // If user_id exists, find or create a sponsor record
+        let sponsorId: string | null = null;
+        
+        if (updatedRequest.user_id) {
+          // Check if sponsor already exists for this user
+          const { data: existingSponsor } = await supabase
+            .from('sponsors')
+            .select('id')
+            .eq('user_id', updatedRequest.user_id)
+            .maybeSingle();
 
-          // If user_id exists, find or create a sponsor record
-          let sponsorId: string | null = null;
-          
-          if (updatedRequest.user_id) {
-            // Check if sponsor already exists for this user
-            const { data: existingSponsor } = await supabase
+          if (existingSponsor) {
+            sponsorId = existingSponsor.id;
+          } else {
+            // Create a new sponsor record
+            const { data: newSponsor, error: sponsorError } = await supabase
               .from('sponsors')
+              .insert({
+                user_id: updatedRequest.user_id,
+                full_name: updatedRequest.sponsor_full_name,
+                phone: updatedRequest.sponsor_phone,
+                email: updatedRequest.sponsor_email || '',
+                country: updatedRequest.sponsor_country,
+              })
               .select('id')
-              .eq('user_id', updatedRequest.user_id)
-              .maybeSingle();
+              .single();
 
-            if (existingSponsor) {
-              sponsorId = existingSponsor.id;
-            } else {
-              // Create a new sponsor record
-              const { data: newSponsor, error: sponsorError } = await supabase
-                .from('sponsors')
-                .insert({
-                  user_id: updatedRequest.user_id,
-                  full_name: updatedRequest.sponsor_full_name,
-                  phone: updatedRequest.sponsor_phone,
-                  email: updatedRequest.sponsor_email || '',
-                  country: updatedRequest.sponsor_country,
-                })
-                .select('id')
-                .single();
-
-              if (!sponsorError && newSponsor) {
-                sponsorId = newSponsor.id;
-              }
+            if (!sponsorError && newSponsor) {
+              sponsorId = newSponsor.id;
             }
           }
+        }
 
-          const { error: insertError } = await supabase
-            .from('sponsorships')
-            .insert({
-              request_id: id,
-              orphan_id: updatedRequest.orphan_id,
-              sponsor_id: sponsorId,
-              sponsor_full_name: updatedRequest.sponsor_full_name,
-              sponsor_phone: updatedRequest.sponsor_phone,
-              sponsor_email: updatedRequest.sponsor_email,
-              sponsor_country: updatedRequest.sponsor_country,
-              type: updatedRequest.sponsorship_type,
-              monthly_amount: updatedRequest.amount,
-              payment_method: updatedRequest.payment_method,
-              transfer_receipt_image: updatedRequest.transfer_receipt_image,
-              cash_receipt_image: updatedRequest.cash_receipt_image,
-              cash_receipt_number: updatedRequest.cash_receipt_number,
-              cash_receipt_date: updatedRequest.cash_receipt_date,
-              approved_at: updateData.approved_at,
-              approved_by: updateData.approved_by,
-              receipt_number: receiptNumber || `RCP-${Date.now()}`,
-              status: 'active',
+        // Upsert sponsorship using request_id as conflict key
+        const { data: sponsorshipData, error: upsertError } = await supabase
+          .from('sponsorships')
+          .upsert({
+            request_id: id,
+            orphan_id: updatedRequest.orphan_id,
+            sponsor_id: sponsorId,
+            sponsor_full_name: updatedRequest.sponsor_full_name,
+            sponsor_phone: updatedRequest.sponsor_phone,
+            sponsor_email: updatedRequest.sponsor_email,
+            sponsor_country: updatedRequest.sponsor_country,
+            type: updatedRequest.sponsorship_type,
+            monthly_amount: updatedRequest.amount,
+            payment_method: updatedRequest.payment_method,
+            transfer_receipt_image: updatedRequest.transfer_receipt_image,
+            cash_receipt_image: updatedRequest.cash_receipt_image,
+            cash_receipt_number: updatedRequest.cash_receipt_number,
+            cash_receipt_date: updatedRequest.cash_receipt_date,
+            approved_at: updateData.approved_at,
+            approved_by: updateData.approved_by,
+            receipt_number: receiptNumber || `RCP-${Date.now()}`,
+            status: 'active',
+          }, {
+            onConflict: 'request_id',
+            ignoreDuplicates: false,
+          })
+          .select('id, receipt_number, monthly_amount')
+          .single();
+
+        if (upsertError) {
+          console.error('[Approve] Error upserting sponsorship:', upsertError);
+          // Don't throw - the request is already approved
+        } else if (sponsorshipData) {
+          // Create/update receipt record
+          const { error: receiptError } = await supabase
+            .from('receipts')
+            .upsert({
+              sponsorship_id: sponsorshipData.id,
+              receipt_number: sponsorshipData.receipt_number,
+              amount: sponsorshipData.monthly_amount,
+              issue_date: new Date().toISOString().split('T')[0],
+            }, {
+              onConflict: 'sponsorship_id',
+              ignoreDuplicates: false,
             });
 
-          if (insertError) {
-            console.error('[Approve] Error creating sponsorship:', insertError);
-            // Don't throw - the request is already approved
+          if (receiptError) {
+            console.error('[Approve] Error creating receipt:', receiptError);
           }
-
-          // Update orphan status to full (not just sponsored for consistency)
-          await supabase
-            .from('orphans')
-            .update({ status: 'full' })
-            .eq('id', updatedRequest.orphan_id);
         }
+
+        // Update orphan status to fully_sponsored (using standardized value)
+        await supabase
+          .from('orphans')
+          .update({ status: 'fully_sponsored' })
+          .eq('id', updatedRequest.orphan_id);
       }
 
       return updatedRequest;
@@ -244,6 +257,8 @@ export function useUpdateSponsorshipRequestStatus() {
       queryClient.invalidateQueries({ queryKey: ['sponsorships'] });
       queryClient.invalidateQueries({ queryKey: ['orphans'] });
       queryClient.invalidateQueries({ queryKey: ['sponsors'] });
+      queryClient.invalidateQueries({ queryKey: ['receipts'] });
+      queryClient.invalidateQueries({ queryKey: ['my-receipts'] });
     },
   });
 }
@@ -261,7 +276,7 @@ export function useUploadCashReceipt() {
 
   return useMutation({
     mutationFn: async ({ id, cash_receipt_image, cash_receipt_number, cash_receipt_date }: UploadCashReceiptData) => {
-      // Update sponsorship_requests
+      // Update sponsorship_requests - the trigger will sync to sponsorships
       const { data: requestData, error: requestError } = await supabase
         .from('sponsorship_requests')
         .update({
@@ -274,20 +289,6 @@ export function useUploadCashReceipt() {
         .single();
 
       if (requestError) throw requestError;
-
-      // Also update the corresponding sponsorship if exists
-      const { error: sponsorshipError } = await supabase
-        .from('sponsorships')
-        .update({
-          cash_receipt_image,
-          cash_receipt_number: cash_receipt_number || null,
-          cash_receipt_date: cash_receipt_date || null,
-        })
-        .eq('request_id', id);
-
-      if (sponsorshipError) {
-        console.warn('[UploadCashReceipt] Could not update sponsorship:', sponsorshipError);
-      }
 
       return requestData;
     },

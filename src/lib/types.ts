@@ -7,7 +7,7 @@ export interface Orphan {
   age: number;
   city: string;
   country: string;
-  status: 'available' | 'partial' | 'full';
+  status: 'available' | 'partially_sponsored' | 'fully_sponsored' | 'inactive' | 'partial' | 'full';
   monthly_amount: number;
   story?: string;
   photo_url?: string;

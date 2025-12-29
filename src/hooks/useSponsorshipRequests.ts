@@ -21,6 +21,7 @@ export interface SponsorshipRequest {
   cash_receipt_image: string | null;
   cash_receipt_number: string | null;
   cash_receipt_date: string | null;
+  user_id: string | null;
   orphan?: {
     id: string;
     full_name: string;
@@ -48,6 +49,29 @@ export function useSponsorshipRequests() {
   });
 }
 
+// Fetch user's own sponsorship requests
+export function useMyRequests(userId: string | undefined) {
+  return useQuery({
+    queryKey: ['my-requests', userId],
+    queryFn: async () => {
+      if (!userId) return [];
+
+      const { data, error } = await supabase
+        .from('sponsorship_requests')
+        .select(`
+          *,
+          orphan:orphans(id, full_name, photo_url, monthly_amount)
+        `)
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      return data as SponsorshipRequest[];
+    },
+    enabled: !!userId,
+  });
+}
+
 // Create a new sponsorship request (public)
 export interface CreateSponsorshipRequestData {
   sponsor_full_name: string;
@@ -58,6 +82,7 @@ export interface CreateSponsorshipRequestData {
   sponsorship_type: 'monthly' | 'yearly';
   amount: number;
   transfer_receipt_image?: string;
+  user_id?: string;
 }
 
 export function useCreateSponsorshipRequest() {
@@ -65,7 +90,6 @@ export function useCreateSponsorshipRequest() {
 
   return useMutation({
     mutationFn: async (data: CreateSponsorshipRequestData) => {
-      // Use minimal insert without .select() to avoid RLS SELECT permission requirement
       const { error } = await supabase
         .from('sponsorship_requests')
         .insert({
@@ -79,6 +103,7 @@ export function useCreateSponsorshipRequest() {
           payment_method: 'تحويل بنكي',
           transfer_receipt_image: data.transfer_receipt_image || null,
           admin_status: 'pending',
+          user_id: data.user_id || null,
         });
 
       if (error) throw error;
@@ -86,6 +111,7 @@ export function useCreateSponsorshipRequest() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['sponsorship-requests'] });
+      queryClient.invalidateQueries({ queryKey: ['my-requests'] });
     },
   });
 }
@@ -141,14 +167,45 @@ export function useUpdateSponsorshipRequestStatus() {
           // Generate receipt number
           const { data: receiptNumber } = await supabase.rpc('generate_receipt_number');
 
+          // If user_id exists, find or create a sponsor record
+          let sponsorId: string | null = null;
+          
+          if (updatedRequest.user_id) {
+            // Check if sponsor already exists for this user
+            const { data: existingSponsor } = await supabase
+              .from('sponsors')
+              .select('id')
+              .eq('user_id', updatedRequest.user_id)
+              .maybeSingle();
+
+            if (existingSponsor) {
+              sponsorId = existingSponsor.id;
+            } else {
+              // Create a new sponsor record
+              const { data: newSponsor, error: sponsorError } = await supabase
+                .from('sponsors')
+                .insert({
+                  user_id: updatedRequest.user_id,
+                  full_name: updatedRequest.sponsor_full_name,
+                  phone: updatedRequest.sponsor_phone,
+                  email: updatedRequest.sponsor_email || '',
+                  country: updatedRequest.sponsor_country,
+                })
+                .select('id')
+                .single();
+
+              if (!sponsorError && newSponsor) {
+                sponsorId = newSponsor.id;
+              }
+            }
+          }
+
           const { error: insertError } = await supabase
             .from('sponsorships')
             .insert({
               request_id: id,
               orphan_id: updatedRequest.orphan_id,
-              // IMPORTANT: sponsor_id is a FK to sponsors.id (not auth.users.id).
-              // For migrated requests we store sponsor details directly on the sponsorship record.
-              sponsor_id: null,
+              sponsor_id: sponsorId,
               sponsor_full_name: updatedRequest.sponsor_full_name,
               sponsor_phone: updatedRequest.sponsor_phone,
               sponsor_email: updatedRequest.sponsor_email,
@@ -171,10 +228,10 @@ export function useUpdateSponsorshipRequestStatus() {
             // Don't throw - the request is already approved
           }
 
-          // Update orphan status to sponsored
+          // Update orphan status to full (not just sponsored for consistency)
           await supabase
             .from('orphans')
-            .update({ status: 'sponsored' })
+            .update({ status: 'full' })
             .eq('id', updatedRequest.orphan_id);
         }
       }
@@ -183,8 +240,10 @@ export function useUpdateSponsorshipRequestStatus() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['sponsorship-requests'] });
+      queryClient.invalidateQueries({ queryKey: ['my-requests'] });
       queryClient.invalidateQueries({ queryKey: ['sponsorships'] });
       queryClient.invalidateQueries({ queryKey: ['orphans'] });
+      queryClient.invalidateQueries({ queryKey: ['sponsors'] });
     },
   });
 }
@@ -202,7 +261,8 @@ export function useUploadCashReceipt() {
 
   return useMutation({
     mutationFn: async ({ id, cash_receipt_image, cash_receipt_number, cash_receipt_date }: UploadCashReceiptData) => {
-      const { data, error } = await supabase
+      // Update sponsorship_requests
+      const { data: requestData, error: requestError } = await supabase
         .from('sponsorship_requests')
         .update({
           cash_receipt_image,
@@ -213,11 +273,28 @@ export function useUploadCashReceipt() {
         .select()
         .single();
 
-      if (error) throw error;
-      return data;
+      if (requestError) throw requestError;
+
+      // Also update the corresponding sponsorship if exists
+      const { error: sponsorshipError } = await supabase
+        .from('sponsorships')
+        .update({
+          cash_receipt_image,
+          cash_receipt_number: cash_receipt_number || null,
+          cash_receipt_date: cash_receipt_date || null,
+        })
+        .eq('request_id', id);
+
+      if (sponsorshipError) {
+        console.warn('[UploadCashReceipt] Could not update sponsorship:', sponsorshipError);
+      }
+
+      return requestData;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['sponsorship-requests'] });
+      queryClient.invalidateQueries({ queryKey: ['sponsorships'] });
+      queryClient.invalidateQueries({ queryKey: ['my-requests'] });
     },
   });
 }

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Heart, MapPin, Calendar, ArrowRight, Upload, X, Loader2, Copy, Check } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
@@ -11,6 +11,7 @@ import { useOrphan } from "@/hooks/useOrphans";
 import { useCreateSponsorshipRequest } from "@/hooks/useSponsorshipRequests";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 const statusLabels = {
   available: { label: "متاح للكفالة", class: "bg-primary text-primary-foreground" },
@@ -112,6 +113,7 @@ function BankAccountsSection() {
 export default function OrphanDetailsPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { data: orphan, isLoading } = useOrphan(id || "");
   const createSponsorshipRequest = useCreateSponsorshipRequest();
 
@@ -126,6 +128,20 @@ export default function OrphanDetailsPage() {
   const [receiptFile, setReceiptFile] = useState<File | null>(null);
   const [receiptPreview, setReceiptPreview] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+
+  // Pre-fill form data from user account
+  useEffect(() => {
+    if (user) {
+      const userMeta = user.user_metadata || {};
+      setFormData(prev => ({
+        ...prev,
+        fullName: userMeta.full_name || prev.fullName,
+        email: user.email || prev.email,
+        phone: userMeta.phone || prev.phone,
+        country: userMeta.country || prev.country,
+      }));
+    }
+  }, [user]);
 
   const handleReceiptFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -207,7 +223,7 @@ export default function OrphanDetailsPage() {
       // Calculate amount
       const amount = formData.sponsorshipType === "yearly" ? orphan.monthly_amount * 12 : orphan.monthly_amount;
 
-      // Create sponsorship request (pending status)
+      // Create sponsorship request (pending status) with user_id
       await createSponsorshipRequest.mutateAsync({
         sponsor_full_name: formData.fullName,
         sponsor_phone: formData.phone,
@@ -217,6 +233,7 @@ export default function OrphanDetailsPage() {
         sponsorship_type: formData.sponsorshipType as "monthly" | "yearly",
         amount,
         transfer_receipt_image: receiptImageUrl || undefined,
+        user_id: user?.id,
       });
 
       // Navigate to thank you page with pending message

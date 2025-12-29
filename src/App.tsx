@@ -25,6 +25,7 @@ const Sponsorship = lazy(() => import("./pages/Sponsorship"));
 const ReceiptPage = lazy(() => import("./pages/ReceiptPage"));
 const Profile = lazy(() => import("./pages/Profile"));
 const MyReceipts = lazy(() => import("./pages/MyReceipts"));
+const MyRequests = lazy(() => import("./pages/MyRequests"));
 const ReceiptLookup = lazy(() => import("./pages/ReceiptLookup"));
 
 // Lazy load admin pages
@@ -101,6 +102,11 @@ const App = () => (
               <Route path="/my-receipts" element={
                 <ProtectedRoute>
                   <LazyRoute><MyReceipts /></LazyRoute>
+                </ProtectedRoute>
+              } />
+              <Route path="/my-requests" element={
+                <ProtectedRoute>
+                  <LazyRoute><MyRequests /></LazyRoute>
                 </ProtectedRoute>
               } />
               <Route path="/deposit-request" element={

@@ -68,6 +68,14 @@ export function useReceipt(receiptNumber: string) {
           *,
           sponsorship:sponsorships(
             *,
+            cash_receipt_image,
+            cash_receipt_number,
+            cash_receipt_date,
+            transfer_receipt_image,
+            sponsor_full_name,
+            sponsor_phone,
+            sponsor_email,
+            sponsor_country,
             orphan:orphans(*),
             sponsor:sponsors(*)
           )

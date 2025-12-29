@@ -62,7 +62,7 @@ export function mapOrphanImportData(data: Record<string, any>[]): Partial<{
   gender: 'male' | 'female';
   city: string;
   country: string;
-  status: 'available' | 'partial' | 'full';
+  status: 'available' | 'partially_sponsored' | 'fully_sponsored';
   monthly_amount: number;
   story: string;
 }>[] {
@@ -85,13 +85,19 @@ export function mapOrphanImportData(data: Record<string, any>[]): Partial<{
     'female': 'female',
   };
 
-  const statusMap: Record<string, 'available' | 'partial' | 'full'> = {
+  const statusMap: Record<string, 'available' | 'partially_sponsored' | 'fully_sponsored'> = {
     'متاح': 'available',
-    'جزئي': 'partial',
-    'مكفول': 'full',
+    'متاح للكفالة': 'available',
+    'جزئي': 'partially_sponsored',
+    'مكفول جزئياً': 'partially_sponsored',
+    'مكفول': 'fully_sponsored',
+    'مكفول بالكامل': 'fully_sponsored',
     'available': 'available',
-    'partial': 'partial',
-    'full': 'full',
+    'partially_sponsored': 'partially_sponsored',
+    'fully_sponsored': 'fully_sponsored',
+    // Legacy mappings for import compatibility
+    'partial': 'partially_sponsored',
+    'full': 'fully_sponsored',
   };
 
   return data.map((row) => {
@@ -160,10 +166,22 @@ export function exportOrphans(orphans: any[]) {
     { key: 'created_at', header: 'تاريخ الإضافة' },
   ];
 
+  // Map status values for display (supports both new and legacy values)
+  const statusDisplayMap: Record<string, string> = {
+    available: 'متاح للكفالة',
+    partially_sponsored: 'مكفول جزئياً',
+    fully_sponsored: 'مكفول بالكامل',
+    inactive: 'غير نشط',
+    // Legacy values
+    partial: 'مكفول جزئياً',
+    full: 'مكفول بالكامل',
+    sponsored: 'مكفول بالكامل',
+  };
+
   const formattedData = orphans.map((o) => ({
     ...o,
     gender: o.gender === 'male' ? 'ذكر' : 'أنثى',
-    status: o.status === 'available' ? 'متاح' : o.status === 'partial' ? 'جزئي' : 'مكفول',
+    status: statusDisplayMap[o.status] || o.status,
     created_at: new Date(o.created_at).toLocaleDateString('ar-SA'),
   }));
 

@@ -119,9 +119,9 @@ export default function DepositReceiptRequest() {
     setIsSubmitting(true);
 
     try {
-      let receiptUrl = null;
+      let receiptPath = null;
 
-      // رفع الملف إلى bucket إذا وُجد
+      // رفع الملف إلى bucket إذا وُجد - حفظ المسار فقط (bucket خاص)
       if (selectedFile) {
         const fileExt = selectedFile.name.split('.').pop();
         const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
@@ -133,14 +133,12 @@ export default function DepositReceiptRequest() {
         if (uploadError) {
           console.error('Upload error:', uploadError);
         } else {
-          const { data: urlData } = supabase.storage
-            .from('deposit-receipts')
-            .getPublicUrl(fileName);
-          receiptUrl = urlData.publicUrl;
+          // حفظ المسار فقط (NOT public URL) لأن الـ bucket خاص
+          receiptPath = fileName;
         }
       }
 
-      // حفظ البيانات في قاعدة البيانات
+      // حفظ البيانات في قاعدة البيانات (حفظ المسار بدلاً من URL الكامل)
       const { error: insertError } = await supabase
         .from('deposit_receipt_requests')
         .insert({
@@ -148,7 +146,7 @@ export default function DepositReceiptRequest() {
           phone_number: data.phoneNumber,
           deposit_amount: Number(data.depositAmount),
           bank_method: data.bankMethod,
-          receipt_image_url: receiptUrl,
+          receipt_image_url: receiptPath,
           user_id: user?.id,
         });
 

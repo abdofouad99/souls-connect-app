@@ -118,7 +118,10 @@ export function useOrphanStats() {
 
       const totalOrphans = orphans?.length || 0;
       const availableOrphans = orphans?.filter(o => o.status === 'available').length || 0;
-      const sponsoredOrphans = orphans?.filter(o => o.status === 'full').length || 0;
+      // Count both new and legacy values for sponsored orphans
+      const sponsoredOrphans = orphans?.filter(o => 
+        o.status === 'fully_sponsored' || o.status === 'full' || o.status === 'sponsored'
+      ).length || 0;
 
       return {
         totalOrphans,
@@ -158,11 +161,11 @@ export function useDashboardChartData() {
         { name: 'إناث', value: orphans?.filter(o => o.gender === 'female').length || 0, fill: 'hsl(38, 75%, 55%)' },
       ];
 
-      // 2. Orphans by status
+      // 2. Orphans by status (includes legacy values for backwards compatibility)
       const statusData = [
         { name: 'متاح', value: orphans?.filter(o => o.status === 'available').length || 0, fill: 'hsl(160, 60%, 35%)' },
-        { name: 'جزئي', value: orphans?.filter(o => o.status === 'partial').length || 0, fill: 'hsl(38, 75%, 55%)' },
-        { name: 'مكفول', value: orphans?.filter(o => o.status === 'full').length || 0, fill: 'hsl(175, 45%, 40%)' },
+        { name: 'جزئي', value: orphans?.filter(o => o.status === 'partially_sponsored' || o.status === 'partial').length || 0, fill: 'hsl(38, 75%, 55%)' },
+        { name: 'مكفول', value: orphans?.filter(o => o.status === 'fully_sponsored' || o.status === 'full' || o.status === 'sponsored').length || 0, fill: 'hsl(175, 45%, 40%)' },
       ];
 
       // 3. Orphans by age groups

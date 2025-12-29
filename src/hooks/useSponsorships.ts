@@ -233,7 +233,7 @@ export function useCreateSponsorship() {
         .eq('orphan_id', data.orphanId)
         .eq('status', 'active');
 
-      const newStatus = (orphanSponsorships?.length || 0) >= 1 ? 'full' : 'partial';
+      const newStatus = (orphanSponsorships?.length || 0) >= 1 ? 'fully_sponsored' : 'partially_sponsored';
 
       await supabase
         .from('orphans')

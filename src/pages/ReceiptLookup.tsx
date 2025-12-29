@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Search, FileCheck, Clock, ExternalLink, Heart, AlertCircle } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Search, FileCheck, Clock, ExternalLink, Heart, AlertCircle, Loader2 } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,6 +11,7 @@ import { ar } from "date-fns/locale";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
+import { useSignedUrl } from "@/components/common/SignedImage";
 
 export default function ReceiptLookup() {
   const { user } = useAuth();
@@ -73,14 +74,21 @@ export default function ReceiptLookup() {
     setSearchData({ sponsorName: "", sponsorPhone: "", depositAmount: "" });
   };
 
+  // Get signed URL for the cash receipt image
+  const { signedUrl: receiptImageUrl, isLoading: imageLoading } = useSignedUrl(
+    receipt?.cash_receipt_image,
+    'cash-receipts',
+    900 // 15 minutes
+  );
+
   // Download receipt using blob for cross-origin support
   const handleDownload = async () => {
-    if (!receipt?.cash_receipt_image) return;
+    if (!receiptImageUrl) return;
 
     setDownloading(true);
     try {
       // Fetch the image as blob
-      const response = await fetch(receipt.cash_receipt_image);
+      const response = await fetch(receiptImageUrl);
       if (!response.ok) throw new Error("فشل في تحميل الصورة");
 
       const blob = await response.blob();
@@ -89,7 +97,7 @@ export default function ReceiptLookup() {
       // Create hidden link and trigger download
       const link = document.createElement("a");
       link.href = objectUrl;
-      link.download = `سند-قبض-${receipt.cash_receipt_number || receipt.id}.jpg`;
+      link.download = `سند-قبض-${receipt?.cash_receipt_number || receipt?.id}.jpg`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -297,7 +305,18 @@ export default function ReceiptLookup() {
 
                     {/* Receipt Image */}
                     <div className="rounded-lg overflow-hidden border border-border mb-4">
-                      <img src={receipt.cash_receipt_image} alt="سند القبض" className="w-full" />
+                      {imageLoading ? (
+                        <div className="flex items-center justify-center py-8">
+                          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                        </div>
+                      ) : receiptImageUrl ? (
+                        <img src={receiptImageUrl} alt="سند القبض" className="w-full" />
+                      ) : (
+                        <div className="flex items-center justify-center py-8 text-muted-foreground">
+                          <AlertCircle className="h-6 w-6 ml-2" />
+                          فشل في تحميل الصورة
+                        </div>
+                      )}
                     </div>
 
                     {/* Action Buttons */}
@@ -305,10 +324,23 @@ export default function ReceiptLookup() {
                       <Button
                         variant="outline"
                         className="flex-1"
-                        onClick={() => window.open(receipt.cash_receipt_image!, "_blank")}
+                        onClick={() => receiptImageUrl && window.open(receiptImageUrl, "_blank")}
+                        disabled={!receiptImageUrl}
                       >
                         <ExternalLink className="h-4 w-4 ml-2" />
                         فتح
+                      </Button>
+                      <Button
+                        className="flex-1"
+                        onClick={handleDownload}
+                        disabled={downloading || !receiptImageUrl}
+                      >
+                        {downloading ? (
+                          <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+                        ) : (
+                          <Search className="h-4 w-4 ml-2" />
+                        )}
+                        تحميل
                       </Button>
                     </div>
                   </CardContent>

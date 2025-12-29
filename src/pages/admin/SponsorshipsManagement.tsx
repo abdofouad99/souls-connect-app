@@ -1,10 +1,11 @@
 import { useState, useCallback } from 'react';
-import { Search, ExternalLink, Download, Image as ImageIcon } from 'lucide-react';
+import { Search, ExternalLink, Download, Image as ImageIcon, FileImage, Receipt } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Table,
   TableBody,
@@ -28,12 +29,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
 import { useSponsorships, useUpdateSponsorshipStatus } from '@/hooks/useSponsorships';
 import { exportSponsorships } from '@/lib/exportUtils';
 import { toast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
+import { SignedImage } from '@/components/common/SignedImage';
 
 const statusLabels = {
   active: { label: 'نشطة', class: 'bg-primary text-primary-foreground' },
@@ -144,7 +147,8 @@ export default function SponsorshipsManagement() {
                     <TableHead>النوع</TableHead>
                     <TableHead>المبلغ</TableHead>
                     <TableHead>تاريخ البدء</TableHead>
-                    <TableHead>صورة الإيصال</TableHead>
+                    <TableHead>صورة التحويل</TableHead>
+                    <TableHead>سند القبض</TableHead>
                     <TableHead>الحالة</TableHead>
                     <TableHead>الإجراءات</TableHead>
                   </TableRow>
@@ -175,8 +179,9 @@ export default function SponsorshipsManagement() {
                       <TableCell>
                         {format(new Date(sponsorship.start_date), 'dd MMM yyyy', { locale: ar })}
                       </TableCell>
+                      {/* صورة التحويل */}
                       <TableCell>
-                        {(sponsorship as any).receipt_image_url ? (
+                        {(sponsorship as any).transfer_receipt_image || (sponsorship as any).receipt_image_url ? (
                           <Dialog>
                             <DialogTrigger asChild>
                               <button className="group relative w-12 h-12 rounded-lg overflow-hidden border border-border hover:border-primary transition-colors cursor-pointer">
@@ -186,11 +191,11 @@ export default function SponsorshipsManagement() {
                                   </div>
                                 ) : (
                                   <>
-                                    <img 
-                                      src={(sponsorship as any).receipt_image_url} 
-                                      alt="صورة الإيصال" 
+                                    <SignedImage 
+                                      path={(sponsorship as any).transfer_receipt_image || (sponsorship as any).receipt_image_url}
+                                      bucket="deposit-receipts"
+                                      alt="صورة التحويل" 
                                       className="w-full h-full object-cover"
-                                      onError={() => handleImageError(sponsorship.id, (sponsorship as any).receipt_image_url)}
                                     />
                                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
                                       <ImageIcon className="h-4 w-4 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -201,58 +206,105 @@ export default function SponsorshipsManagement() {
                             </DialogTrigger>
                             <DialogContent className="max-w-2xl">
                               <DialogHeader>
-                                <DialogTitle>صورة إيصال الكفالة</DialogTitle>
+                                <DialogTitle>صورة إيصال التحويل</DialogTitle>
                                 <DialogDescription>
                                   رقم الإيصال: {sponsorship.receipt_number}
                                 </DialogDescription>
                               </DialogHeader>
                               <div className="mt-4">
-                                {imageErrors[sponsorship.id] ? (
-                                  <div className="flex flex-col items-center justify-center p-8 border border-destructive/30 bg-destructive/5 rounded-lg">
-                                    <AlertCircle className="h-12 w-12 text-destructive mb-4" />
-                                    <p className="text-destructive font-medium mb-2">تعذر تحميل الصورة</p>
-                                    <p className="text-muted-foreground text-sm mb-4 text-center">
-                                      قد تكون الصورة محذوفة أو الرابط غير صالح
-                                    </p>
-                                    <Button asChild variant="outline" size="sm">
-                                      <a 
-                                        href={(sponsorship as any).receipt_image_url} 
-                                        target="_blank" 
-                                        rel="noopener noreferrer"
-                                      >
-                                        <ExternalLink className="h-4 w-4 ml-2" />
-                                        فتح الرابط مباشرة
-                                      </a>
-                                    </Button>
-                                  </div>
-                                ) : (
-                                  <img 
-                                    src={(sponsorship as any).receipt_image_url} 
-                                    alt="صورة الإيصال" 
-                                    className="w-full rounded-lg border border-border"
-                                    onError={() => handleImageError(sponsorship.id, (sponsorship as any).receipt_image_url)}
-                                    onLoad={() => console.log(`[ImageLoad] Successfully loaded image for ${sponsorship.id}`)}
-                                  />
-                                )}
+                                <SignedImage 
+                                  path={(sponsorship as any).transfer_receipt_image || (sponsorship as any).receipt_image_url}
+                                  bucket="deposit-receipts"
+                                  alt="صورة التحويل" 
+                                  className="w-full rounded-lg border border-border"
+                                />
                               </div>
-                              {!imageErrors[sponsorship.id] && (
-                                <div className="flex justify-end mt-4">
-                                  <Button asChild variant="outline">
-                                    <a 
-                                      href={(sponsorship as any).receipt_image_url} 
-                                      target="_blank" 
-                                      rel="noopener noreferrer"
-                                    >
-                                      <ExternalLink className="h-4 w-4 ml-2" />
-                                      فتح في نافذة جديدة
-                                    </a>
-                                  </Button>
-                                </div>
-                              )}
                             </DialogContent>
                           </Dialog>
                         ) : (
                           <span className="text-muted-foreground text-sm">لا يوجد</span>
+                        )}
+                      </TableCell>
+                      
+                      {/* سند القبض */}
+                      <TableCell>
+                        {(sponsorship as any).cash_receipt_image ? (
+                          <Dialog>
+                            <DialogTrigger asChild>
+                              <button className="group relative w-12 h-12 rounded-lg overflow-hidden border border-primary/50 hover:border-primary transition-colors cursor-pointer bg-primary/5">
+                                <SignedImage 
+                                  path={(sponsorship as any).cash_receipt_image}
+                                  bucket="cash-receipts"
+                                  alt="سند القبض" 
+                                  className="w-full h-full object-cover"
+                                />
+                                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+                                  <FileImage className="h-4 w-4 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                                </div>
+                              </button>
+                            </DialogTrigger>
+                            <DialogContent className="max-w-3xl">
+                              <DialogHeader>
+                                <DialogTitle className="flex items-center gap-2">
+                                  <Receipt className="h-5 w-5 text-primary" />
+                                  بيانات سند القبض
+                                </DialogTitle>
+                                <DialogDescription>
+                                  رقم الكفالة: {sponsorship.receipt_number}
+                                </DialogDescription>
+                              </DialogHeader>
+                              
+                              <Tabs defaultValue="cash-receipt" className="mt-4">
+                                <TabsList className="grid w-full grid-cols-2">
+                                  <TabsTrigger value="cash-receipt">سند القبض (صورة المشرف)</TabsTrigger>
+                                  <TabsTrigger value="system-receipt">إيصال النظام</TabsTrigger>
+                                </TabsList>
+                                
+                                <TabsContent value="cash-receipt" className="space-y-4">
+                                  {/* بيانات السند */}
+                                  <div className="grid grid-cols-2 gap-4 p-4 bg-muted rounded-lg">
+                                    <div>
+                                      <p className="text-sm text-muted-foreground">رقم سند القبض</p>
+                                      <p className="font-medium font-mono">
+                                        {(sponsorship as any).cash_receipt_number || '-'}
+                                      </p>
+                                    </div>
+                                    <div>
+                                      <p className="text-sm text-muted-foreground">تاريخ السند</p>
+                                      <p className="font-medium">
+                                        {(sponsorship as any).cash_receipt_date 
+                                          ? format(new Date((sponsorship as any).cash_receipt_date), 'dd MMM yyyy', { locale: ar })
+                                          : '-'}
+                                      </p>
+                                    </div>
+                                  </div>
+                                  
+                                  {/* صورة السند */}
+                                  <SignedImage 
+                                    path={(sponsorship as any).cash_receipt_image}
+                                    bucket="cash-receipts"
+                                    alt="سند القبض" 
+                                    className="w-full rounded-lg border border-border max-h-[500px] object-contain"
+                                  />
+                                </TabsContent>
+                                
+                                <TabsContent value="system-receipt">
+                                  <div className="text-center py-8">
+                                    <Receipt className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                                    <p className="text-muted-foreground mb-4">إيصال النظام الإلكتروني</p>
+                                    <Button asChild>
+                                      <Link to={`/receipt/${sponsorship.receipt_number}`}>
+                                        <ExternalLink className="h-4 w-4 ml-2" />
+                                        فتح الإيصال
+                                      </Link>
+                                    </Button>
+                                  </div>
+                                </TabsContent>
+                              </Tabs>
+                            </DialogContent>
+                          </Dialog>
+                        ) : (
+                          <span className="text-muted-foreground text-sm">لم يُرفع</span>
                         )}
                       </TableCell>
                       <TableCell>

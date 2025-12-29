@@ -271,6 +271,7 @@ export type Database = {
           sponsorship_type: string
           transfer_receipt_image: string | null
           updated_at: string
+          user_id: string | null
         }
         Insert: {
           admin_notes?: string | null
@@ -292,6 +293,7 @@ export type Database = {
           sponsorship_type: string
           transfer_receipt_image?: string | null
           updated_at?: string
+          user_id?: string | null
         }
         Update: {
           admin_notes?: string | null
@@ -313,6 +315,7 @@ export type Database = {
           sponsorship_type?: string
           transfer_receipt_image?: string | null
           updated_at?: string
+          user_id?: string | null
         }
         Relationships: [
           {

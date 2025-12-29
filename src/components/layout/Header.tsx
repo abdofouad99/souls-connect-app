@@ -76,6 +76,9 @@ export function Header() {
                   <Link to="/profile">الملف الشخصي</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
+                  <Link to="/my-requests">طلباتي</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
                   <Link to="/my-receipts">إيصالاتي</Link>
                 </DropdownMenuItem>
                 {(isAdmin || isStaff) && (

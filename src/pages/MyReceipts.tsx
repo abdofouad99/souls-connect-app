@@ -42,30 +42,54 @@ export default function MyReceipts() {
     }
   }, [user, authLoading, navigate]);
 
-  // Fetch user receipts
+  // Fetch user receipts - improved query using user_id from sponsorship_requests
   const { data: receipts, isLoading } = useQuery({
     queryKey: ['my-receipts', user?.id],
     queryFn: async () => {
       if (!user?.id) return [];
 
-      // First get the sponsor record for this user
+      // Method 1: Try via sponsors table (for properly linked sponsorships)
       const { data: sponsor } = await supabase
         .from('sponsors')
         .select('id')
         .eq('user_id', user.id)
         .maybeSingle();
 
-      if (!sponsor) return [];
+      let sponsorshipIds: string[] = [];
 
-      // Get all sponsorships for this sponsor
-      const { data: sponsorships } = await supabase
-        .from('sponsorships')
+      if (sponsor) {
+        const { data: sponsorships } = await supabase
+          .from('sponsorships')
+          .select('id')
+          .eq('sponsor_id', sponsor.id);
+        
+        if (sponsorships) {
+          sponsorshipIds = sponsorships.map(s => s.id);
+        }
+      }
+
+      // Method 2: Also get sponsorships via sponsorship_requests.user_id
+      const { data: userRequests } = await supabase
+        .from('sponsorship_requests')
         .select('id')
-        .eq('sponsor_id', sponsor.id);
+        .eq('user_id', user.id)
+        .eq('admin_status', 'approved');
 
-      if (!sponsorships || sponsorships.length === 0) return [];
+      if (userRequests && userRequests.length > 0) {
+        const requestIds = userRequests.map(r => r.id);
+        const { data: requestSponsorships } = await supabase
+          .from('sponsorships')
+          .select('id')
+          .in('request_id', requestIds);
 
-      const sponsorshipIds = sponsorships.map(s => s.id);
+        if (requestSponsorships) {
+          // Merge and dedupe
+          const newIds = requestSponsorships.map(s => s.id);
+          sponsorshipIds = [...new Set([...sponsorshipIds, ...newIds])];
+        }
+      }
+
+      if (sponsorshipIds.length === 0) return [];
 
       // Get all receipts for these sponsorships
       const { data, error } = await supabase

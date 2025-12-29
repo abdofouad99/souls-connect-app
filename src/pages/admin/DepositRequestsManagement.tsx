@@ -40,20 +40,23 @@ const ReceiptImageViewer = ({ imageUrl }: { imageUrl: string }) => {
   useEffect(() => {
     const getSignedUrl = async () => {
       try {
-        // استخراج اسم الملف من URL
-        const urlParts = imageUrl.split('/deposit-receipts/');
-        if (urlParts.length < 2) {
-          setError('رابط الصورة غير صالح');
-          setIsLoading(false);
-          return;
+        let filePath = imageUrl;
+        
+        // التوافق للخلف: إذا كانت القيمة URL كامل، استخرج المسار منها
+        if (imageUrl.startsWith('http')) {
+          const urlParts = imageUrl.split('/deposit-receipts/');
+          if (urlParts.length < 2) {
+            setError('رابط الصورة غير صالح');
+            setIsLoading(false);
+            return;
+          }
+          filePath = urlParts[1];
         }
         
-        const filePath = urlParts[1];
-        
-        // الحصول على signed URL صالح لمدة ساعة
+        // الحصول على signed URL صالح لمدة 15 دقيقة
         const { data, error: signedUrlError } = await supabase.storage
           .from('deposit-receipts')
-          .createSignedUrl(filePath, 3600); // صالح لمدة ساعة
+          .createSignedUrl(filePath, 900); // 15 دقيقة
 
         if (signedUrlError) {
           console.error('Error creating signed URL:', signedUrlError);

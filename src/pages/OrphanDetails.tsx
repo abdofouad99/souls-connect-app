@@ -184,17 +184,15 @@ export default function OrphanDetailsPage() {
 
     try {
       const fileExt = receiptFile.name.split(".").pop();
-      const fileName = `public/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+      // Store only path (not public URL) for private bucket
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
 
       const { error: uploadError } = await supabase.storage.from("deposit-receipts").upload(fileName, receiptFile);
 
       if (uploadError) throw uploadError;
 
-      const {
-        data: { publicUrl },
-      } = supabase.storage.from("deposit-receipts").getPublicUrl(fileName);
-
-      return publicUrl;
+      // Return only the file path, NOT the public URL (bucket is private)
+      return fileName;
     } catch (error) {
       console.error("Error uploading receipt:", error);
       return null;

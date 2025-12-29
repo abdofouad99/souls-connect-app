@@ -38,12 +38,48 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
+import { SignedImage, useSignedUrl } from '@/components/common/SignedImage';
 
 const statusConfig = {
   pending: { label: 'قيد المراجعة', icon: Clock, class: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' },
   approved: { label: 'معتمد', icon: CheckCircle2, class: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' },
   rejected: { label: 'مرفوض', icon: XCircle, class: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' },
 };
+
+// مكون لعرض سند القبض مع signed URL
+function CashReceiptDisplay({ imagePath, receiptNumber, receiptDate }: { 
+  imagePath: string; 
+  receiptNumber?: string | null;
+  receiptDate?: string | null;
+}) {
+  const { signedUrl, isLoading } = useSignedUrl(imagePath, 'cash-receipts', 900);
+  
+  return (
+    <div>
+      <Label className="text-muted-foreground mb-2 block">سند القبض</Label>
+      {isLoading ? (
+        <div className="flex items-center gap-2 py-4">
+          <Loader2 className="h-4 w-4 animate-spin" />
+          <span className="text-sm text-muted-foreground">جاري تحميل الصورة...</span>
+        </div>
+      ) : signedUrl ? (
+        <>
+          <img src={signedUrl} alt="سند القبض" className="rounded-lg border max-h-64 object-contain" />
+          {receiptNumber && <p className="mt-2 text-sm">رقم السند: {receiptNumber}</p>}
+          {receiptDate && <p className="text-sm">تاريخ السند: {receiptDate}</p>}
+          <div className="mt-3 flex gap-2">
+            <Button variant="outline" size="sm" onClick={() => window.open(signedUrl, '_blank')}>
+              <Eye className="h-4 w-4 ml-1" />
+              فتح
+            </Button>
+          </div>
+        </>
+      ) : (
+        <p className="text-sm text-destructive">فشل في تحميل الصورة</p>
+      )}
+    </div>
+  );
+}
 
 export default function SponsorshipRequestsManagement() {
   const { data: requests, isLoading } = useSponsorshipRequests();
@@ -149,22 +185,10 @@ export default function SponsorshipRequestsManagement() {
       
       console.log('[UploadReceipt] File uploaded:', uploadData);
 
-      // Get signed URL (private bucket)
-      const { data: signedData, error: signedError } = await supabase.storage
-        .from('cash-receipts')
-        .createSignedUrl(fileName, 60 * 60 * 24 * 365); // 1 year
-
-      if (signedError || !signedData?.signedUrl) {
-        console.error('[UploadReceipt] Signed URL error:', signedError);
-        throw new Error('فشل في إنشاء رابط الصورة');
-      }
-      
-      console.log('[UploadReceipt] Got signed URL');
-
-      // Update request
+      // حفظ المسار فقط (NOT signed URL) - سيتم إنشاء signed URL عند العرض
       await uploadCashReceipt.mutateAsync({
         id: selectedRequest.id,
-        cash_receipt_image: signedData.signedUrl,
+        cash_receipt_image: fileName,
         cash_receipt_number: receiptNumber || undefined,
         cash_receipt_date: receiptDate || undefined,
       });
@@ -418,8 +442,9 @@ export default function SponsorshipRequestsManagement() {
               {selectedRequest.transfer_receipt_image && (
                 <div>
                   <Label className="text-muted-foreground mb-2 block">صورة إثبات التحويل</Label>
-                  <img
-                    src={selectedRequest.transfer_receipt_image}
+                  <SignedImage
+                    path={selectedRequest.transfer_receipt_image}
+                    bucket="deposit-receipts"
                     alt="إثبات التحويل"
                     className="rounded-lg border max-h-64 object-contain"
                   />
@@ -434,39 +459,11 @@ export default function SponsorshipRequestsManagement() {
               )}
 
               {selectedRequest.cash_receipt_image ? (
-                <div>
-                  <Label className="text-muted-foreground mb-2 block">سند القبض</Label>
-                  <img
-                    src={selectedRequest.cash_receipt_image}
-                    alt="سند القبض"
-                    className="rounded-lg border max-h-64 object-contain"
-                  />
-                  {selectedRequest.cash_receipt_number && (
-                    <p className="mt-2 text-sm">رقم السند: {selectedRequest.cash_receipt_number}</p>
-                  )}
-                  {selectedRequest.cash_receipt_date && (
-                    <p className="text-sm">تاريخ السند: {selectedRequest.cash_receipt_date}</p>
-                  )}
-                  <div className="mt-3 flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => window.open(selectedRequest.cash_receipt_image!, '_blank')}
-                    >
-                      <Eye className="h-4 w-4 ml-1" />
-                      فتح
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      asChild
-                    >
-                      <a href={selectedRequest.cash_receipt_image!} download>
-                        تحميل
-                      </a>
-                    </Button>
-                  </div>
-                </div>
+                <CashReceiptDisplay 
+                  imagePath={selectedRequest.cash_receipt_image}
+                  receiptNumber={selectedRequest.cash_receipt_number}
+                  receiptDate={selectedRequest.cash_receipt_date}
+                />
               ) : selectedRequest.admin_status === 'approved' && (
                 <div className="bg-muted/50 p-4 rounded-lg border border-dashed">
                   <Label className="text-muted-foreground mb-3 block">رفع سند القبض</Label>

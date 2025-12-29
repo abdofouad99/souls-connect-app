@@ -13,10 +13,15 @@ import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 
-const statusLabels = {
+const statusLabels: Record<string, { label: string; class: string }> = {
   available: { label: "متاح للكفالة", class: "bg-primary text-primary-foreground" },
-  partial: { label: "كفالة جزئية", class: "bg-secondary text-secondary-foreground" },
-  full: { label: "مكفول", class: "bg-muted text-muted-foreground" },
+  partially_sponsored: { label: "مكفول جزئياً", class: "bg-secondary text-secondary-foreground" },
+  fully_sponsored: { label: "مكفول بالكامل", class: "bg-muted text-muted-foreground" },
+  inactive: { label: "غير نشط", class: "bg-muted text-muted-foreground" },
+  // Legacy values
+  partial: { label: "مكفول جزئياً", class: "bg-secondary text-secondary-foreground" },
+  full: { label: "مكفول بالكامل", class: "bg-muted text-muted-foreground" },
+  sponsored: { label: "مكفول بالكامل", class: "bg-muted text-muted-foreground" },
 };
 
 // Bank accounts data - replace placeholders with actual data later
@@ -375,7 +380,7 @@ export default function OrphanDetailsPage() {
                   <p className="text-muted-foreground mb-6">
                     ساهم في توفير حياة كريمة لهذا اليتيم من خلال كفالتك الشهرية أو السنوية
                   </p>
-                  {orphan.status !== "full" ? (
+                  {!['fully_sponsored', 'full', 'sponsored'].includes(orphan.status) ? (
                     <Button variant="hero" size="xl" onClick={() => setShowForm(true)} className="w-full">
                       أكفل هذا اليتيم الآن
                     </Button>

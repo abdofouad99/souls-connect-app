@@ -45,10 +45,15 @@ import { exportOrphans, parseExcelFile, mapOrphanImportData, downloadOrphansTemp
 import { toast } from '@/hooks/use-toast';
 import type { Orphan } from '@/lib/types';
 
-const statusLabels = {
+const statusLabels: Record<string, { label: string; class: string }> = {
   available: { label: 'متاح', class: 'bg-primary text-primary-foreground' },
+  partially_sponsored: { label: 'جزئي', class: 'bg-secondary text-secondary-foreground' },
+  fully_sponsored: { label: 'مكفول', class: 'bg-muted text-muted-foreground' },
+  inactive: { label: 'غير نشط', class: 'bg-muted text-muted-foreground' },
+  // Legacy values (for backward compatibility)
   partial: { label: 'جزئي', class: 'bg-secondary text-secondary-foreground' },
   full: { label: 'مكفول', class: 'bg-muted text-muted-foreground' },
+  sponsored: { label: 'مكفول', class: 'bg-muted text-muted-foreground' },
 };
 
 const emptyOrphan: Omit<Orphan, 'id' | 'created_at' | 'updated_at'> = {
@@ -409,12 +414,13 @@ export default function OrphansManagement() {
               </div>
               <div>
                 <Label>الحالة *</Label>
-                <Select value={formData.status} onValueChange={(v) => setFormData({ ...formData, status: v as 'available' | 'partial' | 'full' })}>
+                <Select value={formData.status} onValueChange={(v) => setFormData({ ...formData, status: v as any })}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="available">متاح للكفالة</SelectItem>
-                    <SelectItem value="partial">كفالة جزئية</SelectItem>
-                    <SelectItem value="full">مكفول</SelectItem>
+                    <SelectItem value="partially_sponsored">مكفول جزئياً</SelectItem>
+                    <SelectItem value="fully_sponsored">مكفول بالكامل</SelectItem>
+                    <SelectItem value="inactive">غير نشط</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

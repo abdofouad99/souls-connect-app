@@ -14,10 +14,15 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 
-const statusLabels = {
+const statusLabels: Record<string, { label: string; class: string }> = {
   available: { label: 'متاح للكفالة', class: 'bg-primary text-primary-foreground' },
-  partial: { label: 'كفالة جزئية', class: 'bg-secondary text-secondary-foreground' },
-  full: { label: 'مكفول', class: 'bg-muted text-muted-foreground' },
+  partially_sponsored: { label: 'مكفول جزئياً', class: 'bg-secondary text-secondary-foreground' },
+  fully_sponsored: { label: 'مكفول بالكامل', class: 'bg-muted text-muted-foreground' },
+  inactive: { label: 'غير نشط', class: 'bg-muted text-muted-foreground' },
+  // Legacy values (for backward compatibility during migration)
+  partial: { label: 'مكفول جزئياً', class: 'bg-secondary text-secondary-foreground' },
+  full: { label: 'مكفول بالكامل', class: 'bg-muted text-muted-foreground' },
+  sponsored: { label: 'مكفول بالكامل', class: 'bg-muted text-muted-foreground' },
 };
 
 interface SelectedImage {
@@ -141,7 +146,7 @@ export default function OrphansPage() {
                       <Button asChild variant="outline" size="sm" className="flex-1">
                         <Link to={`/orphan/${orphan.id}`}>تفاصيل</Link>
                       </Button>
-                      {orphan.status !== 'full' && (
+                      {!['fully_sponsored', 'full', 'sponsored'].includes(orphan.status) && (
                         <Button asChild variant="hero" size="sm" className="flex-1">
                           <Link to={`/orphan/${orphan.id}`}>أكفل هذا اليتيم</Link>
                         </Button>

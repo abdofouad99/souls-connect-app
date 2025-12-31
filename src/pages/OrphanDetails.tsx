@@ -12,6 +12,28 @@ import { useCreateSponsorshipRequest } from "@/hooks/useSponsorshipRequests";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { z } from "zod";
+
+// Zod schema for sponsorship form validation
+const sponsorshipFormSchema = z.object({
+  fullName: z.string()
+    .trim()
+    .min(2, { message: "الاسم يجب أن يكون حرفين على الأقل" })
+    .max(100, { message: "الاسم يجب أن يكون أقل من 100 حرف" }),
+  phone: z.string()
+    .trim()
+    .regex(/^[0-9]{10,15}$/, { message: "رقم الهاتف يجب أن يكون بين 10-15 رقم" }),
+  email: z.string()
+    .trim()
+    .email({ message: "البريد الإلكتروني غير صالح" })
+    .max(255, { message: "البريد الإلكتروني يجب أن يكون أقل من 255 حرف" }),
+  country: z.string()
+    .trim()
+    .max(100, { message: "اسم البلد يجب أن يكون أقل من 100 حرف" })
+    .optional()
+    .or(z.literal("")),
+  sponsorshipType: z.enum(["monthly", "yearly"]),
+});
 
 const statusLabels: Record<string, { label: string; class: string }> = {
   available: { label: "متاح للكفالة", class: "bg-primary text-primary-foreground" },
@@ -204,15 +226,19 @@ export default function OrphanDetailsPage() {
 
     if (!orphan) return;
 
-    // Validate required fields
-    if (!formData.fullName.trim() || !formData.phone.trim()) {
+    // Validate form using Zod schema
+    const validationResult = sponsorshipFormSchema.safeParse(formData);
+    if (!validationResult.success) {
+      const firstError = validationResult.error.errors[0];
       toast({
-        title: "بيانات ناقصة",
-        description: "يرجى إدخال الاسم ورقم الهاتف",
+        title: "بيانات غير صالحة",
+        description: firstError.message,
         variant: "destructive",
       });
       return;
     }
+
+    const validatedData = validationResult.data;
 
     setSubmitting(true);
 
@@ -224,16 +250,16 @@ export default function OrphanDetailsPage() {
       }
 
       // Calculate amount
-      const amount = formData.sponsorshipType === "yearly" ? orphan.monthly_amount * 12 : orphan.monthly_amount;
+      const amount = validatedData.sponsorshipType === "yearly" ? orphan.monthly_amount * 12 : orphan.monthly_amount;
 
       // Create sponsorship request (pending status) with user_id
       await createSponsorshipRequest.mutateAsync({
-        sponsor_full_name: formData.fullName,
-        sponsor_phone: formData.phone,
-        sponsor_email: formData.email || undefined,
-        sponsor_country: formData.country || undefined,
+        sponsor_full_name: validatedData.fullName,
+        sponsor_phone: validatedData.phone,
+        sponsor_email: validatedData.email || undefined,
+        sponsor_country: validatedData.country || undefined,
         orphan_id: orphan.id,
-        sponsorship_type: formData.sponsorshipType as "monthly" | "yearly",
+        sponsorship_type: validatedData.sponsorshipType,
         amount,
         transfer_receipt_image: receiptImageUrl || undefined,
         user_id: user?.id,
@@ -241,7 +267,7 @@ export default function OrphanDetailsPage() {
 
       // Navigate to thank you page with pending message
       const params = new URLSearchParams({
-        name: formData.fullName,
+        name: validatedData.fullName,
         amount: amount.toString(),
         status: "pending",
       });

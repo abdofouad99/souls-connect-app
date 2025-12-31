@@ -59,7 +59,7 @@ export class ErrorBoundary extends Component<Props, State> {
                 العودة للرئيسية
               </Button>
             </div>
-            {process.env.NODE_ENV === 'development' && this.state.error && (
+            {import.meta.env.DEV && this.state.error && (
               <details className="mt-6 text-right bg-muted p-4 rounded-lg">
                 <summary className="cursor-pointer text-sm font-medium">
                   تفاصيل الخطأ (للمطورين)

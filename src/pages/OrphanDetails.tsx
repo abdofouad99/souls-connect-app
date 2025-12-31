@@ -22,7 +22,7 @@ const sponsorshipFormSchema = z.object({
     .max(100, { message: "الاسم يجب أن يكون أقل من 100 حرف" }),
   phone: z.string()
     .trim()
-    .regex(/^[0-9]{10,15}$/, { message: "رقم الهاتف يجب أن يكون بين 10-15 رقم" }),
+    .regex(/^[0-9]{9}$/, { message: "رقم الهاتف يجب أن يكون 9 أرقام" }),
   email: z.string()
     .trim()
     .email({ message: "البريد الإلكتروني غير صالح" })

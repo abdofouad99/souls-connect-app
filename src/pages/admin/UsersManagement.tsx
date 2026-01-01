@@ -75,9 +75,21 @@ export default function UsersManagement() {
   const [newRole, setNewRole] = useState<AppRole | ''>('');
   const [isUpdatingRole, setIsUpdatingRole] = useState(false);
   const { toast } = useToast();
-  const { signOut } = useAuth();
+  const { signOut, session, isAdmin } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Redirect non-admin users away from this page
+  useEffect(() => {
+    if (isAdmin === false) {
+      toast({
+        variant: 'destructive',
+        title: 'غير مصرح',
+        description: 'هذه الصفحة متاحة للمديرين فقط',
+      });
+      navigate('/admin', { replace: true });
+    }
+  }, [isAdmin, navigate, toast]);
 
   const handleSessionInvalid = useCallback(
     async (message?: string) => {
@@ -156,8 +168,17 @@ export default function UsersManagement() {
 
     setIsLoading(true);
     try {
+      // Ensure we have a valid session token
+      if (!session?.access_token) {
+        await handleSessionInvalid('لم يتم العثور على جلسة صالحة');
+        return;
+      }
+
       const { data, error } = await supabase.functions.invoke('invite-user', {
         body: { email, role },
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
       });
 
       if (error) {
@@ -310,7 +331,7 @@ export default function UsersManagement() {
                 </Button>
                 <Button 
                   onClick={handleInvite} 
-                  disabled={isLoading || !email || !role}
+                  disabled={isLoading || !email || !role || !session}
                   className="gap-2"
                 >
                   {isLoading ? (

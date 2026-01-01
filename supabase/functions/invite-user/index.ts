@@ -11,6 +11,24 @@ interface InviteRequest {
   role: "admin" | "sponsor" | "staff";
 }
 
+/**
+ * Robustly extract JWT token from Authorization header.
+ * Handles variations like "Bearer <token>", "bearer <token>", extra spaces, etc.
+ */
+function extractToken(authHeader: string | null): string | null {
+  if (!authHeader) return null;
+  
+  // Remove "Bearer " prefix (case-insensitive) and trim
+  const match = authHeader.match(/^bearer\s+(.+)$/i);
+  if (!match || !match[1]) return null;
+  
+  const token = match[1].trim();
+  // Ensure it's not empty and looks like a JWT (has dots)
+  if (!token || !token.includes('.')) return null;
+  
+  return token;
+}
+
 serve(async (req: Request) => {
   // Handle CORS preflight
   if (req.method === "OPTIONS") {
@@ -20,8 +38,10 @@ serve(async (req: Request) => {
   try {
     // Get the authorization header to verify the requesting user
     const authHeader = req.headers.get("authorization");
-    if (!authHeader) {
-      console.error("No authorization header provided");
+    const token = extractToken(authHeader);
+    
+    if (!token) {
+      console.error("No valid token extracted from Authorization header");
       return new Response(
         JSON.stringify({ error: "غير مصرح - يجب تسجيل الدخول" }),
         { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -31,9 +51,6 @@ serve(async (req: Request) => {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
-    // Extract the JWT token from the authorization header
-    const token = authHeader.replace("Bearer ", "");
-
     // Create admin client with service role key
     const adminClient = createClient(supabaseUrl, supabaseServiceKey, {
       auth: {
@@ -42,8 +59,9 @@ serve(async (req: Request) => {
       },
     });
 
-    // Get the current user using the token
+    // Get the current user using the extracted token
     const { data: { user: currentUser }, error: userError } = await adminClient.auth.getUser(token);
+    
     if (userError || !currentUser) {
       console.error("Failed to get current user:", userError);
       return new Response(
@@ -115,11 +133,50 @@ serve(async (req: Request) => {
     if (inviteError) {
       console.error("Failed to invite user:", inviteError);
       
-      // Check for specific error types
-      if (inviteError.message?.includes("already registered")) {
+      // Handle "email already registered" - update their role instead
+      if (inviteError.message?.includes("already registered") || (inviteError as any).code === "email_exists") {
+        console.log(`Email ${email} already registered, attempting to update role...`);
+        
+        // Find user by email in profiles table
+        const { data: profileData, error: profileError } = await adminClient
+          .from("profiles")
+          .select("user_id")
+          .eq("email", email)
+          .maybeSingle();
+        
+        if (profileError || !profileData) {
+          console.error("Could not find profile for email:", email, profileError);
+          return new Response(
+            JSON.stringify({ error: "هذا البريد مسجل مسبقاً ولم نتمكن من العثور على ملفه الشخصي" }),
+            { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+        
+        // Update or insert role for existing user
+        const { error: roleUpsertError } = await adminClient
+          .from("user_roles")
+          .upsert(
+            { user_id: profileData.user_id, role: role },
+            { onConflict: "user_id" }
+          );
+        
+        if (roleUpsertError) {
+          console.error("Failed to update role for existing user:", roleUpsertError);
+          return new Response(
+            JSON.stringify({ error: "فشل تحديث صلاحية المستخدم الموجود" }),
+            { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+        
+        console.log(`Successfully updated role for existing user ${email} to ${role}`);
         return new Response(
-          JSON.stringify({ error: "هذا البريد الإلكتروني مسجل بالفعل" }),
-          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          JSON.stringify({ 
+            success: true, 
+            message: "تم تحديث صلاحية المستخدم الموجود بنجاح",
+            updated_existing: true,
+            user: { id: profileData.user_id, email: email }
+          }),
+          { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
       

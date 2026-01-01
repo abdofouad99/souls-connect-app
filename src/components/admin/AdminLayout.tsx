@@ -30,6 +30,7 @@ const navItems = [
   { href: '/admin/receipts', label: 'الإيصالات', icon: Receipt },
   { href: '/admin/deposit-requests', label: 'طلبات الإيداع', icon: FileText },
   { href: '/admin/notifications', label: 'سجل الإشعارات', icon: Bell },
+  { href: '/admin/users', label: 'إدارة المستخدمين', icon: Users },
 ];
 
 export function AdminLayout({ children }: AdminLayoutProps) {

@@ -62,14 +62,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     );
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
-      
+
       if (session?.user) {
         fetchUserRole(session.user.id).then(setUserRole);
+
+        // Validate that the session is still valid server-side.
+        // If the session was revoked (e.g. logout from another device), clear local state.
+        try {
+          const { data, error } = await supabase.auth.getUser();
+          if (error || !data?.user) {
+            await supabase.auth.signOut();
+            setSession(null);
+            setUser(null);
+            setUserRole(null);
+          }
+        } catch {
+          await supabase.auth.signOut();
+          setSession(null);
+          setUser(null);
+          setUserRole(null);
+        }
       }
-      
+
       setLoading(false);
     });
 

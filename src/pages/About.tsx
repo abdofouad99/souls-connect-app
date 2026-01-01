@@ -4,11 +4,12 @@ import { useScrollAnimation } from '@/hooks/useScrollAnimation';
 import { cn } from '@/lib/utils';
 
 const projects = [
+  { icon: Home, title: 'مشاريع المسجد الأقصى والقدس الشريف' },
   { icon: Heart, title: 'مشاريع الكفالات' },
-  { icon: Package, title: 'مشاريع الإغاثة' },
-  { icon: Home, title: 'مشاريع الإعمار' },
-  { icon: HandHeart, title: 'مشاريع الإغاثية' },
-  { icon: Sprout, title: 'مشاريع التنموية' },
+  { icon: HandHeart, title: 'المشاريع الإغاثية' },
+  { icon: Package, title: 'المشاريع الصحية' },
+  { icon: Sprout, title: 'المشاريع التعليمية' },
+  { icon: Sprout, title: 'المشاريع التنموية' },
 ];
 
 export default function AboutPage() {
@@ -68,7 +69,7 @@ export default function AboutPage() {
               )}
             >
               <ol className="list-decimal list-inside space-y-4 text-muted-foreground text-lg leading-relaxed">
-                <li>العمل في القضية الفلسطينية.</li>
+                <li>التعريف بالقضية الفلسطينية.</li>
                 <li>
                   دعم الشعب الفلسطيني مادياً ومعنوياً من خلال تنفيذ المشاريع الخيرية والإنسانية المختلفة.
                 </li>

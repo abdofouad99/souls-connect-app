@@ -1,5 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { AdminLayout } from '@/components/admin/AdminLayout';
+import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -73,11 +75,27 @@ export default function UsersManagement() {
   const [newRole, setNewRole] = useState<AppRole | ''>('');
   const [isUpdatingRole, setIsUpdatingRole] = useState(false);
   const { toast } = useToast();
+  const { signOut } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const handleSessionInvalid = useCallback(
+    async (message?: string) => {
+      toast({
+        variant: 'destructive',
+        title: 'انتهت الجلسة',
+        description: message || 'يرجى تسجيل الدخول مرة أخرى',
+      });
+      await signOut();
+      const redirectPath = encodeURIComponent(location.pathname + location.search);
+      navigate(`/auth?redirect=${redirectPath}`, { replace: true });
+    },
+    [location.pathname, location.search, navigate, signOut, toast]
+  );
 
   const fetchUsers = async () => {
     setIsLoadingUsers(true);
     try {
-      // Fetch user roles with profiles
       const { data: rolesData, error: rolesError } = await supabase
         .from('user_roles')
         .select('user_id, role');
@@ -104,6 +122,13 @@ export default function UsersManagement() {
       setUsers(usersWithRoles);
     } catch (error: any) {
       console.error('Error fetching users:', error);
+
+      const status = (error as any)?.status;
+      if (status === 401 || status === 403) {
+        await handleSessionInvalid('جلسة تسجيل الدخول غير صالحة');
+        return;
+      }
+
       toast({
         variant: 'destructive',
         title: 'خطأ في تحميل المستخدمين',
@@ -136,10 +161,19 @@ export default function UsersManagement() {
       });
 
       if (error) {
+        const status = (error as any)?.context?.status;
+        if (status === 401 || status === 403) {
+          await handleSessionInvalid('جلسة تسجيل الدخول غير صالحة');
+          return;
+        }
         throw new Error(error.message || 'فشل إرسال الدعوة');
       }
 
       if (data?.error) {
+        if (String(data.error).includes('جلسة') || String(data.error).includes('غير صالحة')) {
+          await handleSessionInvalid(String(data.error));
+          return;
+        }
         throw new Error(data.error);
       }
 

@@ -7,7 +7,7 @@ interface ProtectedAdminRouteProps {
 }
 
 export function ProtectedAdminRoute({ children }: ProtectedAdminRouteProps) {
-  const { user, loading, isAdmin, isStaff } = useAuth();
+  const { user, session, loading, isAdmin, isStaff } = useAuth();
 
   if (loading) {
     return (
@@ -17,7 +17,7 @@ export function ProtectedAdminRoute({ children }: ProtectedAdminRouteProps) {
     );
   }
 
-  if (!user) {
+  if (!user || !session) {
     return <Navigate to="/auth" replace />;
   }
 

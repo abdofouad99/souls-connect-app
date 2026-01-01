@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -20,25 +20,105 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { UserPlus, Mail, Shield, Loader2 } from 'lucide-react';
+import { UserPlus, Mail, Shield, Loader2, Edit, Users } from 'lucide-react';
 import { z } from 'zod';
+import type { AppRole } from '@/lib/types';
 
 const inviteSchema = z.object({
   email: z.string().email({ message: 'صيغة البريد الإلكتروني غير صالحة' }),
   role: z.enum(['admin', 'staff', 'sponsor'], { required_error: 'الدور مطلوب' }),
 });
 
+interface UserWithRole {
+  user_id: string;
+  role: AppRole;
+  profile: {
+    full_name: string;
+    email: string | null;
+  } | null;
+}
+
+const roleLabels: Record<AppRole, string> = {
+  admin: 'مدير نظام',
+  staff: 'مشرف',
+  sponsor: 'مستخدم عادي',
+};
+
+const roleBadgeVariants: Record<AppRole, 'default' | 'secondary' | 'outline'> = {
+  admin: 'default',
+  staff: 'secondary',
+  sponsor: 'outline',
+};
+
 export default function UsersManagement() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [email, setEmail] = useState('');
   const [role, setRole] = useState<'admin' | 'staff' | 'sponsor' | ''>('');
   const [isLoading, setIsLoading] = useState(false);
+  const [users, setUsers] = useState<UserWithRole[]>([]);
+  const [isLoadingUsers, setIsLoadingUsers] = useState(true);
+  const [selectedUser, setSelectedUser] = useState<UserWithRole | null>(null);
+  const [newRole, setNewRole] = useState<AppRole | ''>('');
+  const [isUpdatingRole, setIsUpdatingRole] = useState(false);
   const { toast } = useToast();
 
+  const fetchUsers = async () => {
+    setIsLoadingUsers(true);
+    try {
+      // Fetch user roles with profiles
+      const { data: rolesData, error: rolesError } = await supabase
+        .from('user_roles')
+        .select('user_id, role');
+
+      if (rolesError) throw rolesError;
+
+      // Fetch profiles
+      const { data: profilesData, error: profilesError } = await supabase
+        .from('profiles')
+        .select('user_id, full_name, email');
+
+      if (profilesError) throw profilesError;
+
+      // Combine data
+      const usersWithRoles: UserWithRole[] = (rolesData || []).map((roleRecord) => {
+        const profile = profilesData?.find((p) => p.user_id === roleRecord.user_id);
+        return {
+          user_id: roleRecord.user_id,
+          role: roleRecord.role as AppRole,
+          profile: profile ? { full_name: profile.full_name, email: profile.email } : null,
+        };
+      });
+
+      setUsers(usersWithRoles);
+    } catch (error: any) {
+      console.error('Error fetching users:', error);
+      toast({
+        variant: 'destructive',
+        title: 'خطأ في تحميل المستخدمين',
+        description: error.message,
+      });
+    } finally {
+      setIsLoadingUsers(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
   const handleInvite = async () => {
-    // Validate input
     const validation = inviteSchema.safeParse({ email, role });
     if (!validation.success) {
       toast({
@@ -68,10 +148,10 @@ export default function UsersManagement() {
         description: `تم إرسال دعوة إلى ${email} بنجاح`,
       });
 
-      // Reset form and close dialog
       setEmail('');
       setRole('');
       setIsDialogOpen(false);
+      fetchUsers();
     } catch (error: any) {
       console.error('Invite error:', error);
       toast({
@@ -81,6 +161,45 @@ export default function UsersManagement() {
       });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleEditRole = (user: UserWithRole) => {
+    setSelectedUser(user);
+    setNewRole(user.role);
+    setIsEditDialogOpen(true);
+  };
+
+  const handleUpdateRole = async () => {
+    if (!selectedUser || !newRole) return;
+
+    setIsUpdatingRole(true);
+    try {
+      const { error } = await supabase
+        .from('user_roles')
+        .update({ role: newRole })
+        .eq('user_id', selectedUser.user_id);
+
+      if (error) throw error;
+
+      toast({
+        title: 'تم تحديث الدور',
+        description: `تم تغيير دور ${selectedUser.profile?.full_name || 'المستخدم'} إلى ${roleLabels[newRole]}`,
+      });
+
+      setIsEditDialogOpen(false);
+      setSelectedUser(null);
+      setNewRole('');
+      fetchUsers();
+    } catch (error: any) {
+      console.error('Update role error:', error);
+      toast({
+        variant: 'destructive',
+        title: 'فشل تحديث الدور',
+        description: error.message || 'حدث خطأ غير متوقع',
+      });
+    } finally {
+      setIsUpdatingRole(false);
     }
   };
 
@@ -177,12 +296,135 @@ export default function UsersManagement() {
           </Dialog>
         </div>
 
+        {/* Users List */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Users className="h-5 w-5" />
+              قائمة المستخدمين
+            </CardTitle>
+            <CardDescription>
+              جميع المستخدمين المسجلين في النظام مع صلاحياتهم
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {isLoadingUsers ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+              </div>
+            ) : users.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                لا يوجد مستخدمين مسجلين
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>الاسم</TableHead>
+                      <TableHead>البريد الإلكتروني</TableHead>
+                      <TableHead>الدور</TableHead>
+                      <TableHead className="text-left">الإجراءات</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {users.map((user) => (
+                      <TableRow key={user.user_id}>
+                        <TableCell className="font-medium">
+                          {user.profile?.full_name || 'غير محدد'}
+                        </TableCell>
+                        <TableCell dir="ltr" className="text-left">
+                          {user.profile?.email || 'غير محدد'}
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant={roleBadgeVariants[user.role]}>
+                            {roleLabels[user.role]}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleEditRole(user)}
+                            className="gap-1"
+                          >
+                            <Edit className="h-4 w-4" />
+                            تعديل الدور
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Edit Role Dialog */}
+        <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Edit className="h-5 w-5" />
+                تعديل دور المستخدم
+              </DialogTitle>
+              <DialogDescription>
+                تغيير صلاحيات {selectedUser?.profile?.full_name || 'المستخدم'}
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="grid gap-4 py-4">
+              <div className="space-y-2">
+                <Label className="flex items-center gap-2">
+                  <Shield className="h-4 w-4" />
+                  الدور الجديد
+                </Label>
+                <Select value={newRole} onValueChange={(value: AppRole) => setNewRole(value)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="اختر الدور" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="admin">مدير نظام (Admin)</SelectItem>
+                    <SelectItem value="staff">مشرف (Staff)</SelectItem>
+                    <SelectItem value="sponsor">مستخدم عادي (Sponsor)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <DialogFooter className="gap-2 sm:gap-0">
+              <Button
+                variant="outline"
+                onClick={() => setIsEditDialogOpen(false)}
+                disabled={isUpdatingRole}
+              >
+                إلغاء
+              </Button>
+              <Button 
+                onClick={handleUpdateRole} 
+                disabled={isUpdatingRole || !newRole || newRole === selectedUser?.role}
+                className="gap-2"
+              >
+                {isUpdatingRole ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    جاري التحديث...
+                  </>
+                ) : (
+                  'حفظ التغييرات'
+                )}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
         {/* Info Card */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">كيفية عمل الدعوات</CardTitle>
+            <CardTitle className="text-lg">شرح الصلاحيات</CardTitle>
             <CardDescription>
-              معلومات حول نظام دعوة المستخدمين
+              معلومات حول أدوار المستخدمين وصلاحياتهم
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -214,16 +456,6 @@ export default function UsersManagement() {
                   يمكنه تصفح الأيتام وتقديم طلبات الكفالة ومتابعة كفالاته
                 </p>
               </div>
-            </div>
-            <div className="p-4 rounded-lg border border-border bg-card">
-              <h3 className="font-medium mb-2">خطوات الدعوة:</h3>
-              <ol className="list-decimal list-inside space-y-2 text-sm text-muted-foreground">
-                <li>أدخل البريد الإلكتروني للمستخدم الجديد</li>
-                <li>اختر الدور المناسب له</li>
-                <li>سيستقبل المستخدم رسالة بالبريد تحتوي على رابط الدعوة</li>
-                <li>عند فتح الرابط، سيقوم بتعيين كلمة المرور الخاصة به</li>
-                <li>بعد ذلك يمكنه تسجيل الدخول واستخدام النظام</li>
-              </ol>
             </div>
           </CardContent>
         </Card>

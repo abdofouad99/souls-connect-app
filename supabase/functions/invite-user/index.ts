@@ -8,7 +8,7 @@ const corsHeaders = {
 
 interface InviteRequest {
   email: string;
-  role: "admin" | "sponsor";
+  role: "admin" | "sponsor" | "staff";
 }
 
 serve(async (req: Request) => {
@@ -30,15 +30,20 @@ serve(async (req: Request) => {
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
 
-    // Create a client with the user's token to verify their role
-    const userClient = createClient(supabaseUrl, supabaseAnonKey, {
-      global: { headers: { Authorization: authHeader } },
+    // Extract the JWT token from the authorization header
+    const token = authHeader.replace("Bearer ", "");
+
+    // Create admin client with service role key
+    const adminClient = createClient(supabaseUrl, supabaseServiceKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false,
+      },
     });
 
-    // Get the current user
-    const { data: { user: currentUser }, error: userError } = await userClient.auth.getUser();
+    // Get the current user using the token
+    const { data: { user: currentUser }, error: userError } = await adminClient.auth.getUser(token);
     if (userError || !currentUser) {
       console.error("Failed to get current user:", userError);
       return new Response(
@@ -48,7 +53,7 @@ serve(async (req: Request) => {
     }
 
     // Check if the requesting user is admin or staff
-    const { data: roleData, error: roleError } = await userClient
+    const { data: roleData, error: roleError } = await adminClient
       .from("user_roles")
       .select("role")
       .eq("user_id", currentUser.id)
@@ -91,20 +96,12 @@ serve(async (req: Request) => {
     }
 
     // Validate role
-    if (!["admin", "sponsor"].includes(role)) {
+    if (!["admin", "sponsor", "staff"].includes(role)) {
       return new Response(
-        JSON.stringify({ error: "الدور غير صالح - يجب أن يكون admin أو sponsor" }),
+        JSON.stringify({ error: "الدور غير صالح" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
-
-    // Create admin client with service role key
-    const adminClient = createClient(supabaseUrl, supabaseServiceKey, {
-      auth: {
-        autoRefreshToken: false,
-        persistSession: false,
-      },
-    });
 
     // Invite the user
     console.log(`Inviting user: ${email} with role: ${role}`);

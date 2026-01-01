@@ -27,13 +27,13 @@ import { z } from 'zod';
 
 const inviteSchema = z.object({
   email: z.string().email({ message: 'صيغة البريد الإلكتروني غير صالحة' }),
-  role: z.enum(['admin', 'sponsor'], { required_error: 'الدور مطلوب' }),
+  role: z.enum(['admin', 'staff', 'sponsor'], { required_error: 'الدور مطلوب' }),
 });
 
 export default function UsersManagement() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [email, setEmail] = useState('');
-  const [role, setRole] = useState<'admin' | 'sponsor' | ''>('');
+  const [role, setRole] = useState<'admin' | 'staff' | 'sponsor' | ''>('');
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
@@ -134,12 +134,13 @@ export default function UsersManagement() {
                     <Shield className="h-4 w-4" />
                     الدور
                   </Label>
-                  <Select value={role} onValueChange={(value: 'admin' | 'sponsor') => setRole(value)}>
+                  <Select value={role} onValueChange={(value: 'admin' | 'staff' | 'sponsor') => setRole(value)}>
                     <SelectTrigger id="role">
                       <SelectValue placeholder="اختر الدور" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="admin">مدير نظام (Admin)</SelectItem>
+                      <SelectItem value="staff">مشرف (Staff)</SelectItem>
                       <SelectItem value="sponsor">مستخدم عادي (Sponsor)</SelectItem>
                     </SelectContent>
                   </Select>
@@ -185,7 +186,7 @@ export default function UsersManagement() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid gap-4 md:grid-cols-2">
+            <div className="grid gap-4 md:grid-cols-3">
               <div className="p-4 rounded-lg bg-muted">
                 <h3 className="font-medium mb-2 flex items-center gap-2">
                   <Shield className="h-4 w-4 text-primary" />
@@ -193,6 +194,15 @@ export default function UsersManagement() {
                 </h3>
                 <p className="text-sm text-muted-foreground">
                   يمكنه الوصول الكامل للوحة التحكم وإدارة جميع البيانات والمستخدمين
+                </p>
+              </div>
+              <div className="p-4 rounded-lg bg-muted">
+                <h3 className="font-medium mb-2 flex items-center gap-2">
+                  <Shield className="h-4 w-4 text-secondary" />
+                  مشرف (Staff)
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  يمكنه إدارة الأيتام والكفالات والإيصالات بدون صلاحيات إدارة المستخدمين
                 </p>
               </div>
               <div className="p-4 rounded-lg bg-muted">

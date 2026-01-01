@@ -38,6 +38,8 @@ const SponsorshipRequestsManagement = lazy(() => import("./pages/admin/Sponsorsh
 const ReceiptsManagement = lazy(() => import("./pages/admin/ReceiptsManagement"));
 const DepositRequestsManagement = lazy(() => import("./pages/admin/DepositRequestsManagement"));
 const NotificationsLog = lazy(() => import("./pages/admin/NotificationsLog"));
+const UsersManagement = lazy(() => import("./pages/admin/UsersManagement"));
+const SetPassword = lazy(() => import("./pages/SetPassword"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -73,6 +75,7 @@ const App = () => (
               <Route path="/about" element={<LazyRoute><About /></LazyRoute>} />
               <Route path="/thanks" element={<LazyRoute><SponsorThankYou /></LazyRoute>} />
               <Route path="/thank-you/:receiptNumber" element={<LazyRoute><ThankYou /></LazyRoute>} />
+              <Route path="/set-password" element={<LazyRoute><SetPassword /></LazyRoute>} />
 
               {/* Protected Routes - Auth required */}
               <Route path="/orphans" element={
@@ -160,6 +163,11 @@ const App = () => (
               <Route path="/admin/notifications" element={
                 <ProtectedAdminRoute>
                   <LazyRoute><NotificationsLog /></LazyRoute>
+                </ProtectedAdminRoute>
+              } />
+              <Route path="/admin/users" element={
+                <ProtectedAdminRoute>
+                  <LazyRoute><UsersManagement /></LazyRoute>
                 </ProtectedAdminRoute>
               } />
 

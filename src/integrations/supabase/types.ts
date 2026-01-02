@@ -462,6 +462,10 @@ export type Database = {
         Returns: boolean
       }
       is_admin_or_staff: { Args: { _user_id: string }; Returns: boolean }
+      recalculate_orphan_status: {
+        Args: { _orphan_id: string }
+        Returns: string
+      }
     }
     Enums: {
       app_role: "admin" | "staff" | "sponsor"

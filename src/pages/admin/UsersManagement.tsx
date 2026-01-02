@@ -168,21 +168,33 @@ export default function UsersManagement() {
 
     setIsLoading(true);
     try {
-      // Ensure we have a valid session token
-      if (!session?.access_token) {
+      // Get the current session to ensure we have a fresh token
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError || !sessionData?.session?.access_token) {
         await handleSessionInvalid('لم يتم العثور على جلسة صالحة');
         return;
       }
 
-      const { data, error } = await supabase.functions.invoke('invite-user', {
-        body: { email, role },
-        headers: {
-          Authorization: `Bearer ${session.access_token}`,
-        },
-      });
+      // Use fetch directly to ensure Authorization header is sent correctly
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/invite-user`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${sessionData.session.access_token}`,
+            'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          },
+          body: JSON.stringify({ email, role }),
+        }
+      );
+
+      const data = await response.json();
+      const error = !response.ok ? { message: data?.error || 'فشل إرسال الدعوة', context: { status: response.status } } : null;
 
       if (error) {
-        const status = (error as any)?.context?.status;
+        const status = error?.context?.status;
         if (status === 401 || status === 403) {
           await handleSessionInvalid('جلسة تسجيل الدخول غير صالحة');
           return;

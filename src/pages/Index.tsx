@@ -10,7 +10,7 @@ const Index = () => {
   const heroAnim = useScrollAnimation<HTMLElement>();
   const missionAnim = useScrollAnimation<HTMLElement>();
 
-  const contactNumbers = ["77243079", "04251675", "784665006"];
+  const contactNumbers = ["04251675", "784665006"];
 
   return (
     <Layout>

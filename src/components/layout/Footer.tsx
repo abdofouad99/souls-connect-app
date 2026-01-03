@@ -66,7 +66,7 @@ export function Footer() {
             <div className="flex flex-col gap-3">
               <div className="flex items-center gap-2 text-sm text-primary-foreground/80">
                 <Phone className="h-4 w-4 text-secondary" />
-                <span dir="ltr">77243079 - 04251675 - 784665006</span>
+                <span dir="ltr">04251675 - 784665006</span>
               </div>
               <div className="flex items-center gap-2 text-sm text-primary-foreground/80">
                 <Mail className="h-4 w-4 text-secondary" />

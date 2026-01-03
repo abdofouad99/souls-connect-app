@@ -249,8 +249,9 @@ export default function OrphanDetailsPage() {
         receiptImageUrl = await uploadReceiptImage();
       }
 
-      // Calculate amount
-      const amount = validatedData.sponsorshipType === "yearly" ? orphan.monthly_amount * 12 : orphan.monthly_amount;
+      // Calculate amount - fixed at 60 SAR per month
+      const SPONSOR_AMOUNT_SAR = 60;
+      const amount = validatedData.sponsorshipType === "yearly" ? SPONSOR_AMOUNT_SAR * 12 : SPONSOR_AMOUNT_SAR;
 
       // Create sponsorship request (pending status) with user_id
       await createSponsorshipRequest.mutateAsync({
@@ -361,9 +362,7 @@ export default function OrphanDetailsPage() {
                   <div className="grid grid-cols-2 gap-4 mb-6">
                     <div className="flex items-center gap-2 text-muted-foreground">
                       <MapPin className="h-5 w-5" />
-                      <span>
-                        {orphan.city}، {orphan.country}
-                      </span>
+                      <span>غزة</span>
                     </div>
                     <div className="flex items-center gap-2 text-muted-foreground">
                       <Calendar className="h-5 w-5" />
@@ -373,7 +372,7 @@ export default function OrphanDetailsPage() {
 
                   <div className="bg-primary/10 rounded-xl p-4 mb-6">
                     <div className="text-sm text-muted-foreground mb-1">قيمة الكفالة الشهرية</div>
-                    <div className="text-2xl font-bold text-primary">{orphan.monthly_amount} ر.س</div>
+                    <div className="text-xl font-bold text-primary">60 ريال سعودي • 15 دولار • 25,500 ريال يمني</div>
                   </div>
 
                   {orphan.story && (
@@ -465,11 +464,11 @@ export default function OrphanDetailsPage() {
                       >
                         <div className="flex items-center space-x-2 space-x-reverse">
                           <RadioGroupItem value="monthly" id="monthly" />
-                          <Label htmlFor="monthly">شهرية ({orphan.monthly_amount} ر.س)</Label>
+                          <Label htmlFor="monthly">شهرية (60 ر.س / 15$)</Label>
                         </div>
                         <div className="flex items-center space-x-2 space-x-reverse">
                           <RadioGroupItem value="yearly" id="yearly" />
-                          <Label htmlFor="yearly">سنوية ({orphan.monthly_amount * 12} ر.س)</Label>
+                          <Label htmlFor="yearly">سنوية (720 ر.س / 180$)</Label>
                         </div>
                       </RadioGroup>
                     </div>

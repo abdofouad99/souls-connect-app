@@ -1,26 +1,14 @@
 import { Link } from "react-router-dom";
-import { Heart, Users, HandHeart, TrendingUp, Phone } from "lucide-react";
+import { Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Layout } from "@/components/layout/Layout";
-import { useOrphanStats } from "@/hooks/useOrphans";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import heroImage from "@/assets/hero-image.jpg";
 import { cn } from "@/lib/utils";
 
 const Index = () => {
-  const { data: stats } = useOrphanStats();
-
-  // Scroll animations for sections
   const heroAnim = useScrollAnimation<HTMLElement>();
-  const statsAnim = useScrollAnimation<HTMLElement>();
   const missionAnim = useScrollAnimation<HTMLElement>();
-
-  const statCards = [
-    { icon: Users, label: "إجمالي الأيتام", value: stats?.totalOrphans || 0, color: "text-primary" },
-    { icon: Heart, label: "يتيم مكفول", value: stats?.sponsoredOrphans || 0, color: "text-secondary" },
-    { icon: HandHeart, label: "كافل كريم", value: stats?.totalSponsors || 0, color: "text-accent" },
-    { icon: TrendingUp, label: "كفالة نشطة", value: stats?.activeSponsorships || 0, color: "text-primary" },
-  ];
 
   const contactNumbers = ["77243079", "04251675", "784665006"];
 
@@ -88,43 +76,13 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Stats Section */}
-      <section ref={statsAnim.ref} className="py-16 bg-card">
-        <div className="container">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {statCards.map((stat, index) => (
-              <div
-                key={stat.label}
-                className={cn(
-                  "bg-background rounded-2xl p-6 text-center shadow-card card-hover transition-all duration-500",
-                  statsAnim.isVisible ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-8 scale-95",
-                )}
-                style={{ transitionDelay: statsAnim.isVisible ? `${index * 100}ms` : "0ms" }}
-              >
-                <stat.icon
-                  className={`h-10 w-10 mx-auto mb-3 ${stat.color} transition-transform duration-300 group-hover:scale-110`}
-                />
-                <div className="text-3xl md:text-4xl font-bold text-foreground mb-1">{stat.value}</div>
-                <div className="text-sm text-muted-foreground">{stat.label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* Mission Section */}
       <section ref={missionAnim.ref} className="py-20">
         <div className="container">
           <div className="max-w-3xl mx-auto text-center">
-            <h2
-              className={cn(
-                "text-3xl md:text-4xl font-serif font-bold text-foreground mb-6 transition-all duration-700",
-                missionAnim.isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8",
-              )}
-            ></h2>
             <div
               className={cn(
-                "mt-8 transition-all duration-700 delay-200",
+                "transition-all duration-700",
                 missionAnim.isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8",
               )}
             >

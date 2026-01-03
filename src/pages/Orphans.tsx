@@ -130,15 +130,15 @@ export default function OrphansPage() {
                     
                     <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
                       <MapPin className="h-4 w-4" />
-                      <span>{orphan.city}، {orphan.country}</span>
+                      <span>غزة</span>
                     </div>
                     
                     <div className="flex items-center justify-between mb-4">
                       <span className="text-sm text-muted-foreground">
                         {orphan.age} سنة • {orphan.gender === 'male' ? 'ذكر' : 'أنثى'}
                       </span>
-                      <span className="font-bold text-primary">
-                        {orphan.monthly_amount} ر.س/شهر
+                      <span className="font-bold text-primary text-sm">
+                        60 ر.س / 15$ / شهر
                       </span>
                     </div>
                     

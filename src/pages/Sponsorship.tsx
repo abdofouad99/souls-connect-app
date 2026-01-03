@@ -45,9 +45,9 @@ const Sponsorship = () => {
           }`}
         >
           <div className="container mx-auto px-4 text-center">
-            <h1 className="text-3xl md:text-5xl font-bold text-primary mb-6">كفالة الأيتام في غزة</h1>
+            <h1 className="text-3xl md:text-5xl font-bold text-primary mb-6">كفالة طفلٍ في غزّة</h1>
             <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-              هي بصمة تمتد، وأمان يُعاد، وحياة تُبنى من جديد
+              هي رحمةٌ تمتدّ، وأمانٌ يُعاد، وحياةٌ تُبنى من جديد
             </p>
           </div>
         </section>
@@ -62,9 +62,9 @@ const Sponsorship = () => {
           <div className="container mx-auto px-4">
             <div className="max-w-3xl mx-auto">
               <div className="prose prose-lg text-foreground leading-loose space-y-6 text-right">
-                <p className="text-lg md:text-xl">لطفل كُسرت طفولته قبل أن يشتد عوده…</p>
+                <p className="text-lg md:text-xl">لطفلٍ كُسِر قلبه قبل أن يشتدّ عوده…</p>
 
-                <p className="text-lg md:text-xl">قوله عليه الصلاة والسلام:</p>
+                <p className="text-lg md:text-xl">قال عليه الصلاة والسلام:</p>
               </div>
 
               {/* Hadith Callout Card */}
@@ -77,63 +77,55 @@ const Sponsorship = () => {
                 <Quote className="absolute top-4 right-4 w-8 h-8 text-primary/30" />
                 <Quote className="absolute bottom-4 left-4 w-8 h-8 text-primary/30 rotate-180" />
                 <p className="text-2xl md:text-3xl font-bold text-primary text-center leading-relaxed py-4">
-                  «أنا وكافل اليتيم في الجنة»
+                  «أنا وكافلُ اليتيمِ في الجنّة كهاتين»
                 </p>
-                <p className="text-center text-muted-foreground mt-2">وأشار بالسبابة والوسطى.</p>
+                <p className="text-center text-muted-foreground mt-2">وأشار بالسبّابة والوسطى.</p>
               </div>
 
               <div className="prose prose-lg text-foreground leading-loose space-y-6 text-right">
                 <p className="text-lg md:text-xl">
-                  حديثٌ ينبئ عن أن اليتيم ليس رقماً في قائمة المساعدات،
+                  حديثٌ يؤكّد على أنّ اليتيم ليس رقمًا في قائمة، ولا صورةً عابرة،
                   <br />
-                  بل هو مشروع إنساني يجب أن يُنظر له
+                  بل هو موقفٌ إنسانيّ يجب أن يُنظر له،
                   <br />
-                  ولا يُجرد من أبسط مقومات الحياة.
+                  والأجر عامرٌ بالخيرات…
                 </p>
 
                 <p className="text-lg md:text-xl">
-                  أيتام غزة لم تُعطَ لهم الفرصة
+                  الأيتام في غزّة تعلّموا الصبر قبل أن يتعلّموا الكلام،
                   <br />
-                  أن يتعلموا الكلام، أو يقاسوا
-                  <br />
-                  مع الفقد قبل أن يعرفوا معنى الحياة…
+                  وتعايشوا مع الفقد قبل أن يعرفوا معنى الحياة…
                 </p>
 
                 <p className="text-lg md:text-xl">
-                  معي لدعمه ليستمر الخير الكافل
+                  حين دلّك الله لتسير في درب الكافلين،
                   <br />
-                  هو اختيارك لترك بصمتك في الدنيا
+                  فهو اختيارٌ لك لتمسك بيد اليتيم،
                   <br />
-                  وتكون أنت السبب
+                  فينجو في الدنيا، وتنجو أنت في الآخرة،
                   <br />
-                  في حياةٍ أفضل لليتامى في غزة…
+                  ولكليكما حتماً في الدنيا والآخرة…
                 </p>
 
                 <p className="text-lg md:text-xl font-semibold text-primary">
-                  في غزة ما يقارب 60 ألف يتيم
+                  في غزّة ما يقارب ستّين ألف يتيم،
                   <br />
-                  فقدوا السند، فقدوا الحماية
+                  واليتيم في غزّة فقدٌ للوالدين أو أحدهما،
                   <br />
-                  فكونوا عوناً لهم.
+                  فقدٌ للسكن، فقدٌ للصحة، وإمكانات عيشٍ كريم…
                 </p>
 
                 <div className="bg-surface/50 rounded-lg p-4 md:p-6 border border-border/50">
                   <p className="text-lg md:text-xl italic text-center">
-                    «كفالة يتيم ما أحلى أثرها
+                    كفالتك ليتيمٍ واحد تعني:
                     <br />
-                    من أحياها فكأنما
+                    <span className="font-bold text-primary">﴿ومن أحياها فكأنّما أحيا الناس جميعًا﴾</span>
                     <br />
-                    أحيا الناس جميعاً»
+                    تعني أن تجعل له أملًا في الحياة والعلم،
+                    <br />
+                    وعمارةً للأرض…
                   </p>
                 </div>
-
-                <p className="text-lg md:text-xl">
-                  والعمل الخيري في غزة هو مشروع حياة
-                  <br />
-                  فكن أنت من يعيد الأمل
-                  <br />
-                  ويحفظ كرامة الإنسان.
-                </p>
               </div>
             </div>
           </div>

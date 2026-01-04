@@ -85,7 +85,36 @@ export default function OrphansManagement() {
   const [uploading, setUploading] = useState(false);
   const [importing, setImporting] = useState(false);
   const [importPreview, setImportPreview] = useState<any[]>([]);
+  const [selectedCurrency, setSelectedCurrency] = useState<'SAR' | 'USD' | 'YER'>('SAR');
+  const [amountInCurrency, setAmountInCurrency] = useState<number>(60);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Currency conversion rates (base: SAR)
+  const currencyRates = {
+    SAR: 1,
+    USD: 4, // 1 USD = 4 SAR
+    YER: 0.00235, // 1 YER ≈ 0.00235 SAR (25,500 YER = 60 SAR)
+  };
+
+  const currencyLabels = {
+    SAR: 'ريال سعودي',
+    USD: 'دولار أمريكي',
+    YER: 'ريال يمني',
+  };
+
+  const handleCurrencyChange = (currency: 'SAR' | 'USD' | 'YER') => {
+    setSelectedCurrency(currency);
+    // Convert amount to SAR and store
+    const amountInSAR = amountInCurrency * currencyRates[currency];
+    setFormData({ ...formData, monthly_amount: Math.round(amountInSAR) });
+  };
+
+  const handleAmountChange = (amount: number) => {
+    setAmountInCurrency(amount);
+    // Convert to SAR based on selected currency
+    const amountInSAR = amount * currencyRates[selectedCurrency];
+    setFormData({ ...formData, monthly_amount: Math.round(amountInSAR) });
+  };
 
   const filteredOrphans = orphans?.filter(orphan =>
     orphan.full_name.includes(search) ||
@@ -97,6 +126,8 @@ export default function OrphansManagement() {
     setSelectedOrphan(null);
     setFormData(emptyOrphan);
     setSelectedFile(null);
+    setSelectedCurrency('SAR');
+    setAmountInCurrency(60);
     setDialogOpen(true);
   };
 
@@ -115,6 +146,8 @@ export default function OrphansManagement() {
       intro_video_url: orphan.intro_video_url || '',
     });
     setSelectedFile(null);
+    setSelectedCurrency('SAR');
+    setAmountInCurrency(orphan.monthly_amount);
     setDialogOpen(true);
   };
 
@@ -446,16 +479,34 @@ export default function OrphansManagement() {
               </div>
             </div>
 
-            <div>
-              <Label>المبلغ الشهري (ر.س) *</Label>
-              <Input
-                type="number"
-                required
-                min={1}
-                value={formData.monthly_amount}
-                onChange={(e) => setFormData({ ...formData, monthly_amount: parseFloat(e.target.value) })}
-              />
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label>العملة *</Label>
+                <Select value={selectedCurrency} onValueChange={(v) => handleCurrencyChange(v as 'SAR' | 'USD' | 'YER')}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="SAR">ريال سعودي</SelectItem>
+                    <SelectItem value="USD">دولار أمريكي</SelectItem>
+                    <SelectItem value="YER">ريال يمني</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label>المبلغ الشهري ({currencyLabels[selectedCurrency]}) *</Label>
+                <Input
+                  type="number"
+                  required
+                  min={1}
+                  value={amountInCurrency}
+                  onChange={(e) => handleAmountChange(parseFloat(e.target.value) || 0)}
+                />
+              </div>
             </div>
+            {selectedCurrency !== 'SAR' && (
+              <p className="text-sm text-muted-foreground">
+                المبلغ بالريال السعودي: {formData.monthly_amount} ر.س
+              </p>
+            )}
 
             <div>
               <Label>القصة</Label>

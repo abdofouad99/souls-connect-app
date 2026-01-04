@@ -181,7 +181,8 @@ const Sponsorship = () => {
             <div className="max-w-2xl mx-auto bg-surface rounded-2xl p-8 md:p-12 border border-border shadow-elegant">
               <Heart className="w-12 h-12 text-primary mx-auto mb-6" />
               <h2 className="text-2xl md:text-3xl font-bold text-primary mb-4">كن سنداً ليتيم في غزة</h2>
-              <p className="text-muted-foreground mb-8 text-lg">ابدأ رحلة الكفالة واترك أثراً يدوم</p>
+              <p className="text-muted-foreground mb-4 text-lg">ابدأ رحلة الكفالة واترك أثراً يدوم</p>
+              <p className="text-primary font-bold text-xl mb-8">60 ريال سعودي • 15 دولار • 25,000 ريال يمني / شهرياً</p>
               <Link to="/orphans">
                 <Button size="xl" className="text-lg px-8 py-6">
                   ابدأ الكفالة الآن

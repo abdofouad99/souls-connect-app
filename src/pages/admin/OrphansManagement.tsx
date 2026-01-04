@@ -142,9 +142,10 @@ export default function OrphansManagement() {
       }
       setDialogOpen(false);
       setSelectedFile(null);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error:', error);
-      toast({ title: 'حدث خطأ', variant: 'destructive' });
+      const errorMessage = error?.message || 'حدث خطأ غير متوقع';
+      toast({ title: errorMessage, variant: 'destructive' });
     } finally {
       setUploading(false);
     }

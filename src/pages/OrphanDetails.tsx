@@ -372,7 +372,7 @@ export default function OrphanDetailsPage() {
 
                   <div className="bg-primary/10 rounded-xl p-4 mb-6">
                     <div className="text-sm text-muted-foreground mb-1">قيمة الكفالة الشهرية</div>
-                    <div className="text-xl font-bold text-primary">60 ريال سعودي • 15 دولار • 25,500 ريال يمني</div>
+                    <div className="text-xl font-bold text-primary">60 ريال سعودي • 15 دولار • 25,000 ريال يمني</div>
                   </div>
 
                   {orphan.story && (

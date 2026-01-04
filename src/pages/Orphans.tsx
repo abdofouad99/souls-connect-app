@@ -138,7 +138,7 @@ export default function OrphansPage() {
                         {orphan.age} سنة • {orphan.gender === 'male' ? 'ذكر' : 'أنثى'}
                       </span>
                       <span className="font-bold text-primary text-sm">
-                        60 ر.س / 15$ / شهر
+                        60 ر.س / 15$ / 25,000 ر.ي / شهر
                       </span>
                     </div>
                     

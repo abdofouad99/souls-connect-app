@@ -10,7 +10,8 @@ import {
   Menu,
   X,
   FileText,
-  Bell
+  Bell,
+  Building2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
@@ -29,6 +30,7 @@ const navItems = [
   { href: '/admin/sponsorship-requests', label: 'طلبات الكفالة', icon: FileText },
   { href: '/admin/receipts', label: 'الإيصالات', icon: Receipt },
   { href: '/admin/deposit-requests', label: 'طلبات الإيداع', icon: FileText },
+  { href: '/admin/bank-accounts', label: 'الحسابات البنكية', icon: Building2 },
   { href: '/admin/notifications', label: 'سجل الإشعارات', icon: Bell },
   { href: '/admin/users', label: 'إدارة المستخدمين', icon: Users },
 ];

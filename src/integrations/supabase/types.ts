@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      bank_accounts: {
+        Row: {
+          account_number: string
+          bank_name: string
+          beneficiary_name: string
+          created_at: string
+          display_order: number
+          iban: string | null
+          id: string
+          is_active: boolean
+          notes: string | null
+          updated_at: string
+        }
+        Insert: {
+          account_number: string
+          bank_name: string
+          beneficiary_name: string
+          created_at?: string
+          display_order?: number
+          iban?: string | null
+          id?: string
+          is_active?: boolean
+          notes?: string | null
+          updated_at?: string
+        }
+        Update: {
+          account_number?: string
+          bank_name?: string
+          beneficiary_name?: string
+          created_at?: string
+          display_order?: number
+          iban?: string | null
+          id?: string
+          is_active?: boolean
+          notes?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       deposit_receipt_requests: {
         Row: {
           bank_method: string

@@ -27,7 +27,6 @@ export function Header() {
     { href: '/about', label: 'من نحن' },
     { href: '/sponsorship', label: 'كفالة الأيتام' },
     { href: '/orphans', label: 'الأيتام' },
-    { href: '/receipt-lookup', label: 'استعلام عن السند' },
   ];
 
   return (

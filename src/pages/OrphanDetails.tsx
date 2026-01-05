@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useOrphan } from "@/hooks/useOrphans";
 import { useCreateSponsorshipRequest } from "@/hooks/useSponsorshipRequests";
+import { useBankAccounts } from "@/hooks/useBankAccounts";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -46,42 +47,9 @@ const statusLabels: Record<string, { label: string; class: string }> = {
   sponsored: { label: "مكفول بالكامل", class: "bg-muted text-muted-foreground" },
 };
 
-// Bank accounts data - replace placeholders with actual data later
-const bankAccounts = [
-  {
-    bankName: "بنك الكريمي",
-    accountName: "الحساب اليمني",
-    iban: "3073854128",
-  },
-  {
-    bankName: "بنك الكريمي",
-    accountName: "الحساب السعودي",
-    iban: "3137559853",
-  },
-  {
-    bankName: "بنك الكريمي",
-    accountName: "الحساب الدولار",
-    iban: "3153152739",
-  },
-  {
-    bankName: "بنك الكريمي",
-    accountName: "الحساب اليمني",
-    iban: "3063750157",
-  },
-  {
-    bankName: "بنك الكريمي",
-    accountName: "الحساب السعودي",
-    iban: "3131509811",
-  },
-  {
-    bankName: "بنك الكريمي",
-    accountName: "الحساب الدولار",
-    iban: "3164552135",
-  },
-];
-
 function BankAccountsSection() {
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
+  const { data: bankAccounts, isLoading } = useBankAccounts();
 
   const copyToClipboard = async (text: string, index: number) => {
     try {
@@ -93,28 +61,40 @@ function BankAccountsSection() {
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="bg-muted/50 rounded-xl p-4 border border-border">
+        <div className="text-center text-muted-foreground">جاري التحميل...</div>
+      </div>
+    );
+  }
+
+  if (!bankAccounts || bankAccounts.length === 0) {
+    return null;
+  }
+
   return (
     <div className="bg-muted/50 rounded-xl p-4 border border-border">
       <h3 className="font-bold text-foreground mb-3">بيانات الحسابات البنكية</h3>
       <div className="space-y-4">
         {bankAccounts.map((account, index) => (
-          <div key={index} className="bg-card rounded-lg p-3 border border-border">
+          <div key={account.id} className="bg-card rounded-lg p-3 border border-border">
             <div className="text-sm text-muted-foreground mb-1">اسم البنك</div>
-            <div className="font-medium text-foreground mb-2 select-all">{account.bankName}</div>
+            <div className="font-medium text-foreground mb-2 select-all">{account.bank_name}</div>
 
-            <div className="text-sm text-muted-foreground mb-1">اسم الحساب</div>
-            <div className="font-medium text-foreground mb-2 select-all">{account.accountName}</div>
+            <div className="text-sm text-muted-foreground mb-1">اسم المستفيد</div>
+            <div className="font-medium text-foreground mb-2 select-all">{account.beneficiary_name}</div>
 
-            <div className="text-sm text-muted-foreground mb-1">رقم الحساب / IBAN</div>
+            <div className="text-sm text-muted-foreground mb-1">رقم الحساب</div>
             <div className="flex items-center gap-2">
               <code className="flex-1 bg-muted px-2 py-1 rounded text-sm font-mono select-all" dir="ltr">
-                {account.iban}
+                {account.account_number}
               </code>
               <Button
                 type="button"
                 variant="outline"
                 size="sm"
-                onClick={() => copyToClipboard(account.iban, index)}
+                onClick={() => copyToClipboard(account.account_number, index)}
                 className="shrink-0"
               >
                 {copiedIndex === index ? (
@@ -130,6 +110,19 @@ function BankAccountsSection() {
                 )}
               </Button>
             </div>
+
+            {account.iban && (
+              <>
+                <div className="text-sm text-muted-foreground mb-1 mt-2">IBAN</div>
+                <code className="block bg-muted px-2 py-1 rounded text-sm font-mono select-all" dir="ltr">
+                  {account.iban}
+                </code>
+              </>
+            )}
+
+            {account.notes && (
+              <div className="text-sm text-muted-foreground mt-2">{account.notes}</div>
+            )}
           </div>
         ))}
       </div>

@@ -37,6 +37,7 @@ const SponsorshipsManagement = lazy(() => import("./pages/admin/SponsorshipsMana
 const SponsorshipRequestsManagement = lazy(() => import("./pages/admin/SponsorshipRequestsManagement"));
 const ReceiptsManagement = lazy(() => import("./pages/admin/ReceiptsManagement"));
 const DepositRequestsManagement = lazy(() => import("./pages/admin/DepositRequestsManagement"));
+const BankAccountsManagement = lazy(() => import("./pages/admin/BankAccountsManagement"));
 const NotificationsLog = lazy(() => import("./pages/admin/NotificationsLog"));
 const UsersManagement = lazy(() => import("./pages/admin/UsersManagement"));
 const SetPassword = lazy(() => import("./pages/SetPassword"));
@@ -77,22 +78,12 @@ const App = () => (
               <Route path="/thank-you/:receiptNumber" element={<LazyRoute><ThankYou /></LazyRoute>} />
               <Route path="/set-password" element={<LazyRoute><SetPassword /></LazyRoute>} />
 
+              {/* Public Routes - No auth required */}
+              <Route path="/orphans" element={<LazyRoute><Orphans /></LazyRoute>} />
+              <Route path="/orphan/:id" element={<LazyRoute><OrphanDetails /></LazyRoute>} />
+              <Route path="/sponsorship" element={<LazyRoute><Sponsorship /></LazyRoute>} />
+
               {/* Protected Routes - Auth required */}
-              <Route path="/orphans" element={
-                <ProtectedRoute>
-                  <LazyRoute><Orphans /></LazyRoute>
-                </ProtectedRoute>
-              } />
-              <Route path="/orphan/:id" element={
-                <ProtectedRoute>
-                  <LazyRoute><OrphanDetails /></LazyRoute>
-                </ProtectedRoute>
-              } />
-              <Route path="/sponsorship" element={
-                <ProtectedRoute>
-                  <LazyRoute><Sponsorship /></LazyRoute>
-                </ProtectedRoute>
-              } />
               <Route path="/receipt/:receiptNumber" element={
                 <ProtectedRoute>
                   <LazyRoute><ReceiptPage /></LazyRoute>
@@ -158,6 +149,11 @@ const App = () => (
               <Route path="/admin/deposit-requests" element={
                 <ProtectedAdminRoute>
                   <LazyRoute><DepositRequestsManagement /></LazyRoute>
+                </ProtectedAdminRoute>
+              } />
+              <Route path="/admin/bank-accounts" element={
+                <ProtectedAdminRoute>
+                  <LazyRoute><BankAccountsManagement /></LazyRoute>
                 </ProtectedAdminRoute>
               } />
               <Route path="/admin/notifications" element={

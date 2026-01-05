@@ -1,6 +1,4 @@
-import { Link } from "react-router-dom";
 import { Phone } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Layout } from "@/components/layout/Layout";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import heroImage from "@/assets/hero-image.jpg";
@@ -8,7 +6,6 @@ import { cn } from "@/lib/utils";
 
 const Index = () => {
   const heroAnim = useScrollAnimation<HTMLElement>();
-  const missionAnim = useScrollAnimation<HTMLElement>();
 
   const contactNumbers = ["04251675", "784665006"];
 
@@ -76,23 +73,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Mission Section */}
-      <section ref={missionAnim.ref} className="py-20">
-        <div className="container">
-          <div className="max-w-3xl mx-auto text-center">
-            <div
-              className={cn(
-                "transition-all duration-700",
-                missionAnim.isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8",
-              )}
-            >
-              <Button asChild variant="gold" size="lg" className="hover:scale-105 transition-transform">
-                <Link to="/orphans">استعرض الأيتام المتاحين للكفالة</Link>
-              </Button>
-            </div>
-          </div>
-        </div>
-      </section>
     </Layout>
   );
 };

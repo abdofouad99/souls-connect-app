@@ -131,6 +131,30 @@ const SponsorThankYou = () => {
               </div>
             </div>
 
+            {/* WhatsApp Contact Section */}
+            <div className="bg-muted/50 border border-border rounded-2xl p-6 mt-8 text-center">
+              <p className="text-lg font-semibold text-foreground mb-4">
+                للتواصل وتأكيد الكفالة عبر الواتساب:
+              </p>
+              <Button
+                asChild
+                variant="outline"
+                size="lg"
+                className="mb-4"
+              >
+                <a
+                  href="https://wa.me/967784665006?text=السلام%20عليكم%20-%20أود%20تأكيد%20كفالة%20اليتيم."
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  تواصل معنا على الواتساب
+                </a>
+              </Button>
+              <p className="text-muted-foreground text-sm">
+                أو يمكنك نسخ الرقم والتواصل مباشرة: <span className="font-mono font-semibold" dir="ltr">784665006</span>
+              </p>
+            </div>
+
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center mt-10">
               {receiptNumber && (

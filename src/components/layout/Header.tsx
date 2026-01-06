@@ -23,10 +23,10 @@ export function Header() {
   };
 
   const navLinks = [
-    { href: '/', label: 'الرئيسية' },
-    { href: '/about', label: 'من نحن' },
-    { href: '/sponsorship', label: 'كفالة الأيتام' },
-    { href: '/orphans', label: 'الأيتام' },
+    { href: '/', label: 'الرئيسة' },
+    { href: '/about', label: 'نبذة عن الجمعية' },
+    { href: '/sponsorship', label: 'مشروع كفالة الأيتام' },
+    { href: '/orphans', label: 'لبدء الكفالة في غزة' },
   ];
 
   return (

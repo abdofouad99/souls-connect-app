@@ -27,28 +27,28 @@ export function Footer() {
                 className="flex items-center gap-2 text-sm text-primary-foreground/80 hover:text-secondary transition-colors"
               >
                 <Home className="h-4 w-4" />
-                الرئيسية
+                الرئيسة
               </Link>
               <Link
                 to="/about"
                 className="flex items-center gap-2 text-sm text-primary-foreground/80 hover:text-secondary transition-colors"
               >
                 <Info className="h-4 w-4" />
-                من نحن
+                نبذة عن الجمعية
               </Link>
               <Link
                 to="/sponsorship"
                 className="flex items-center gap-2 text-sm text-primary-foreground/80 hover:text-secondary transition-colors"
               >
                 <Heart className="h-4 w-4" />
-                كفالة الأيتام
+                مشروع كفالة الأيتام
               </Link>
               <Link
                 to="/orphans"
                 className="flex items-center gap-2 text-sm text-primary-foreground/80 hover:text-secondary transition-colors"
               >
                 <Users className="h-4 w-4" />
-                الأيتام
+                لبدء الكفالة في غزة
               </Link>
               <Link
                 to="/deposit-request"

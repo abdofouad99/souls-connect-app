@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
+import { useSiteSetting } from "@/hooks/useSiteSettings";
 import { Button } from "@/components/ui/button";
 import { Quote, Heart, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -14,6 +15,7 @@ import thankYou5 from "@/assets/thank-you-5.jpg";
 
 const Sponsorship = () => {
   const [selectedImage, setSelectedImage] = useState<number | null>(null);
+  const { data: sponsorshipAmountSetting } = useSiteSetting("sponsorship_amount_text");
   const heroAnimation = useScrollAnimation();
   const textAnimation = useScrollAnimation();
   const calloutAnimation = useScrollAnimation();
@@ -182,7 +184,9 @@ const Sponsorship = () => {
               <Heart className="w-12 h-12 text-primary mx-auto mb-6" />
               <h2 className="text-2xl md:text-3xl font-bold text-primary mb-4">كن سنداً ليتيم في غزة</h2>
               <p className="text-muted-foreground mb-4 text-lg">ابدأ رحلة الكفالة واترك أثراً يدوم</p>
-              <p className="text-primary font-bold text-xl mb-8">60 ريال سعودي • 15 دولار • 25,000 ريال يمني / شهرياً</p>
+              <p className="text-primary font-bold text-xl mb-8">
+                {sponsorshipAmountSetting?.value || "60 ريال سعودي • 15 دولار • 25,000 ريال يمني"} / شهرياً
+              </p>
               <Link to="/orphans">
                 <Button size="xl" className="text-lg px-8 py-6">
                   ابدأ الكفالة الآن

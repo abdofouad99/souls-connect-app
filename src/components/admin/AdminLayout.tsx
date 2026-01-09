@@ -33,6 +33,7 @@ const navItems = [
   { href: '/admin/bank-accounts', label: 'الحسابات البنكية', icon: Building2 },
   { href: '/admin/notifications', label: 'سجل الإشعارات', icon: Bell },
   { href: '/admin/users', label: 'إدارة المستخدمين', icon: Users },
+  { href: '/admin/settings', label: 'إعدادات الموقع', icon: LayoutDashboard },
 ];
 
 export function AdminLayout({ children }: AdminLayoutProps) {

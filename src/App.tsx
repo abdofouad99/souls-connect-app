@@ -40,6 +40,7 @@ const DepositRequestsManagement = lazy(() => import("./pages/admin/DepositReques
 const BankAccountsManagement = lazy(() => import("./pages/admin/BankAccountsManagement"));
 const NotificationsLog = lazy(() => import("./pages/admin/NotificationsLog"));
 const UsersManagement = lazy(() => import("./pages/admin/UsersManagement"));
+const SiteSettings = lazy(() => import("./pages/admin/SiteSettings"));
 const SetPassword = lazy(() => import("./pages/SetPassword"));
 
 const queryClient = new QueryClient({
@@ -164,6 +165,11 @@ const App = () => (
               <Route path="/admin/users" element={
                 <ProtectedAdminRoute>
                   <LazyRoute><UsersManagement /></LazyRoute>
+                </ProtectedAdminRoute>
+              } />
+              <Route path="/admin/settings" element={
+                <ProtectedAdminRoute>
+                  <LazyRoute><SiteSettings /></LazyRoute>
                 </ProtectedAdminRoute>
               } />
 

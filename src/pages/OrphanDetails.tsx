@@ -10,6 +10,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useOrphan } from "@/hooks/useOrphans";
 import { useCreateSponsorshipRequest } from "@/hooks/useSponsorshipRequests";
 import { useBankAccounts } from "@/hooks/useBankAccounts";
+import { useSiteSetting } from "@/hooks/useSiteSettings";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -135,6 +136,7 @@ export default function OrphanDetailsPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { data: orphan, isLoading } = useOrphan(id || "");
+  const { data: sponsorshipAmountSetting } = useSiteSetting("sponsorship_amount_text");
   const createSponsorshipRequest = useCreateSponsorshipRequest();
 
   const [showForm, setShowForm] = useState(false);
@@ -365,7 +367,9 @@ export default function OrphanDetailsPage() {
 
                   <div className="bg-primary/10 rounded-xl p-4 mb-6">
                     <div className="text-sm text-muted-foreground mb-1">قيمة الكفالة الشهرية</div>
-                    <div className="text-xl font-bold text-primary">60 ريال سعودي • 15 دولار • 25,000 ريال يمني</div>
+                    <div className="text-xl font-bold text-primary">
+                      {sponsorshipAmountSetting?.value || "60 ريال سعودي • 15 دولار • 25,000 ريال يمني"}
+                    </div>
                   </div>
 
                   {orphan.story && (

@@ -1,9 +1,7 @@
 import { Link } from "react-router-dom";
-import { Phone, Mail, MapPin, Home, Info, Heart, Users } from "lucide-react";
-
+import { Phone, Home, Info, Heart, Users } from "lucide-react";
 export function Footer() {
-  return (
-    <footer className="bg-foreground text-primary-foreground">
+  return <footer className="bg-foreground text-primary-foreground">
       <div className="container py-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Quick Links - moved to first column */}
@@ -12,31 +10,19 @@ export function Footer() {
           <div>
             <h3 className="font-serif font-bold mb-4">روابط سريعة</h3>
             <nav className="flex flex-col gap-2">
-              <Link
-                to="/"
-                className="flex items-center gap-2 text-base text-primary-foreground/80 hover:text-secondary transition-colors"
-              >
+              <Link to="/" className="flex items-center gap-2 text-base text-primary-foreground/80 hover:text-secondary transition-colors">
                 <Home className="h-4 w-4" />
                 الرئيسة
               </Link>
-              <Link
-                to="/about"
-                className="flex items-center gap-2 text-base text-primary-foreground/80 hover:text-secondary transition-colors"
-              >
+              <Link to="/about" className="flex items-center gap-2 text-base text-primary-foreground/80 hover:text-secondary transition-colors">
                 <Info className="h-4 w-4" />
                 نبذة عن الجمعية
               </Link>
-              <Link
-                to="/sponsorship"
-                className="flex items-center gap-2 text-base text-primary-foreground/80 hover:text-secondary transition-colors"
-              >
+              <Link to="/sponsorship" className="flex items-center gap-2 text-base text-primary-foreground/80 hover:text-secondary transition-colors">
                 <Heart className="h-4 w-4" />
                 مشروع كفالة الأيتام
               </Link>
-              <Link
-                to="/orphans"
-                className="flex items-center gap-2 text-base text-primary-foreground/80 hover:text-secondary transition-colors"
-              >
+              <Link to="/orphans" className="flex items-center gap-2 text-base text-primary-foreground/80 hover:text-secondary transition-colors">
                 <Users className="h-4 w-4" />
                 لبدء الكفالة في غزة
               </Link>
@@ -45,22 +31,16 @@ export function Footer() {
 
           {/* Contact */}
           <div>
-            <h3 className="font-serif font-bold mb-4">تواصل معنا</h3>
+            
             <div className="flex flex-col gap-3">
+              
               <div className="flex items-center gap-2 text-sm text-primary-foreground/80">
-                <Phone className="h-4 w-4 text-secondary" />
-                <span dir="ltr">04251675 - 784665006</span>
+                
+                
               </div>
               <div className="flex items-center gap-2 text-sm text-primary-foreground/80">
-                <Mail className="h-4 w-4 text-secondary" />
-                <span> https://www.facebook.com/share/1a6MtvyzUw/ </span>
-              </div>
-              <div className="flex items-center gap-2 text-sm text-primary-foreground/80">
-                <MapPin className="h-4 w-4 text-secondary" />
-                <span>
-                  {" "}
-                  شارع جمال -جولة المسبح -مقابل الكريمي الرئيس-فوق محلات مرح-فوق عيادة د.سميرة الخليدي Taiz, Yemen{" "}
-                </span>
+                
+                
               </div>
             </div>
           </div>
@@ -72,6 +52,5 @@ export function Footer() {
           </p>
         </div>
       </div>
-    </footer>
-  );
+    </footer>;
 }

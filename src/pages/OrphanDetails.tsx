@@ -18,40 +18,64 @@ import { z } from "zod";
 
 // Zod schema for sponsorship form validation
 const sponsorshipFormSchema = z.object({
-  fullName: z.string()
-    .trim()
-    .min(2, { message: "الاسم يجب أن يكون حرفين على الأقل" })
-    .max(100, { message: "الاسم يجب أن يكون أقل من 100 حرف" }),
-  phone: z.string()
-    .trim()
-    .regex(/^[0-9]{9}$/, { message: "رقم الهاتف يجب أن يكون 9 أرقام" }),
-  email: z.string()
-    .trim()
-    .email({ message: "البريد الإلكتروني غير صالح" })
-    .max(255, { message: "البريد الإلكتروني يجب أن يكون أقل من 255 حرف" }),
-  country: z.string()
-    .trim()
-    .max(100, { message: "اسم البلد يجب أن يكون أقل من 100 حرف" })
-    .optional()
-    .or(z.literal("")),
-  sponsorshipType: z.enum(["monthly", "yearly"]),
+  fullName: z.string().trim().min(2, {
+    message: "الاسم يجب أن يكون حرفين على الأقل"
+  }).max(100, {
+    message: "الاسم يجب أن يكون أقل من 100 حرف"
+  }),
+  phone: z.string().trim().regex(/^[0-9]{9}$/, {
+    message: "رقم الهاتف يجب أن يكون 9 أرقام"
+  }),
+  email: z.string().trim().email({
+    message: "البريد الإلكتروني غير صالح"
+  }).max(255, {
+    message: "البريد الإلكتروني يجب أن يكون أقل من 255 حرف"
+  }),
+  country: z.string().trim().max(100, {
+    message: "اسم البلد يجب أن يكون أقل من 100 حرف"
+  }).optional().or(z.literal("")),
+  sponsorshipType: z.enum(["monthly", "yearly"])
 });
-
-const statusLabels: Record<string, { label: string; class: string }> = {
-  available: { label: "متاح للكفالة", class: "bg-primary text-primary-foreground" },
-  partially_sponsored: { label: "مكفول جزئياً", class: "bg-secondary text-secondary-foreground" },
-  fully_sponsored: { label: "مكفول بالكامل", class: "bg-muted text-muted-foreground" },
-  inactive: { label: "غير نشط", class: "bg-muted text-muted-foreground" },
+const statusLabels: Record<string, {
+  label: string;
+  class: string;
+}> = {
+  available: {
+    label: "متاح للكفالة",
+    class: "bg-primary text-primary-foreground"
+  },
+  partially_sponsored: {
+    label: "مكفول جزئياً",
+    class: "bg-secondary text-secondary-foreground"
+  },
+  fully_sponsored: {
+    label: "مكفول بالكامل",
+    class: "bg-muted text-muted-foreground"
+  },
+  inactive: {
+    label: "غير نشط",
+    class: "bg-muted text-muted-foreground"
+  },
   // Legacy values
-  partial: { label: "مكفول جزئياً", class: "bg-secondary text-secondary-foreground" },
-  full: { label: "مكفول بالكامل", class: "bg-muted text-muted-foreground" },
-  sponsored: { label: "مكفول بالكامل", class: "bg-muted text-muted-foreground" },
+  partial: {
+    label: "مكفول جزئياً",
+    class: "bg-secondary text-secondary-foreground"
+  },
+  full: {
+    label: "مكفول بالكامل",
+    class: "bg-muted text-muted-foreground"
+  },
+  sponsored: {
+    label: "مكفول بالكامل",
+    class: "bg-muted text-muted-foreground"
+  }
 };
-
 function BankAccountsSection() {
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
-  const { data: bankAccounts, isLoading } = useBankAccounts();
-
+  const {
+    data: bankAccounts,
+    isLoading
+  } = useBankAccounts();
   const copyToClipboard = async (text: string, index: number) => {
     try {
       await navigator.clipboard.writeText(text.replace(/\s/g, ""));
@@ -61,25 +85,18 @@ function BankAccountsSection() {
       console.error("Failed to copy:", err);
     }
   };
-
   if (isLoading) {
-    return (
-      <div className="bg-muted/50 rounded-xl p-4 border border-border">
+    return <div className="bg-muted/50 rounded-xl p-4 border border-border">
         <div className="text-center text-muted-foreground">جاري التحميل...</div>
-      </div>
-    );
+      </div>;
   }
-
   if (!bankAccounts || bankAccounts.length === 0) {
     return null;
   }
-
-  return (
-    <div className="bg-muted/50 rounded-xl p-4 border border-border">
+  return <div className="bg-muted/50 rounded-xl p-4 border border-border">
       <h3 className="font-bold text-foreground mb-3">بيانات الحسابات البنكية</h3>
       <div className="space-y-4">
-        {bankAccounts.map((account, index) => (
-          <div key={account.id} className="bg-card rounded-lg p-3 border border-border">
+        {bankAccounts.map((account, index) => <div key={account.id} className="bg-card rounded-lg p-3 border border-border">
             <div className="text-sm text-muted-foreground mb-1">اسم البنك</div>
             <div className="font-medium text-foreground mb-2 select-all">{account.bank_name}</div>
 
@@ -91,61 +108,54 @@ function BankAccountsSection() {
               <code className="flex-1 bg-muted px-2 py-1 rounded text-sm font-mono select-all" dir="ltr">
                 {account.account_number}
               </code>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => copyToClipboard(account.account_number, index)}
-                className="shrink-0"
-              >
-                {copiedIndex === index ? (
-                  <>
+              <Button type="button" variant="outline" size="sm" onClick={() => copyToClipboard(account.account_number, index)} className="shrink-0">
+                {copiedIndex === index ? <>
                     <Check className="h-4 w-4 text-green-500" />
                     <span className="mr-1 text-green-500">تم النسخ</span>
-                  </>
-                ) : (
-                  <>
+                  </> : <>
                     <Copy className="h-4 w-4" />
                     <span className="mr-1">نسخ</span>
-                  </>
-                )}
+                  </>}
               </Button>
             </div>
 
-            {account.iban && (
-              <>
+            {account.iban && <>
                 <div className="text-sm text-muted-foreground mb-1 mt-2">IBAN</div>
                 <code className="block bg-muted px-2 py-1 rounded text-sm font-mono select-all" dir="ltr">
                   {account.iban}
                 </code>
-              </>
-            )}
+              </>}
 
-            {account.notes && (
-              <div className="text-sm text-muted-foreground mt-2">{account.notes}</div>
-            )}
-          </div>
-        ))}
+            {account.notes && <div className="text-sm text-muted-foreground mt-2">{account.notes}</div>}
+          </div>)}
       </div>
-    </div>
-  );
+    </div>;
 }
-
 export default function OrphanDetailsPage() {
-  const { id } = useParams<{ id: string }>();
+  const {
+    id
+  } = useParams<{
+    id: string;
+  }>();
   const navigate = useNavigate();
-  const { user } = useAuth();
-  const { data: orphan, isLoading } = useOrphan(id || "");
-  const { data: sponsorshipAmountSetting } = useSiteSetting("sponsorship_amount_text");
+  const {
+    user
+  } = useAuth();
+  const {
+    data: orphan,
+    isLoading
+  } = useOrphan(id || "");
+  const {
+    data: sponsorshipAmountSetting
+  } = useSiteSetting("sponsorship_amount_text");
   const createSponsorshipRequest = useCreateSponsorshipRequest();
-
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
     fullName: "",
     phone: "",
     email: "",
     country: "",
-    sponsorshipType: "monthly",
+    sponsorshipType: "monthly"
   });
   const [receiptFile, setReceiptFile] = useState<File | null>(null);
   const [receiptPreview, setReceiptPreview] = useState<string | null>(null);
@@ -160,11 +170,10 @@ export default function OrphanDetailsPage() {
         fullName: userMeta.full_name || prev.fullName,
         email: user.email || prev.email,
         phone: userMeta.phone || prev.phone,
-        country: userMeta.country || prev.country,
+        country: userMeta.country || prev.country
       }));
     }
   }, [user]);
-
   const handleReceiptFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -172,7 +181,7 @@ export default function OrphanDetailsPage() {
         toast({
           title: "خطأ",
           description: "يرجى اختيار ملف صورة فقط",
-          variant: "destructive",
+          variant: "destructive"
         });
         return;
       }
@@ -180,7 +189,7 @@ export default function OrphanDetailsPage() {
         toast({
           title: "خطأ",
           description: "حجم الصورة يجب أن يكون أقل من 5MB",
-          variant: "destructive",
+          variant: "destructive"
         });
         return;
       }
@@ -190,22 +199,19 @@ export default function OrphanDetailsPage() {
       reader.readAsDataURL(file);
     }
   };
-
   const removeReceiptImage = () => {
     setReceiptFile(null);
     setReceiptPreview(null);
   };
-
   const uploadReceiptImage = async (): Promise<string | null> => {
     if (!receiptFile) return null;
-
     try {
       const fileExt = receiptFile.name.split(".").pop();
       // Store only path (not public URL) for private bucket
       const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
-
-      const { error: uploadError } = await supabase.storage.from("deposit-receipts").upload(fileName, receiptFile);
-
+      const {
+        error: uploadError
+      } = await supabase.storage.from("deposit-receipts").upload(fileName, receiptFile);
       if (uploadError) throw uploadError;
 
       // Return only the file path, NOT the public URL (bucket is private)
@@ -215,10 +221,8 @@ export default function OrphanDetailsPage() {
       return null;
     }
   };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!orphan) return;
 
     // Validate form using Zod schema
@@ -228,15 +232,12 @@ export default function OrphanDetailsPage() {
       toast({
         title: "بيانات غير صالحة",
         description: firstError.message,
-        variant: "destructive",
+        variant: "destructive"
       });
       return;
     }
-
     const validatedData = validationResult.data;
-
     setSubmitting(true);
-
     try {
       // Upload receipt image if exists
       let receiptImageUrl: string | null = null;
@@ -258,14 +259,14 @@ export default function OrphanDetailsPage() {
         sponsorship_type: validatedData.sponsorshipType,
         amount,
         transfer_receipt_image: receiptImageUrl || undefined,
-        user_id: user?.id,
+        user_id: user?.id
       });
 
       // Navigate to thank you page with pending message
       const params = new URLSearchParams({
         name: validatedData.fullName,
         amount: amount.toString(),
-        status: "pending",
+        status: "pending"
       });
       navigate(`/thanks?${params.toString()}`);
     } catch (error: any) {
@@ -274,12 +275,11 @@ export default function OrphanDetailsPage() {
         message: error?.message,
         code: error?.code,
         status: error?.status,
-        details: error?.details,
+        details: error?.details
       });
 
       // Better error messages based on error type
       let errorMessage = "لم نتمكن من إرسال طلب الكفالة. يرجى المحاولة مرة أخرى.";
-
       if (error?.message?.includes("fetch") || error?.message?.includes("network")) {
         errorMessage = "تعذر الاتصال بالخادم. يرجى التحقق من اتصالك بالإنترنت.";
       } else if (error?.code === "23505") {
@@ -291,42 +291,33 @@ export default function OrphanDetailsPage() {
       } else if (error?.code?.startsWith("22") || error?.status === 400) {
         errorMessage = "تأكد من إدخال جميع البيانات المطلوبة بشكل صحيح.";
       }
-
       toast({
         title: "حدث خطأ",
         description: errorMessage,
-        variant: "destructive",
+        variant: "destructive"
       });
     } finally {
       setSubmitting(false);
     }
   };
-
   if (isLoading) {
-    return (
-      <Layout>
+    return <Layout>
         <div className="min-h-screen flex items-center justify-center">
           <div className="animate-pulse text-muted-foreground">جاري التحميل...</div>
         </div>
-      </Layout>
-    );
+      </Layout>;
   }
-
   if (!orphan) {
-    return (
-      <Layout>
+    return <Layout>
         <div className="min-h-screen flex items-center justify-center">
           <div className="text-center">
             <Heart className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
             <p className="text-lg text-muted-foreground">لم يتم العثور على اليتيم</p>
           </div>
         </div>
-      </Layout>
-    );
+      </Layout>;
   }
-
-  return (
-    <Layout>
+  return <Layout>
       <div className="min-h-screen bg-background py-8">
         <div className="container">
           <Button variant="ghost" onClick={() => navigate(-1)} className="mb-6">
@@ -339,13 +330,9 @@ export default function OrphanDetailsPage() {
             <div>
               <div className="bg-card rounded-2xl overflow-hidden shadow-card">
                 <div className="aspect-video bg-muted relative">
-                  {orphan.photo_url ? (
-                    <img src={orphan.photo_url} alt={orphan.full_name} className="w-full h-full object-cover" />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center">
+                  {orphan.photo_url ? <img src={orphan.photo_url} alt={orphan.full_name} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center">
                       <Heart className="h-24 w-24 text-muted-foreground/50" />
-                    </div>
-                  )}
+                    </div>}
                   <Badge className={`absolute top-4 right-4 ${statusLabels[orphan.status].class}`}>
                     {statusLabels[orphan.status].label}
                   </Badge>
@@ -372,93 +359,72 @@ export default function OrphanDetailsPage() {
                     </div>
                   </div>
 
-                  {orphan.story && (
-                    <div>
-                      <h3 className="font-serif font-bold text-lg mb-2">القصة</h3>
-                      <p className="text-muted-foreground leading-relaxed">{orphan.story}</p>
-                    </div>
-                  )}
+                  {orphan.story && <div>
+                      
+                      
+                    </div>}
 
-                  {orphan.intro_video_url && (
-                    <div className="mt-6">
+                  {orphan.intro_video_url && <div className="mt-6">
                       <h3 className="font-serif font-bold text-lg mb-2">فيديو تعريفي</h3>
                       <video controls className="w-full rounded-lg" src={orphan.intro_video_url} />
-                    </div>
-                  )}
+                    </div>}
                 </div>
               </div>
             </div>
 
             {/* Sponsorship Form */}
             <div>
-              {!showForm ? (
-                <div className="bg-card rounded-2xl p-8 shadow-card text-center">
+              {!showForm ? <div className="bg-card rounded-2xl p-8 shadow-card text-center">
                   <Heart className="h-16 w-16 mx-auto text-primary fill-primary/20 mb-4" />
                   <h2 className="text-2xl font-serif font-bold text-foreground mb-4">
                     كن كافلاً لـ {orphan.full_name}
                   </h2>
-                  <p className="text-muted-foreground mb-6">
-                    ساهم في توفير حياة كريمة لهذا اليتيم من خلال كفالتك الشهرية أو السنوية
-                  </p>
-                  {!['fully_sponsored', 'full', 'sponsored'].includes(orphan.status) ? (
-                    <Button variant="hero" size="xl" onClick={() => setShowForm(true)} className="w-full">
+                  
+                  {!['fully_sponsored', 'full', 'sponsored'].includes(orphan.status) ? <Button variant="hero" size="xl" onClick={() => setShowForm(true)} className="w-full">
                       أكفل هذا اليتيم الآن
-                    </Button>
-                  ) : (
-                    <p className="text-muted-foreground">هذا اليتيم مكفول بالكامل</p>
-                  )}
-                </div>
-              ) : (
-                <form onSubmit={handleSubmit} className="bg-card rounded-2xl p-8 shadow-card space-y-6">
+                    </Button> : <p className="text-muted-foreground">هذا اليتيم مكفول بالكامل</p>}
+                </div> : <form onSubmit={handleSubmit} className="bg-card rounded-2xl p-8 shadow-card space-y-6">
                   <h2 className="text-2xl font-serif font-bold text-foreground mb-6">نموذج الكفالة</h2>
 
                   <div className="space-y-4">
                     <div>
                       <Label htmlFor="fullName">الاسم الكامل *</Label>
-                      <Input
-                        id="fullName"
-                        required
-                        value={formData.fullName}
-                        onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                      />
+                      <Input id="fullName" required value={formData.fullName} onChange={e => setFormData({
+                    ...formData,
+                    fullName: e.target.value
+                  })} />
                     </div>
 
                     <div>
                       <Label htmlFor="email">البريد الإلكتروني *</Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        required
-                        value={formData.email}
-                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      />
+                      <Input id="email" type="email" required value={formData.email} onChange={e => setFormData({
+                    ...formData,
+                    email: e.target.value
+                  })} />
                     </div>
 
                     <div>
                       <Label htmlFor="phone">رقم الهاتف</Label>
-                      <Input
-                        id="phone"
-                        value={formData.phone}
-                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      />
+                      <Input id="phone" value={formData.phone} onChange={e => setFormData({
+                    ...formData,
+                    phone: e.target.value
+                  })} />
                     </div>
 
                     <div>
                       <Label htmlFor="country">البلد</Label>
-                      <Input
-                        id="country"
-                        value={formData.country}
-                        onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-                      />
+                      <Input id="country" value={formData.country} onChange={e => setFormData({
+                    ...formData,
+                    country: e.target.value
+                  })} />
                     </div>
 
                     <div>
                       <Label>نوع الكفالة *</Label>
-                      <RadioGroup
-                        value={formData.sponsorshipType}
-                        onValueChange={(v) => setFormData({ ...formData, sponsorshipType: v })}
-                        className="flex gap-4 mt-2"
-                      >
+                      <RadioGroup value={formData.sponsorshipType} onValueChange={v => setFormData({
+                    ...formData,
+                    sponsorshipType: v
+                  })} className="flex gap-4 mt-2">
                         <div className="flex items-center space-x-2 space-x-reverse">
                           <RadioGroupItem value="monthly" id="monthly" />
                           <Label htmlFor="monthly">شهرية (60 ر.س / 15$)</Label>
@@ -484,36 +450,17 @@ export default function OrphanDetailsPage() {
                       <p className="text-xs text-muted-foreground mb-2">
                         يمكنك رفع صورة إيصال التحويل البنكي لتسريع المراجعة
                       </p>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleReceiptFileChange}
-                        className="hidden"
-                        id="receipt-upload"
-                      />
-                      {receiptPreview ? (
-                        <div className="relative w-full aspect-video rounded-xl overflow-hidden bg-muted border border-border">
+                      <input type="file" accept="image/*" onChange={handleReceiptFileChange} className="hidden" id="receipt-upload" />
+                      {receiptPreview ? <div className="relative w-full aspect-video rounded-xl overflow-hidden bg-muted border border-border">
                           <img src={receiptPreview} alt="صورة الإيصال" className="w-full h-full object-cover" />
-                          <Button
-                            type="button"
-                            variant="destructive"
-                            size="icon"
-                            className="absolute top-2 left-2"
-                            onClick={removeReceiptImage}
-                          >
+                          <Button type="button" variant="destructive" size="icon" className="absolute top-2 left-2" onClick={removeReceiptImage}>
                             <X className="h-4 w-4" />
                           </Button>
-                        </div>
-                      ) : (
-                        <label
-                          htmlFor="receipt-upload"
-                          className="flex flex-col items-center justify-center w-full h-32 rounded-xl border-2 border-dashed border-border hover:border-primary/50 hover:bg-muted/50 cursor-pointer transition-colors"
-                        >
+                        </div> : <label htmlFor="receipt-upload" className="flex flex-col items-center justify-center w-full h-32 rounded-xl border-2 border-dashed border-border hover:border-primary/50 hover:bg-muted/50 cursor-pointer transition-colors">
                           <Upload className="h-8 w-8 text-muted-foreground mb-2" />
                           <span className="text-sm text-muted-foreground">اضغط لرفع صورة الإيصال</span>
                           <span className="text-xs text-muted-foreground">PNG, JPG (حد أقصى 5MB)</span>
-                        </label>
-                      )}
+                        </label>}
                     </div>
                   </div>
 
@@ -522,22 +469,16 @@ export default function OrphanDetailsPage() {
                       إلغاء
                     </Button>
                     <Button type="submit" variant="hero" className="flex-1" disabled={submitting}>
-                      {submitting ? (
-                        <>
+                      {submitting ? <>
                           <Loader2 className="h-4 w-4 ml-2 animate-spin" />
                           جاري الإرسال...
-                        </>
-                      ) : (
-                        "إرسال طلب الكفالة"
-                      )}
+                        </> : "إرسال طلب الكفالة"}
                     </Button>
                   </div>
-                </form>
-              )}
+                </form>}
             </div>
           </div>
         </div>
       </div>
-    </Layout>
-  );
+    </Layout>;
 }

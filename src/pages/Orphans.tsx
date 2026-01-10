@@ -8,47 +8,62 @@ import { Badge } from '@/components/ui/badge';
 import { useOrphans } from '@/hooks/useOrphans';
 import { LazyImage } from '@/components/common/LazyImage';
 import { SkeletonCard } from '@/components/common/LoadingSpinner';
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-} from '@/components/ui/dialog';
-
-const statusLabels: Record<string, { label: string; class: string }> = {
-  available: { label: 'متاح للكفالة', class: 'bg-primary text-primary-foreground' },
-  partially_sponsored: { label: 'مكفول جزئياً', class: 'bg-secondary text-secondary-foreground' },
-  fully_sponsored: { label: 'مكفول بالكامل', class: 'bg-muted text-muted-foreground' },
-  inactive: { label: 'غير نشط', class: 'bg-muted text-muted-foreground' },
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+const statusLabels: Record<string, {
+  label: string;
+  class: string;
+}> = {
+  available: {
+    label: 'متاح للكفالة',
+    class: 'bg-primary text-primary-foreground'
+  },
+  partially_sponsored: {
+    label: 'مكفول جزئياً',
+    class: 'bg-secondary text-secondary-foreground'
+  },
+  fully_sponsored: {
+    label: 'مكفول بالكامل',
+    class: 'bg-muted text-muted-foreground'
+  },
+  inactive: {
+    label: 'غير نشط',
+    class: 'bg-muted text-muted-foreground'
+  },
   // Legacy values (for backward compatibility during migration)
-  partial: { label: 'مكفول جزئياً', class: 'bg-secondary text-secondary-foreground' },
-  full: { label: 'مكفول بالكامل', class: 'bg-muted text-muted-foreground' },
-  sponsored: { label: 'مكفول بالكامل', class: 'bg-muted text-muted-foreground' },
+  partial: {
+    label: 'مكفول جزئياً',
+    class: 'bg-secondary text-secondary-foreground'
+  },
+  full: {
+    label: 'مكفول بالكامل',
+    class: 'bg-muted text-muted-foreground'
+  },
+  sponsored: {
+    label: 'مكفول بالكامل',
+    class: 'bg-muted text-muted-foreground'
+  }
 };
-
 interface SelectedImage {
   url: string;
   name: string;
 }
-
 export default function OrphansPage() {
-  const { data: orphans, isLoading } = useOrphans();
+  const {
+    data: orphans,
+    isLoading
+  } = useOrphans();
   const [search, setSearch] = useState('');
   const [selectedImage, setSelectedImage] = useState<SelectedImage | null>(null);
-
-  const filteredOrphans = orphans?.filter(orphan =>
-    orphan.full_name.includes(search) ||
-    orphan.city.includes(search) ||
-    orphan.country.includes(search)
-  ) || [];
-
+  const filteredOrphans = orphans?.filter(orphan => orphan.full_name.includes(search) || orphan.city.includes(search) || orphan.country.includes(search)) || [];
   const handleImageClick = (e: React.MouseEvent, photoUrl: string, name: string) => {
     e.preventDefault();
     e.stopPropagation();
-    setSelectedImage({ url: photoUrl, name });
+    setSelectedImage({
+      url: photoUrl,
+      name
+    });
   };
-
-  return (
-    <Layout>
+  return <Layout>
       <div className="min-h-screen bg-background">
         {/* Header */}
         <section className="bg-gradient-to-l from-primary/10 to-accent/10 py-16">
@@ -66,58 +81,29 @@ export default function OrphansPage() {
         <section className="container py-8">
           <div className="max-w-md mx-auto relative">
             <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-            <Input
-              placeholder="ابحث بالاسم أو المدينة..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="pr-10"
-            />
+            <Input placeholder="ابحث بالاسم أو المدينة..." value={search} onChange={e => setSearch(e.target.value)} className="pr-10" />
           </div>
         </section>
 
         {/* Orphans Grid */}
         <section className="container pb-16">
-          {isLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {[...Array(8)].map((_, i) => (
-                <SkeletonCard key={i} />
-              ))}
-            </div>
-          ) : filteredOrphans.length === 0 ? (
-            <div className="text-center py-20">
+          {isLoading ? <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {[...Array(8)].map((_, i) => <SkeletonCard key={i} />)}
+            </div> : filteredOrphans.length === 0 ? <div className="text-center py-20">
               <Heart className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
               <p className="text-lg text-muted-foreground">لا يوجد أيتام حالياً</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {filteredOrphans.map((orphan, index) => (
-                <div
-                  key={orphan.id}
-                  className="bg-card rounded-2xl overflow-hidden shadow-card card-hover animate-fade-up"
-                  style={{ animationDelay: `${0.05 * index}s` }}
-                >
+            </div> : <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {filteredOrphans.map((orphan, index) => <div key={orphan.id} className="bg-card rounded-2xl overflow-hidden shadow-card card-hover animate-fade-up" style={{
+            animationDelay: `${0.05 * index}s`
+          }}>
                   <div className="aspect-square bg-muted relative">
-                    {orphan.photo_url ? (
-                      <div 
-                        className="w-full h-full cursor-pointer"
-                        onClick={(e) => handleImageClick(e, orphan.photo_url!, orphan.full_name)}
-                      >
-                        <LazyImage
-                          src={orphan.photo_url}
-                          alt={`صورة اليتيم ${orphan.full_name}`}
-                          className="w-full h-full"
-                          fallback={
-                            <div className="w-full h-full flex items-center justify-center bg-muted">
+                    {orphan.photo_url ? <div className="w-full h-full cursor-pointer" onClick={e => handleImageClick(e, orphan.photo_url!, orphan.full_name)}>
+                        <LazyImage src={orphan.photo_url} alt={`صورة اليتيم ${orphan.full_name}`} className="w-full h-full" fallback={<div className="w-full h-full flex items-center justify-center bg-muted">
                               <Heart className="h-16 w-16 text-muted-foreground/50" />
-                            </div>
-                          }
-                        />
-                      </div>
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center">
+                            </div>} />
+                      </div> : <div className="w-full h-full flex items-center justify-center">
                         <Heart className="h-16 w-16 text-muted-foreground/50" />
-                      </div>
-                    )}
+                      </div>}
                     <Badge className={`absolute top-3 right-3 ${statusLabels[orphan.status].class}`}>
                       {statusLabels[orphan.status].label}
                     </Badge>
@@ -138,7 +124,7 @@ export default function OrphansPage() {
                         {orphan.age} سنة • {orphan.gender === 'male' ? 'ذكر' : 'أنثى'}
                       </span>
                       <span className="font-bold text-primary text-sm">
-                        60 ر.س / 15$ / 25,000 ر.ي / شهر
+                        60 ر.س / 15$ / او مايقابله ب ر.ي / شهر
                       </span>
                     </div>
                     
@@ -146,17 +132,13 @@ export default function OrphansPage() {
                       <Button asChild variant="outline" size="sm" className="flex-1">
                         <Link to={`/orphan/${orphan.id}`}>تفاصيل</Link>
                       </Button>
-                      {!['fully_sponsored', 'full', 'sponsored'].includes(orphan.status) && (
-                        <Button asChild variant="hero" size="sm" className="flex-1">
+                      {!['fully_sponsored', 'full', 'sponsored'].includes(orphan.status) && <Button asChild variant="hero" size="sm" className="flex-1">
                           <Link to={`/orphan/${orphan.id}`}>أكفل هذا اليتيم</Link>
-                        </Button>
-                      )}
+                        </Button>}
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          )}
+                </div>)}
+            </div>}
         </section>
       </div>
 
@@ -167,24 +149,12 @@ export default function OrphansPage() {
             {selectedImage?.name ? `صورة ${selectedImage.name}` : 'صورة اليتيم'}
           </DialogTitle>
           <div className="relative">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="absolute top-2 left-2 z-10 bg-background/80 hover:bg-background"
-              onClick={() => setSelectedImage(null)}
-            >
+            <Button variant="ghost" size="icon" className="absolute top-2 left-2 z-10 bg-background/80 hover:bg-background" onClick={() => setSelectedImage(null)}>
               <X className="h-5 w-5" />
             </Button>
-            {selectedImage && (
-              <img
-                src={selectedImage.url}
-                alt={`صورة ${selectedImage.name}`}
-                className="w-full h-auto max-h-[90vh] object-contain"
-              />
-            )}
+            {selectedImage && <img src={selectedImage.url} alt={`صورة ${selectedImage.name}`} className="w-full h-auto max-h-[90vh] object-contain" />}
           </div>
         </DialogContent>
       </Dialog>
-    </Layout>
-  );
+    </Layout>;
 }

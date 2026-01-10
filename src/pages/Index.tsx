@@ -45,11 +45,8 @@ const Index = () => {
 
               {/* العنوان الرئيسي */}
               <h1 className="text-3xl md:text-4xl lg:text-5xl font-serif font-bold text-foreground leading-relaxed">
-                جمعية الأقصى
+                جمعية الأقصى – المكتب النسوي – تعز
               </h1>
-              <p className="text-2xl md:text-3xl lg:text-4xl font-serif text-primary mt-2">
-                المكتب النسوي _ تعز
-              </p>
 
               {/* خط زخرفي سفلي */}
               <div className="flex items-center justify-center gap-4 mt-6">

@@ -14,28 +14,28 @@ export function Footer() {
             <nav className="flex flex-col gap-2">
               <Link
                 to="/"
-                className="flex items-center gap-2 text-sm text-primary-foreground/80 hover:text-secondary transition-colors"
+                className="flex items-center gap-2 text-base text-primary-foreground/80 hover:text-secondary transition-colors"
               >
                 <Home className="h-4 w-4" />
                 الرئيسة
               </Link>
               <Link
                 to="/about"
-                className="flex items-center gap-2 text-sm text-primary-foreground/80 hover:text-secondary transition-colors"
+                className="flex items-center gap-2 text-base text-primary-foreground/80 hover:text-secondary transition-colors"
               >
                 <Info className="h-4 w-4" />
                 نبذة عن الجمعية
               </Link>
               <Link
                 to="/sponsorship"
-                className="flex items-center gap-2 text-sm text-primary-foreground/80 hover:text-secondary transition-colors"
+                className="flex items-center gap-2 text-base text-primary-foreground/80 hover:text-secondary transition-colors"
               >
                 <Heart className="h-4 w-4" />
                 مشروع كفالة الأيتام
               </Link>
               <Link
                 to="/orphans"
-                className="flex items-center gap-2 text-sm text-primary-foreground/80 hover:text-secondary transition-colors"
+                className="flex items-center gap-2 text-base text-primary-foreground/80 hover:text-secondary transition-colors"
               >
                 <Users className="h-4 w-4" />
                 لبدء الكفالة في غزة

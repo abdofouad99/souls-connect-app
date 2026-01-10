@@ -35,7 +35,7 @@ export function Header() {
         <Link to="/" className="flex items-center gap-2">
           <img src={logo} alt="شعار جمعية الأقصى" className="h-10 w-10 rounded-full object-cover" />
           <span className="text-xl font-serif font-bold text-foreground">
-            جمعية الأقصى
+            جمعية الأقصى – المكتب النسوي – تعز
           </span>
         </Link>
 

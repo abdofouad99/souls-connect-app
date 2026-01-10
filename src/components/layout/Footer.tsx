@@ -1,22 +1,12 @@
 import { Link } from "react-router-dom";
-import { Phone, Mail, MapPin, Home, Info, Heart, Users, FileText } from "lucide-react";
-import logo from "@/assets/logo.jpg";
+import { Phone, Mail, MapPin, Home, Info, Heart, Users } from "lucide-react";
 
 export function Footer() {
   return (
     <footer className="bg-foreground text-primary-foreground">
       <div className="container py-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* About */}
-          <div>
-            <div className="flex items-center gap-2 mb-4">
-              <img src={logo} alt="شعار جمعية الأقصى" className="h-10 w-10 rounded-full object-cover" />
-              <span className="text-lg font-serif font-bold">جمعية الأقصى لرعاية الأيتام</span>
-            </div>
-            <p className="text-primary-foreground/80 text-sm leading-relaxed">
-              نسعى لتوفير حياة كريمة للأيتام من خلال برامج الكفالة والدعم المستمر. ساهم معنا في رسم البسمة على وجوههم.
-            </p>
-          </div>
+          {/* Quick Links - moved to first column */}
 
           {/* Quick Links */}
           <div>

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Heart, MapPin, Calendar, ArrowRight, Upload, X, Loader2, Copy, Check } from "lucide-react";
+import { Heart, MapPin, Calendar, ArrowRight, Upload, X, Loader2, Phone, MessageCircle } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useOrphan } from "@/hooks/useOrphans";
 import { useCreateSponsorshipRequest } from "@/hooks/useSponsorshipRequests";
-import { useBankAccounts } from "@/hooks/useBankAccounts";
+
 import { useSiteSetting } from "@/hooks/useSiteSettings";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -25,11 +25,6 @@ const sponsorshipFormSchema = z.object({
   }),
   phone: z.string().trim().regex(/^[0-9]{9}$/, {
     message: "رقم الهاتف يجب أن يكون 9 أرقام"
-  }),
-  email: z.string().trim().email({
-    message: "البريد الإلكتروني غير صالح"
-  }).max(255, {
-    message: "البريد الإلكتروني يجب أن يكون أقل من 255 حرف"
   }),
   country: z.string().trim().max(100, {
     message: "اسم البلد يجب أن يكون أقل من 100 حرف"
@@ -70,67 +65,6 @@ const statusLabels: Record<string, {
     class: "bg-muted text-muted-foreground"
   }
 };
-function BankAccountsSection() {
-  const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
-  const {
-    data: bankAccounts,
-    isLoading
-  } = useBankAccounts();
-  const copyToClipboard = async (text: string, index: number) => {
-    try {
-      await navigator.clipboard.writeText(text.replace(/\s/g, ""));
-      setCopiedIndex(index);
-      setTimeout(() => setCopiedIndex(null), 2000);
-    } catch (err) {
-      console.error("Failed to copy:", err);
-    }
-  };
-  if (isLoading) {
-    return <div className="bg-muted/50 rounded-xl p-4 border border-border">
-        <div className="text-center text-muted-foreground">جاري التحميل...</div>
-      </div>;
-  }
-  if (!bankAccounts || bankAccounts.length === 0) {
-    return null;
-  }
-  return <div className="bg-muted/50 rounded-xl p-4 border border-border">
-      <h3 className="font-bold text-foreground mb-3">بيانات الحسابات البنكية</h3>
-      <div className="space-y-4">
-        {bankAccounts.map((account, index) => <div key={account.id} className="bg-card rounded-lg p-3 border border-border">
-            <div className="text-sm text-muted-foreground mb-1">اسم البنك</div>
-            <div className="font-medium text-foreground mb-2 select-all">{account.bank_name}</div>
-
-            <div className="text-sm text-muted-foreground mb-1">اسم المستفيد</div>
-            <div className="font-medium text-foreground mb-2 select-all">{account.beneficiary_name}</div>
-
-            <div className="text-sm text-muted-foreground mb-1">رقم الحساب</div>
-            <div className="flex items-center gap-2">
-              <code className="flex-1 bg-muted px-2 py-1 rounded text-sm font-mono select-all" dir="ltr">
-                {account.account_number}
-              </code>
-              <Button type="button" variant="outline" size="sm" onClick={() => copyToClipboard(account.account_number, index)} className="shrink-0">
-                {copiedIndex === index ? <>
-                    <Check className="h-4 w-4 text-green-500" />
-                    <span className="mr-1 text-green-500">تم النسخ</span>
-                  </> : <>
-                    <Copy className="h-4 w-4" />
-                    <span className="mr-1">نسخ</span>
-                  </>}
-              </Button>
-            </div>
-
-            {account.iban && <>
-                <div className="text-sm text-muted-foreground mb-1 mt-2">IBAN</div>
-                <code className="block bg-muted px-2 py-1 rounded text-sm font-mono select-all" dir="ltr">
-                  {account.iban}
-                </code>
-              </>}
-
-            {account.notes && <div className="text-sm text-muted-foreground mt-2">{account.notes}</div>}
-          </div>)}
-      </div>
-    </div>;
-}
 export default function OrphanDetailsPage() {
   const {
     id
@@ -153,7 +87,6 @@ export default function OrphanDetailsPage() {
   const [formData, setFormData] = useState({
     fullName: "",
     phone: "",
-    email: "",
     country: "",
     sponsorshipType: "monthly"
   });
@@ -168,7 +101,6 @@ export default function OrphanDetailsPage() {
       setFormData(prev => ({
         ...prev,
         fullName: userMeta.full_name || prev.fullName,
-        email: user.email || prev.email,
         phone: userMeta.phone || prev.phone,
         country: userMeta.country || prev.country
       }));
@@ -253,7 +185,6 @@ export default function OrphanDetailsPage() {
       await createSponsorshipRequest.mutateAsync({
         sponsor_full_name: validatedData.fullName,
         sponsor_phone: validatedData.phone,
-        sponsor_email: validatedData.email || undefined,
         sponsor_country: validatedData.country || undefined,
         orphan_id: orphan.id,
         sponsorship_type: validatedData.sponsorshipType,
@@ -395,13 +326,6 @@ export default function OrphanDetailsPage() {
                   })} />
                     </div>
 
-                    <div>
-                      <Label htmlFor="email">البريد الإلكتروني *</Label>
-                      <Input id="email" type="email" required value={formData.email} onChange={e => setFormData({
-                    ...formData,
-                    email: e.target.value
-                  })} />
-                    </div>
 
                     <div>
                       <Label htmlFor="phone">رقم الهاتف</Label>
@@ -436,13 +360,30 @@ export default function OrphanDetailsPage() {
                       </RadioGroup>
                     </div>
 
-                    <div>
-                      <Label>طريقة الدفع *</Label>
-                      <div className="mt-2 px-3 py-2 bg-muted rounded-md text-foreground">تحويل بنكي</div>
+                    {/* Contact Numbers Section */}
+                    <div className="bg-primary/10 rounded-xl p-4">
+                      <div className="font-bold text-primary mb-3 text-center">طريقة الدفع: تواصلوا معنا على الأرقام التالية</div>
+                      <div className="flex flex-col gap-3">
+                        <a 
+                          href="tel:04251675" 
+                          className="flex items-center justify-center gap-2 bg-background hover:bg-muted rounded-lg p-3 transition-colors border"
+                        >
+                          <Phone className="h-5 w-5 text-primary" />
+                          <span className="font-medium" dir="ltr">04251675</span>
+                          <span className="text-muted-foreground text-sm">(اتصال)</span>
+                        </a>
+                        <a 
+                          href="https://wa.me/967784665006" 
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center justify-center gap-2 bg-green-50 hover:bg-green-100 rounded-lg p-3 transition-colors border border-green-200"
+                        >
+                          <MessageCircle className="h-5 w-5 text-green-600" />
+                          <span className="font-medium" dir="ltr">784665006</span>
+                          <span className="text-green-600 text-sm">(واتساب)</span>
+                        </a>
+                      </div>
                     </div>
-
-                    {/* Bank Account Details Section */}
-                    <BankAccountsSection />
 
                     {/* Receipt Image Upload */}
                     <div>

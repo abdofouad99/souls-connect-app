@@ -9,7 +9,6 @@ import { Badge } from "@/components/ui/badge";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useOrphan } from "@/hooks/useOrphans";
 import { useCreateSponsorshipRequest } from "@/hooks/useSponsorshipRequests";
-
 import { useSiteSetting } from "@/hooks/useSiteSettings";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -364,20 +363,12 @@ export default function OrphanDetailsPage() {
                     <div className="bg-primary/10 rounded-xl p-4">
                       <div className="font-bold text-primary mb-3 text-center">طريقة الدفع: تواصلوا معنا على الأرقام التالية</div>
                       <div className="flex flex-col gap-3">
-                        <a 
-                          href="tel:04251675" 
-                          className="flex items-center justify-center gap-2 bg-background hover:bg-muted rounded-lg p-3 transition-colors border"
-                        >
+                        <a href="tel:04251675" className="flex items-center justify-center gap-2 bg-background hover:bg-muted rounded-lg p-3 transition-colors border">
                           <Phone className="h-5 w-5 text-primary" />
                           <span className="font-medium" dir="ltr">04251675</span>
                           <span className="text-muted-foreground text-sm">(اتصال)</span>
                         </a>
-                        <a 
-                          href="https://wa.me/967784665006" 
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center justify-center gap-2 bg-green-50 hover:bg-green-100 rounded-lg p-3 transition-colors border border-green-200"
-                        >
+                        <a href="https://wa.me/967784665006" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 bg-green-50 hover:bg-green-100 rounded-lg p-3 transition-colors border border-green-200">
                           <MessageCircle className="h-5 w-5 text-green-600" />
                           <span className="font-medium" dir="ltr">784665006</span>
                           <span className="text-green-600 text-sm">(واتساب)</span>
@@ -386,23 +377,7 @@ export default function OrphanDetailsPage() {
                     </div>
 
                     {/* Receipt Image Upload */}
-                    <div>
-                      <Label>صورة الإيصال / الحوالة (اختياري)</Label>
-                      <p className="text-xs text-muted-foreground mb-2">
-                        يمكنك رفع صورة إيصال التحويل البنكي لتسريع المراجعة
-                      </p>
-                      <input type="file" accept="image/*" onChange={handleReceiptFileChange} className="hidden" id="receipt-upload" />
-                      {receiptPreview ? <div className="relative w-full aspect-video rounded-xl overflow-hidden bg-muted border border-border">
-                          <img src={receiptPreview} alt="صورة الإيصال" className="w-full h-full object-cover" />
-                          <Button type="button" variant="destructive" size="icon" className="absolute top-2 left-2" onClick={removeReceiptImage}>
-                            <X className="h-4 w-4" />
-                          </Button>
-                        </div> : <label htmlFor="receipt-upload" className="flex flex-col items-center justify-center w-full h-32 rounded-xl border-2 border-dashed border-border hover:border-primary/50 hover:bg-muted/50 cursor-pointer transition-colors">
-                          <Upload className="h-8 w-8 text-muted-foreground mb-2" />
-                          <span className="text-sm text-muted-foreground">اضغط لرفع صورة الإيصال</span>
-                          <span className="text-xs text-muted-foreground">PNG, JPG (حد أقصى 5MB)</span>
-                        </label>}
-                    </div>
+                    
                   </div>
 
                   <div className="flex gap-4">

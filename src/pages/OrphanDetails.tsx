@@ -314,7 +314,8 @@ export default function OrphanDetailsPage() {
                       أكفل هذا اليتيم الآن
                     </Button> : <p className="text-muted-foreground">هذا اليتيم مكفول بالكامل</p>}
                 </div> : <form onSubmit={handleSubmit} className="bg-card rounded-2xl p-8 shadow-card space-y-6">
-                  <h2 className="text-2xl font-serif font-bold text-foreground mb-6">نموذج بدء الكفالة</h2>
+                  <h2 className="text-2xl font-serif font-bold text-foreground mb-2">نموذج الكفالة</h2>
+                  <p className="text-sm text-muted-foreground mb-6">فضلاً أدخل بياناتك وهي سرية للجمعية فقط حتى نتمكن من التأكيد والمتابعة</p>
 
                   <div className="space-y-4">
                     <div>

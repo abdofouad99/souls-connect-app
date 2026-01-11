@@ -42,7 +42,7 @@ const Sponsorship = () => {
         {/* Hero Section */}
         <section
           ref={heroAnimation.ref}
-          className={`py-16 md:py-24 bg-surface/30 transition-all duration-700 ${
+          className={`py-4 md:py-6 bg-surface/30 transition-all duration-700 ${
             heroAnimation.isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
           }`}
         >

@@ -8,7 +8,7 @@ export function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h3 className="font-serif font-bold mb-4">روابط سريعة</h3>
+            <h3 className="font-serif font-bold mb-4 text-xl text-secondary">روابط سريعة</h3>
             <nav className="flex flex-col gap-2">
               <Link to="/" className="flex items-center gap-2 text-base text-primary-foreground/80 hover:text-secondary transition-colors">
                 <Home className="h-4 w-4" />

@@ -6,46 +6,36 @@ import { Quote, Heart, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-
 import thankYou1 from "@/assets/thank-you-1.jpg";
 import thankYou2 from "@/assets/thank-you-2.jpg";
 import thankYou3 from "@/assets/thank-you-3.jpg";
 import thankYou4 from "@/assets/thank-you-4.jpg";
 import thankYou5 from "@/assets/thank-you-5.jpg";
-
 const Sponsorship = () => {
   const [selectedImage, setSelectedImage] = useState<number | null>(null);
-  const { data: sponsorshipAmountSetting } = useSiteSetting("sponsorship_amount_text");
+  const {
+    data: sponsorshipAmountSetting
+  } = useSiteSetting("sponsorship_amount_text");
   const heroAnimation = useScrollAnimation();
   const textAnimation = useScrollAnimation();
   const calloutAnimation = useScrollAnimation();
   const mediaAnimation = useScrollAnimation();
   const ctaAnimation = useScrollAnimation();
-
   const thankYouImages = [thankYou1, thankYou2, thankYou3, thankYou4, thankYou5];
-
   const handlePrevImage = () => {
     if (selectedImage !== null) {
       setSelectedImage(selectedImage === 0 ? thankYouImages.length - 1 : selectedImage - 1);
     }
   };
-
   const handleNextImage = () => {
     if (selectedImage !== null) {
       setSelectedImage(selectedImage === thankYouImages.length - 1 ? 0 : selectedImage + 1);
     }
   };
-
-  return (
-    <Layout>
+  return <Layout>
       <div className="min-h-screen bg-background">
         {/* Hero Section */}
-        <section
-          ref={heroAnimation.ref}
-          className={`py-4 md:py-6 bg-surface/30 transition-all duration-700 ${
-            heroAnimation.isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-          }`}
-        >
+        <section ref={heroAnimation.ref} className={`py-4 md:py-6 bg-surface/30 transition-all duration-700 ${heroAnimation.isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
           <div className="container mx-auto px-4 text-center">
             <h1 className="text-3xl md:text-5xl font-bold text-primary mb-6">كفالة طفلٍ في غزّة</h1>
             <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
@@ -55,12 +45,7 @@ const Sponsorship = () => {
         </section>
 
         {/* Main Text Section */}
-        <section
-          ref={textAnimation.ref}
-          className={`py-12 md:py-16 transition-all duration-700 delay-100 ${
-            textAnimation.isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-          }`}
-        >
+        <section ref={textAnimation.ref} className={`py-12 md:py-16 transition-all duration-700 delay-100 ${textAnimation.isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
           <div className="container mx-auto px-4">
             <div className="max-w-3xl mx-auto">
               <div className="prose prose-lg text-foreground leading-loose space-y-6 text-right">
@@ -70,12 +55,7 @@ const Sponsorship = () => {
               </div>
 
               {/* Hadith Callout Card */}
-              <div
-                ref={calloutAnimation.ref}
-                className={`my-8 md:my-12 bg-surface border-2 border-border rounded-xl p-6 md:p-8 shadow-elegant relative transition-all duration-700 delay-200 ${
-                  calloutAnimation.isVisible ? "opacity-100 scale-100" : "opacity-0 scale-95"
-                }`}
-              >
+              <div ref={calloutAnimation.ref} className={`my-8 md:my-12 bg-surface border-2 border-border rounded-xl p-6 md:p-8 shadow-elegant relative transition-all duration-700 delay-200 ${calloutAnimation.isVisible ? "opacity-100 scale-100" : "opacity-0 scale-95"}`}>
                 <Quote className="absolute top-4 right-4 w-8 h-8 text-primary/30" />
                 <Quote className="absolute bottom-4 left-4 w-8 h-8 text-primary/30 rotate-180" />
                 <p className="text-2xl md:text-3xl font-bold text-primary text-center leading-relaxed py-4">
@@ -134,51 +114,29 @@ const Sponsorship = () => {
         </section>
 
         {/* Media Section */}
-        <section
-          ref={mediaAnimation.ref}
-          className={`py-12 md:py-16 bg-surface/30 transition-all duration-700 delay-300 ${
-            mediaAnimation.isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-          }`}
-        >
+        <section ref={mediaAnimation.ref} className={`py-12 md:py-16 bg-surface/30 transition-all duration-700 delay-300 ${mediaAnimation.isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
           <div className="container mx-auto px-4">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12">
               {/* Thank You Images */}
               <div>
-                <h3 className="text-xl md:text-2xl font-bold text-primary mb-6 text-center">نماذج شكر من غزة</h3>
+                <h3 className="text-xl md:text-2xl font-bold text-primary mb-6 text-center">نماذج شكر من غزة(من اليتيم الى الكافل)</h3>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
-                  {thankYouImages.map((img, index) => (
-                    <div
-                      key={index}
-                      onClick={() => setSelectedImage(index)}
-                      className="aspect-square bg-surface rounded-lg border border-border overflow-hidden shadow-sm hover:shadow-lg hover:scale-105 transition-all duration-300 cursor-pointer"
-                    >
+                  {thankYouImages.map((img, index) => <div key={index} onClick={() => setSelectedImage(index)} className="aspect-square bg-surface rounded-lg border border-border overflow-hidden shadow-sm hover:shadow-lg hover:scale-105 transition-all duration-300 cursor-pointer">
                       <img src={img} alt={`نموذج شكر ${index + 1}`} className="w-full h-full object-cover" />
-                    </div>
-                  ))}
+                    </div>)}
                 </div>
               </div>
 
               {/* Video Section */}
               <div className="aspect-video w-full rounded-xl overflow-hidden">
-                <iframe
-                  className="w-full h-full"
-                  src="https://drive.google.com/file/d/1MPaZdrcRqXXR_5lWNnXeCz_rhRxddjfN/preview"
-                  title="فيديو كفالة الأيتام"
-                  allow="autoplay; encrypted-media"
-                  allowFullScreen
-                />
+                <iframe className="w-full h-full" src="https://drive.google.com/file/d/1MPaZdrcRqXXR_5lWNnXeCz_rhRxddjfN/preview" title="فيديو كفالة الأيتام" allow="autoplay; encrypted-media" allowFullScreen />
               </div>
             </div>
           </div>
         </section>
 
         {/* CTA Section */}
-        <section
-          ref={ctaAnimation.ref}
-          className={`py-16 md:py-20 transition-all duration-700 delay-400 ${
-            ctaAnimation.isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-          }`}
-        >
+        <section ref={ctaAnimation.ref} className={`py-16 md:py-20 transition-all duration-700 delay-400 ${ctaAnimation.isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
           <div className="container mx-auto px-4 text-center">
             <div className="max-w-2xl mx-auto bg-surface rounded-2xl p-8 md:p-12 border border-border shadow-elegant">
               <Heart className="w-12 h-12 text-primary mx-auto mb-6" />
@@ -202,35 +160,20 @@ const Sponsorship = () => {
         <DialogContent className="max-w-4xl w-[95vw] h-[90vh] p-0 bg-background/95 backdrop-blur-sm border-none">
           <div className="relative w-full h-full flex items-center justify-center">
             {/* Close Button */}
-            <button
-              onClick={() => setSelectedImage(null)}
-              className="absolute top-4 left-4 z-50 p-2 rounded-full bg-background/80 hover:bg-background text-foreground transition-colors"
-            >
+            <button onClick={() => setSelectedImage(null)} className="absolute top-4 left-4 z-50 p-2 rounded-full bg-background/80 hover:bg-background text-foreground transition-colors">
               <X className="w-6 h-6" />
             </button>
 
             {/* Navigation Buttons */}
-            <button
-              onClick={handleNextImage}
-              className="absolute right-4 z-50 p-3 rounded-full bg-background/80 hover:bg-background text-foreground transition-colors"
-            >
+            <button onClick={handleNextImage} className="absolute right-4 z-50 p-3 rounded-full bg-background/80 hover:bg-background text-foreground transition-colors">
               <ChevronRight className="w-8 h-8" />
             </button>
-            <button
-              onClick={handlePrevImage}
-              className="absolute left-4 z-50 p-3 rounded-full bg-background/80 hover:bg-background text-foreground transition-colors"
-            >
+            <button onClick={handlePrevImage} className="absolute left-4 z-50 p-3 rounded-full bg-background/80 hover:bg-background text-foreground transition-colors">
               <ChevronLeft className="w-8 h-8" />
             </button>
 
             {/* Image */}
-            {selectedImage !== null && (
-              <img
-                src={thankYouImages[selectedImage]}
-                alt={`نموذج شكر ${selectedImage + 1}`}
-                className="max-w-full max-h-full object-contain animate-scale-in"
-              />
-            )}
+            {selectedImage !== null && <img src={thankYouImages[selectedImage]} alt={`نموذج شكر ${selectedImage + 1}`} className="max-w-full max-h-full object-contain animate-scale-in" />}
 
             {/* Image Counter */}
             <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-background/80 px-4 py-2 rounded-full text-sm text-foreground">
@@ -239,8 +182,6 @@ const Sponsorship = () => {
           </div>
         </DialogContent>
       </Dialog>
-    </Layout>
-  );
+    </Layout>;
 };
-
 export default Sponsorship;

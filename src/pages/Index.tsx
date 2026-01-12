@@ -13,7 +13,7 @@ const Index = () => {
           <div className="max-w-4xl mx-auto text-center">
             {/* الصورة الرئيسية */}
             <div className={cn("mb-12 transition-all duration-700", heroAnim.isVisible ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-8 scale-95")}>
-              <img src={heroImage} alt="مشروع كفالة الأيتام - جمعية الأقصى" className="w-full max-w-5xl mx-auto rounded-2xl shadow-xl hover:shadow-2xl transition-shadow duration-300" />
+              <img src={heroImage} alt="مشروع كفالة الأيتام - جمعية الأقصى" className="w-full max-w-7xl mx-auto rounded-2xl shadow-xl hover:shadow-2xl transition-shadow duration-300" />
             </div>
 
             {/* العنوان مع الزخرفة */}

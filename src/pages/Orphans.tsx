@@ -109,23 +109,31 @@ export default function OrphansPage() {
                     </Badge>
                   </div>
                   
-                  <div className="p-5">
-                    <h3 className="font-serif font-bold text-lg text-foreground mb-2">
-                      {orphan.full_name}
-                    </h3>
+                  <div className="p-5 space-y-2">
+                    <div className="flex items-start gap-2">
+                      <span className="font-bold text-foreground whitespace-nowrap">اليتيم:</span>
+                      <span className="font-serif font-bold text-lg text-foreground">{orphan.full_name}</span>
+                    </div>
                     
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <MapPin className="h-4 w-4" />
+                      <span className="font-bold text-foreground">المكان:</span>
                       <span>غزة</span>
                     </div>
                     
-                    <div className="flex items-center justify-between mb-4">
-                      <span className="text-sm text-muted-foreground">
-                        {orphan.age} سنة • {orphan.gender === 'male' ? 'ذكر' : 'أنثى'}
-                      </span>
-                      <span className="font-bold text-primary text-sm">
-                        60 ريال سعودي • 15 دولار • او مايقابله 25 الف ريال يمني
-                      </span>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <span className="font-bold text-foreground">الجنس:</span>
+                      <span>{orphan.gender === 'male' ? 'ذكر' : 'أنثى'}</span>
+                    </div>
+                    
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <span className="font-bold text-foreground">العمر:</span>
+                      <span>{orphan.age} سنة</span>
+                    </div>
+                    
+                    <div className="flex flex-col gap-1 text-sm">
+                      <span className="font-bold text-foreground">مبلغ الكفالة:</span>
+                      <span className="text-primary">60 ريال سعودي • 15 دولار • او مايقابله 25 الف ريال يمني</span>
                     </div>
                     
                     <div className="flex gap-2">

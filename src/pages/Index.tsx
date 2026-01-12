@@ -26,7 +26,7 @@ const Index = () => {
               </div>
 
               {/* العنوان الرئيسي */}
-              <h1 className="text-xl md:text-2xl lg:text-3xl font-serif font-bold text-foreground leading-relaxed">​العنوان: شارع جمال -جولة المسبح -مقابل الكريمي الرئيس-فوق محلات مرح-فوق عيادة د.سميرة الخليدي Taiz, Yemen  </h1>
+              <h1 className="text-xl md:text-2xl lg:text-3xl font-serif font-bold text-foreground leading-relaxed">​العنوان: شارع جمال -جولة المسبح -مقابل الكريمي الرئيسي-فوق محلات مرح-فوق عيادة د.سميرة الخليدي Taiz, Yemen</h1>
 
               {/* خط زخرفي سفلي */}
               <div className="flex items-center justify-center gap-4 mt-6">

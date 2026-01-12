@@ -45,7 +45,7 @@ const Sponsorship = () => {
         </section>
 
         {/* Main Text Section */}
-        <section ref={textAnimation.ref} className={`py-12 md:py-16 transition-all duration-700 delay-100 ${textAnimation.isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
+        <section ref={textAnimation.ref} className={`py-6 md:py-8 transition-all duration-700 delay-100 ${textAnimation.isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
           <div className="container mx-auto px-4">
             <div className="max-w-3xl mx-auto">
               <div className="prose prose-lg text-foreground leading-loose space-y-6 text-right">

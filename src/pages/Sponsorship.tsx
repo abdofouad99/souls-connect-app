@@ -79,9 +79,10 @@ const Sponsorship = () => {
                   وتعايشوا مع الفقد قبل أن يعرفوا معنى الحياة…
                 </p>
 
-                <p className="text-lg md:text-xl">
-                  حين دلّك الله لتسير في درب الكافلين،
-                  <br />
+                <p className="text-lg md:text-xl">حين دلّك الله لتسير في درب الكافلين،
+فهو اختيارٌ لك لتمسك بيد اليتيم،
+فينجو في الدنيا، وتنجو أنت في الآخرة،
+ولكليكما حتماً النجاة في الدنيا والآخرة…<br />
                   فهو اختيارٌ لك لتمسك بيد اليتيم،
                   <br />
                   فينجو في الدنيا، وتنجو أنت في الآخرة،
@@ -119,7 +120,7 @@ const Sponsorship = () => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12">
               {/* Thank You Images */}
               <div>
-                <h3 className="text-xl md:text-2xl font-bold text-primary mb-6 text-center">نماذج شكر من غزة(من اليتيم الى الكافل)</h3>
+                <h3 className="text-xl md:text-2xl font-bold text-primary mb-6 text-center">نماذج شكر من غزة(من اليتيم لى الكافل)</h3>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
                   {thankYouImages.map((img, index) => <div key={index} onClick={() => setSelectedImage(index)} className="aspect-square bg-surface rounded-lg border border-border overflow-hidden shadow-sm hover:shadow-lg hover:scale-105 transition-all duration-300 cursor-pointer">
                       <img src={img} alt={`نموذج شكر ${index + 1}`} className="w-full h-full object-cover" />

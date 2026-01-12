@@ -146,7 +146,7 @@ const Sponsorship = () => {
               <h2 className="text-2xl md:text-3xl font-bold text-primary mb-4">كن سنداً ليتيم في غزة</h2>
               <p className="text-muted-foreground mb-4 text-lg">ابدأ رحلة الكفالة واترك أثراً يدوم</p>
               <p className="text-primary font-bold text-xl mb-8">
-                {sponsorshipAmountSetting?.value || "60 ريال سعودي • 15 دولار • 25,000 ريال يمني"} / شهرياً
+                مبلغ الكفالة لليتيم الواحد شهرياً ({sponsorshipAmountSetting?.value || "١٥ دولار - ٦٠ ريال سعودي او مايقابله ٢٥ الف ريال يمني"})
               </p>
               <Link to="/orphans">
                 <Button size="xl" className="text-lg px-8 py-6">

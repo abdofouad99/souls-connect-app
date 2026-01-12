@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { Heart, MapPin, Calendar, ArrowRight, Upload, X, Loader2, Phone, MessageCircle } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
@@ -71,6 +71,7 @@ export default function OrphanDetailsPage() {
     id: string;
   }>();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const {
     user
   } = useAuth();
@@ -92,6 +93,13 @@ export default function OrphanDetailsPage() {
   const [receiptFile, setReceiptFile] = useState<File | null>(null);
   const [receiptPreview, setReceiptPreview] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+
+  // Auto-open form if sponsor=true in URL
+  useEffect(() => {
+    if (searchParams.get('sponsor') === 'true') {
+      setShowForm(true);
+    }
+  }, [searchParams]);
 
   // Pre-fill form data from user account
   useEffect(() => {

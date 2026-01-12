@@ -115,11 +115,7 @@ export default function OrphansPage() {
                       <span className="font-serif font-bold text-lg text-foreground">{orphan.full_name}</span>
                     </div>
                     
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <MapPin className="h-4 w-4" />
-                      <span className="font-bold text-foreground">المكان:</span>
-                      <span>غزة</span>
-                    </div>
+                    
                     
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <span className="font-bold text-foreground">الجنس:</span>

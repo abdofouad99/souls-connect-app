@@ -83,7 +83,7 @@ export default function OrphanDetailsPage() {
     data: sponsorshipAmountSetting
   } = useSiteSetting("sponsorship_amount_text");
   const createSponsorshipRequest = useCreateSponsorshipRequest();
-  const [showForm, setShowForm] = useState(false);
+  const [showForm, setShowForm] = useState(true);
   const [formData, setFormData] = useState({
     fullName: "",
     phone: "",
@@ -263,147 +263,86 @@ export default function OrphanDetailsPage() {
             رجوع
           </Button>
 
-          <div className="grid lg:grid-cols-2 gap-8">
-            {/* Orphan Info */}
-            <div>
-              <div className="bg-card rounded-2xl overflow-hidden shadow-card">
-                <div className="aspect-video bg-muted relative">
-                  {orphan.photo_url ? <img src={orphan.photo_url} alt={orphan.full_name} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center">
-                      <Heart className="h-24 w-24 text-muted-foreground/50" />
-                    </div>}
-                  <Badge className={`absolute top-4 right-4 ${statusLabels[orphan.status].class}`}>
-                    {statusLabels[orphan.status].label}
-                  </Badge>
-                </div>
+          {/* Sponsorship Form Only */}
+          <div className="max-w-xl mx-auto">
+            <form onSubmit={handleSubmit} className="bg-card rounded-2xl p-8 shadow-card space-y-6">
+              <h2 className="text-2xl font-serif font-bold text-foreground mb-2">نموذج كفالة {orphan.full_name}</h2>
+              <p className="text-muted-foreground text-sm mb-6">
+                فضلاً أدخل بياناتك وهي سرية للجمعية فقط حتى نتمكن من التأكيد والمتابعة
+              </p>
 
-                <div className="p-6">
-                  <h1 className="text-3xl font-serif font-bold text-foreground mb-4">{orphan.full_name}</h1>
-
-                  <div className="grid grid-cols-2 gap-4 mb-6">
-                    <div className="flex items-center gap-2 text-muted-foreground">
-                      <MapPin className="h-5 w-5" />
-                      <span>غزة</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-muted-foreground">
-                      <Calendar className="h-5 w-5" />
-                      <span>{orphan.age} سنة</span>
-                    </div>
-                  </div>
-
-                  <div className="bg-primary/10 rounded-xl p-4 mb-6">
-                    <div className="text-sm text-muted-foreground mb-1">قيمة الكفالة الشهرية</div>
-                    <div className="text-xl font-bold text-primary">
-                      {sponsorshipAmountSetting?.value || "60 ريال سعودي • 15 دولار • 25,000 ريال يمني"}
-                    </div>
-                  </div>
-
-                  {orphan.story && <div>
-                      
-                      
-                    </div>}
-
-                  {orphan.intro_video_url && <div className="mt-6">
-                      <h3 className="font-serif font-bold text-lg mb-2">فيديو تعريفي</h3>
-                      <video controls className="w-full rounded-lg" src={orphan.intro_video_url} />
-                    </div>}
-                </div>
-              </div>
-            </div>
-
-            {/* Sponsorship Form */}
-            <div>
-              {!showForm ? <div className="bg-card rounded-2xl p-8 shadow-card text-center">
-                  <Heart className="h-16 w-16 mx-auto text-primary fill-primary/20 mb-4" />
-                  <h2 className="text-2xl font-serif font-bold text-foreground mb-4">
-                    كن كافلاً لـ {orphan.full_name}
-                  </h2>
-                  
-                  {!['fully_sponsored', 'full', 'sponsored'].includes(orphan.status) ? <Button variant="hero" size="xl" onClick={() => setShowForm(true)} className="w-full">
-                      أكفل هذا اليتيم الآن
-                    </Button> : <p className="text-muted-foreground">هذا اليتيم مكفول بالكامل</p>}
-                </div> : <form onSubmit={handleSubmit} className="bg-card rounded-2xl p-8 shadow-card space-y-6">
-                  <h2 className="text-2xl font-serif font-bold text-foreground mb-2">نموذج بدء الكفالة</h2>
-                  <p className="text-muted-foreground text-sm mb-6">
-                    فضلاً أدخل بياناتك وهي سرية للجمعية فقط حتى نتمكن من التأكيد والمتابعة
-                  </p>
-
-                  <div className="space-y-4">
-                    <div>
-                      <Label htmlFor="fullName">الاسم الكامل *</Label>
-                      <Input id="fullName" required value={formData.fullName} onChange={e => setFormData({
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="fullName">الاسم الكامل *</Label>
+                  <Input id="fullName" required value={formData.fullName} onChange={e => setFormData({
                     ...formData,
                     fullName: e.target.value
                   })} />
-                    </div>
+                </div>
 
-
-                    <div>
-                      <Label htmlFor="phone">رقم الهاتف</Label>
-                      <Input id="phone" value={formData.phone} onChange={e => setFormData({
+                <div>
+                  <Label htmlFor="phone">رقم الهاتف</Label>
+                  <Input id="phone" value={formData.phone} onChange={e => setFormData({
                     ...formData,
                     phone: e.target.value
                   })} />
-                    </div>
+                </div>
 
-                    <div>
-                      <Label htmlFor="country">البلد</Label>
-                      <Input id="country" value={formData.country} onChange={e => setFormData({
+                <div>
+                  <Label htmlFor="country">البلد</Label>
+                  <Input id="country" value={formData.country} onChange={e => setFormData({
                     ...formData,
                     country: e.target.value
                   })} />
-                    </div>
+                </div>
 
-                    <div>
-                      <Label>نوع الكفالة *</Label>
-                      <RadioGroup value={formData.sponsorshipType} onValueChange={v => setFormData({
+                <div>
+                  <Label>نوع الكفالة *</Label>
+                  <RadioGroup value={formData.sponsorshipType} onValueChange={v => setFormData({
                     ...formData,
                     sponsorshipType: v
                   })} className="flex gap-4 mt-2">
-                        <div className="flex items-center space-x-2 space-x-reverse">
-                          <RadioGroupItem value="monthly" id="monthly" />
-                          <Label htmlFor="monthly">شهرية (60 ر.س / 15$)</Label>
-                        </div>
-                        <div className="flex items-center space-x-2 space-x-reverse">
-                          <RadioGroupItem value="yearly" id="yearly" />
-                          <Label htmlFor="yearly">سنوية (720 ر.س / 180$)</Label>
-                        </div>
-                      </RadioGroup>
+                    <div className="flex items-center space-x-2 space-x-reverse">
+                      <RadioGroupItem value="monthly" id="monthly" />
+                      <Label htmlFor="monthly">شهرية (60 ر.س / 15$)</Label>
                     </div>
-
-                    {/* Contact Numbers Section */}
-                    <div className="bg-primary/10 rounded-xl p-4">
-                      <div className="font-bold text-primary mb-3 text-center">طريقة الدفع: تواصلوا معنا على الأرقام التالية</div>
-                      <div className="flex flex-col gap-3">
-                        <a href="tel:04251675" className="flex items-center justify-center gap-2 bg-background hover:bg-muted rounded-lg p-3 transition-colors border">
-                          <Phone className="h-5 w-5 text-primary" />
-                          <span className="font-medium" dir="ltr">04251675</span>
-                          <span className="text-muted-foreground text-sm">(اتصال)</span>
-                        </a>
-                        <a href="https://wa.me/967784665006" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 bg-green-50 hover:bg-green-100 rounded-lg p-3 transition-colors border border-green-200">
-                          <MessageCircle className="h-5 w-5 text-green-600" />
-                          <span className="font-medium" dir="ltr">784665006</span>
-                          <span className="text-green-600 text-sm">(واتساب)</span>
-                        </a>
-                      </div>
+                    <div className="flex items-center space-x-2 space-x-reverse">
+                      <RadioGroupItem value="yearly" id="yearly" />
+                      <Label htmlFor="yearly">سنوية (720 ر.س / 180$)</Label>
                     </div>
+                  </RadioGroup>
+                </div>
 
-                    {/* Receipt Image Upload */}
-                    
+                {/* Contact Numbers Section */}
+                <div className="bg-primary/10 rounded-xl p-4">
+                  <div className="font-bold text-primary mb-3 text-center">طريقة الدفع: تواصلوا معنا على الأرقام التالية</div>
+                  <div className="flex flex-col gap-3">
+                    <a href="tel:04251675" className="flex items-center justify-center gap-2 bg-background hover:bg-muted rounded-lg p-3 transition-colors border">
+                      <Phone className="h-5 w-5 text-primary" />
+                      <span className="font-medium" dir="ltr">04251675</span>
+                      <span className="text-muted-foreground text-sm">(اتصال)</span>
+                    </a>
+                    <a href="https://wa.me/967784665006" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 bg-green-50 hover:bg-green-100 rounded-lg p-3 transition-colors border border-green-200">
+                      <MessageCircle className="h-5 w-5 text-green-600" />
+                      <span className="font-medium" dir="ltr">784665006</span>
+                      <span className="text-green-600 text-sm">(واتساب)</span>
+                    </a>
                   </div>
+                </div>
+              </div>
 
-                  <div className="flex gap-4">
-                    <Button type="button" variant="outline" onClick={() => setShowForm(false)} className="flex-1">
-                      إلغاء
-                    </Button>
-                    <Button type="submit" variant="hero" className="flex-1" disabled={submitting}>
-                      {submitting ? <>
-                          <Loader2 className="h-4 w-4 ml-2 animate-spin" />
-                          جاري الإرسال...
-                        </> : "إرسال طلب الكفالة"}
-                    </Button>
-                  </div>
-                </form>}
-            </div>
+              <div className="flex gap-4">
+                <Button type="button" variant="outline" onClick={() => navigate(-1)} className="flex-1">
+                  رجوع
+                </Button>
+                <Button type="submit" variant="hero" className="flex-1" disabled={submitting}>
+                  {submitting ? <>
+                    <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+                    جاري الإرسال...
+                  </> : "إرسال طلب الكفالة"}
+                </Button>
+              </div>
+            </form>
           </div>
         </div>
       </div>

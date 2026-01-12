@@ -120,7 +120,7 @@ const Sponsorship = () => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12">
               {/* Thank You Images */}
               <div>
-                <h3 className="text-xl md:text-2xl font-bold text-primary mb-6 text-center">نماذج شكر من غزة(من اليتيم لى الكافل)</h3>
+                <h3 className="text-xl md:text-2xl font-bold text-primary mb-6 text-center">نماذج شكر من غزة(من اليتيم إلى الكافل)</h3>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
                   {thankYouImages.map((img, index) => <div key={index} onClick={() => setSelectedImage(index)} className="aspect-square bg-surface rounded-lg border border-border overflow-hidden shadow-sm hover:shadow-lg hover:scale-105 transition-all duration-300 cursor-pointer">
                       <img src={img} alt={`نموذج شكر ${index + 1}`} className="w-full h-full object-cover" />

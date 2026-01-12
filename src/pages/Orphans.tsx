@@ -137,7 +137,7 @@ export default function OrphansPage() {
                         <Link to={`/orphan/${orphan.id}`}>تفاصيل</Link>
                       </Button>
                       {!['fully_sponsored', 'full', 'sponsored'].includes(orphan.status) && <Button asChild variant="hero" size="sm" className="flex-1">
-                          <Link to={`/orphan/${orphan.id}`}>أكفل هذا اليتيم</Link>
+                          <Link to={`/orphan/${orphan.id}?sponsor=true`}>أكفل هذا اليتيم</Link>
                         </Button>}
                     </div>
                   </div>

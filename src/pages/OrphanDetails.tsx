@@ -301,14 +301,20 @@ export default function OrphanDetailsPage() {
                   <RadioGroup value={formData.sponsorshipType} onValueChange={v => setFormData({
                     ...formData,
                     sponsorshipType: v
-                  })} className="flex gap-4 mt-2">
-                    <div className="flex items-center space-x-2 space-x-reverse">
+                  })} className="flex flex-row-reverse justify-end gap-6 mt-2" dir="rtl">
+                    <div className="flex items-center gap-2">
                       <RadioGroupItem value="monthly" id="monthly" />
-                      <Label htmlFor="monthly">شهرية (60 ر.س / 15$)</Label>
+                      <Label htmlFor="monthly" className="cursor-pointer">
+                        <span>شهرية</span>
+                        <span className="text-muted-foreground mr-1">(60 ر.س / 15$)</span>
+                      </Label>
                     </div>
-                    <div className="flex items-center space-x-2 space-x-reverse">
+                    <div className="flex items-center gap-2">
                       <RadioGroupItem value="yearly" id="yearly" />
-                      <Label htmlFor="yearly">سنوية (720 ر.س / 180$)</Label>
+                      <Label htmlFor="yearly" className="cursor-pointer">
+                        <span>سنوية</span>
+                        <span className="text-muted-foreground mr-1">(720 ر.س / 180$)</span>
+                      </Label>
                     </div>
                   </RadioGroup>
                 </div>

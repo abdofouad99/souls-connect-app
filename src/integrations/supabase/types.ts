@@ -215,6 +215,30 @@ export type Database = {
         }
         Relationships: []
       }
+      protected_users: {
+        Row: {
+          created_at: string | null
+          email: string
+          id: string
+          reason: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          id?: string
+          reason?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          id?: string
+          reason?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       receipts: {
         Row: {
           amount: number
@@ -528,6 +552,7 @@ export type Database = {
         Returns: boolean
       }
       is_admin_or_staff: { Args: { _user_id: string }; Returns: boolean }
+      is_protected_user: { Args: { _user_id: string }; Returns: boolean }
       recalculate_orphan_status: {
         Args: { _orphan_id: string }
         Returns: string

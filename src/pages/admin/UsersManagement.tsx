@@ -33,7 +33,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { UserPlus, Mail, Shield, Loader2, Edit, Users } from 'lucide-react';
+import { UserPlus, Mail, Shield, Loader2, Edit, Users, ShieldCheck, Lock } from 'lucide-react';
 import { z } from 'zod';
 import type { AppRole } from '@/lib/types';
 
@@ -49,6 +49,7 @@ interface UserWithRole {
     full_name: string;
     email: string | null;
   } | null;
+  is_protected: boolean;
 }
 
 const roleLabels: Record<AppRole, string> = {
@@ -74,8 +75,9 @@ export default function UsersManagement() {
   const [selectedUser, setSelectedUser] = useState<UserWithRole | null>(null);
   const [newRole, setNewRole] = useState<AppRole | ''>('');
   const [isUpdatingRole, setIsUpdatingRole] = useState(false);
+  const [protectedUserIds, setProtectedUserIds] = useState<Set<string>>(new Set());
   const { toast } = useToast();
-  const { signOut, session, isAdmin } = useAuth();
+  const { signOut, session, isAdmin, user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -108,6 +110,18 @@ export default function UsersManagement() {
   const fetchUsers = async () => {
     setIsLoadingUsers(true);
     try {
+      // Fetch protected users first
+      const { data: protectedData, error: protectedError } = await supabase
+        .from('protected_users')
+        .select('user_id');
+      
+      if (protectedError) {
+        console.error('Error fetching protected users:', protectedError);
+      }
+      
+      const protectedIds = new Set((protectedData || []).map(p => p.user_id));
+      setProtectedUserIds(protectedIds);
+
       const { data: rolesData, error: rolesError } = await supabase
         .from('user_roles')
         .select('user_id, role');
@@ -128,6 +142,7 @@ export default function UsersManagement() {
           user_id: roleRecord.user_id,
           role: roleRecord.role as AppRole,
           profile: profile ? { full_name: profile.full_name, email: profile.email } : null,
+          is_protected: protectedIds.has(roleRecord.user_id),
         };
       });
 
@@ -232,6 +247,15 @@ export default function UsersManagement() {
   };
 
   const handleEditRole = (user: UserWithRole) => {
+    // Check if trying to edit protected user who is not the current user
+    if (user.is_protected && user.user_id !== session?.user?.id) {
+      toast({
+        variant: 'destructive',
+        title: 'حساب محمي',
+        description: 'هذا الحساب محمي ولا يمكن تعديل صلاحياته إلا من قبل صاحبه',
+      });
+      return;
+    }
     setSelectedUser(user);
     setNewRole(user.role);
     setIsEditDialogOpen(true);
@@ -404,20 +428,41 @@ export default function UsersManagement() {
                           {user.profile?.email || 'غير محدد'}
                         </TableCell>
                         <TableCell>
-                          <Badge variant={roleBadgeVariants[user.role]}>
-                            {roleLabels[user.role]}
-                          </Badge>
+                          <div className="flex items-center gap-2">
+                            <Badge variant={roleBadgeVariants[user.role]}>
+                              {roleLabels[user.role]}
+                            </Badge>
+                            {user.is_protected && (
+                              <Badge variant="outline" className="gap-1 bg-amber-50 text-amber-700 border-amber-300">
+                                <ShieldCheck className="h-3 w-3" />
+                                محمي
+                              </Badge>
+                            )}
+                          </div>
                         </TableCell>
                         <TableCell>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleEditRole(user)}
-                            className="gap-1"
-                          >
-                            <Edit className="h-4 w-4" />
-                            تعديل الدور
-                          </Button>
+                          {user.is_protected && user.user_id !== session?.user?.id ? (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              disabled
+                              className="gap-1 opacity-50 cursor-not-allowed"
+                              title="هذا الحساب محمي"
+                            >
+                              <Lock className="h-4 w-4" />
+                              محمي
+                            </Button>
+                          ) : (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleEditRole(user)}
+                              className="gap-1"
+                            >
+                              <Edit className="h-4 w-4" />
+                              تعديل الدور
+                            </Button>
+                          )}
                         </TableCell>
                       </TableRow>
                     ))}

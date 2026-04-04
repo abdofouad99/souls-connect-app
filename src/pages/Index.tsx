@@ -5,7 +5,12 @@ import heroImage from "@/assets/hero-image.jpg";
 import { cn } from "@/lib/utils";
 const Index = () => {
   const heroAnim = useScrollAnimation<HTMLElement>();
-  const contactNumbers = ["04251675", "784665006"];
+  const contactNumbers = [
+    { number: "778391912", label: "واتس" },
+    { number: "784665006", label: "واتس واتصال" },
+    { number: "772433079", label: "اتصال ورسائل نصية" },
+    { number: "04251675", label: "اتصال" },
+  ];
   return <Layout>
       {/* Hero Section */}
       <section ref={heroAnim.ref} className="py-12 md:py-20">

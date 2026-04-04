@@ -49,11 +49,12 @@ const Index = () => {
               </div>
 
               <div className="space-y-4">
-                {contactNumbers.map((number, index) => <a key={number} href={`tel:${number}`} className={cn("flex items-center justify-center gap-3 bg-primary/10 hover:bg-primary/20 text-primary font-semibold text-lg md:text-xl py-3 px-6 rounded-xl transition-all duration-300 hover:scale-105", heroAnim.isVisible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-8")} style={{
+                {contactNumbers.map((contact, index) => <a key={contact.number} href={`tel:${contact.number}`} className={cn("flex items-center justify-center gap-3 bg-primary/10 hover:bg-primary/20 text-primary font-semibold text-lg md:text-xl py-3 px-6 rounded-xl transition-all duration-300 hover:scale-105", heroAnim.isVisible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-8")} style={{
                 transitionDelay: heroAnim.isVisible ? `${400 + index * 100}ms` : "0ms"
               }} dir="ltr">
                     <Phone className="h-5 w-5" />
-                    {number}
+                    <span>{contact.number}</span>
+                    <span className="text-sm text-muted-foreground">({contact.label})</span>
                   </a>)}
               </div>
             </div>

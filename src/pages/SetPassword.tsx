@@ -42,7 +42,7 @@ export default function SetPassword() {
         const refreshToken = hashParams.get('refresh_token');
         const type = hashParams.get('type');
 
-        if (accessToken && refreshToken && type === 'invite') {
+        if (accessToken && refreshToken && (type === 'invite' || type === 'recovery')) {
           // Set the session from the tokens
           const { error } = await supabase.auth.setSession({
             access_token: accessToken,

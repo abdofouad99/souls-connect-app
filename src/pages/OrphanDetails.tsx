@@ -106,8 +106,7 @@ export default function OrphanDetailsPage() {
       setFormData(prev => ({
         ...prev,
         fullName: userMeta.full_name || prev.fullName,
-        phone: userMeta.phone || prev.phone,
-        country: userMeta.country || prev.country
+        phone: userMeta.phone || prev.phone
       }));
     }
   }, [user]);

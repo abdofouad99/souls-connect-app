@@ -285,8 +285,8 @@ export default function OrphanDetailsPage() {
                 </div>
 
                 <div>
-                  <Label htmlFor="amount">مبلغ الكفالة</Label>
-                  <Input id="amount" type="number" min="1" placeholder="أدخل مبلغ الكفالة" value={formData.amount} onChange={e => setFormData({
+                  <Label htmlFor="amount">مبلغ الكفالة *</Label>
+                  <Input id="amount" type="number" min="1" required placeholder="أدخل مبلغ الكفالة" value={formData.amount} onChange={e => setFormData({
                     ...formData,
                     amount: e.target.value
                   })} />

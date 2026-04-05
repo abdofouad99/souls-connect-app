@@ -25,7 +25,7 @@ const sponsorshipFormSchema = z.object({
   phone: z.string().trim().regex(/^[0-9]{9}$/, {
     message: "رقم الهاتف يجب أن يكون 9 أرقام"
   }),
-  amount: z.string().optional().or(z.literal("")),
+  amount: z.string().trim().min(1, { message: "يرجى إدخال مبلغ الكفالة" }),
   sponsorshipType: z.enum(["monthly", "yearly"])
 });
 const statusLabels: Record<string, {
@@ -285,8 +285,8 @@ export default function OrphanDetailsPage() {
                 </div>
 
                 <div>
-                  <Label htmlFor="amount">مبلغ الكفالة</Label>
-                  <Input id="amount" type="number" min="1" placeholder="أدخل مبلغ الكفالة" value={formData.amount} onChange={e => setFormData({
+                  <Label htmlFor="amount">مبلغ الكفالة *</Label>
+                  <Input id="amount" type="number" min="1" required placeholder="أدخل مبلغ الكفالة" value={formData.amount} onChange={e => setFormData({
                     ...formData,
                     amount: e.target.value
                   })} />

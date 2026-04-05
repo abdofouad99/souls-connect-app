@@ -85,7 +85,7 @@ export default function OrphanDetailsPage() {
   const [formData, setFormData] = useState({
     fullName: "",
     phone: "",
-    country: "",
+    amount: "",
     sponsorshipType: "monthly"
   });
   const [receiptFile, setReceiptFile] = useState<File | null>(null);

@@ -25,9 +25,7 @@ const sponsorshipFormSchema = z.object({
   phone: z.string().trim().regex(/^[0-9]{9}$/, {
     message: "رقم الهاتف يجب أن يكون 9 أرقام"
   }),
-  country: z.string().trim().max(100, {
-    message: "اسم البلد يجب أن يكون أقل من 100 حرف"
-  }).optional().or(z.literal("")),
+  amount: z.string().optional().or(z.literal("")),
   sponsorshipType: z.enum(["monthly", "yearly"])
 });
 const statusLabels: Record<string, {
@@ -87,7 +85,7 @@ export default function OrphanDetailsPage() {
   const [formData, setFormData] = useState({
     fullName: "",
     phone: "",
-    country: "",
+    amount: "",
     sponsorshipType: "monthly"
   });
   const [receiptFile, setReceiptFile] = useState<File | null>(null);
@@ -108,8 +106,7 @@ export default function OrphanDetailsPage() {
       setFormData(prev => ({
         ...prev,
         fullName: userMeta.full_name || prev.fullName,
-        phone: userMeta.phone || prev.phone,
-        country: userMeta.country || prev.country
+        phone: userMeta.phone || prev.phone
       }));
     }
   }, [user]);
@@ -192,10 +189,9 @@ export default function OrphanDetailsPage() {
       await createSponsorshipRequest.mutateAsync({
         sponsor_full_name: validatedData.fullName,
         sponsor_phone: validatedData.phone,
-        sponsor_country: validatedData.country || undefined,
         orphan_id: orphan.id,
         sponsorship_type: validatedData.sponsorshipType,
-        amount,
+        amount: validatedData.amount ? Number(validatedData.amount) : amount,
         transfer_receipt_image: receiptImageUrl || undefined,
         user_id: user?.id
       });
@@ -289,10 +285,10 @@ export default function OrphanDetailsPage() {
                 </div>
 
                 <div>
-                  <Label htmlFor="country">البلد</Label>
-                  <Input id="country" value={formData.country} onChange={e => setFormData({
+                  <Label htmlFor="amount">مبلغ الكفالة</Label>
+                  <Input id="amount" type="number" min="1" placeholder="أدخل مبلغ الكفالة" value={formData.amount} onChange={e => setFormData({
                     ...formData,
-                    country: e.target.value
+                    amount: e.target.value
                   })} />
                 </div>
 

@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { useOrphans } from '@/hooks/useOrphans';
+import { useSiteSetting } from '@/hooks/useSiteSettings';
 import { LazyImage } from '@/components/common/LazyImage';
 import { SkeletonCard } from '@/components/common/LoadingSpinner';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
@@ -52,6 +53,7 @@ export default function OrphansPage() {
     data: orphans,
     isLoading
   } = useOrphans();
+  const { data: sponsorshipAmountSetting } = useSiteSetting("sponsorship_amount_text");
   const [search, setSearch] = useState('');
   const [selectedImage, setSelectedImage] = useState<SelectedImage | null>(null);
   const filteredOrphans = orphans?.filter(orphan => orphan.full_name.includes(search) || orphan.city.includes(search) || orphan.country.includes(search)) || [];
@@ -129,7 +131,7 @@ export default function OrphansPage() {
                     
                     <div className="flex flex-col gap-1 text-sm">
                       <span className="font-bold text-foreground">مبلغ الكفالة:</span>
-                      <span className="text-primary">60 ريال سعودي • 15 دولار • او مايقابله 25 الف ريال يمني</span>
+                      <span className="text-primary">{sponsorshipAmountSetting?.value || "٦٠ ريال سعودي • ١٥ دولار • او مايقابله ٢٥ الف ريال يمني"}</span>
                     </div>
                     
                     <div className="flex gap-2">

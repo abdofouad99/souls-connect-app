@@ -25,7 +25,7 @@ const sponsorshipFormSchema = z.object({
   phone: z.string().trim().regex(/^[0-9]{9}$/, {
     message: "رقم الهاتف يجب أن يكون 9 أرقام"
   }),
-  amount: z.string().optional().or(z.literal("")),
+  amount: z.string().trim().min(1, { message: "يرجى إدخال مبلغ الكفالة" }),
   sponsorshipType: z.enum(["monthly", "yearly"])
 });
 const statusLabels: Record<string, {

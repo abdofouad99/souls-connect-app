@@ -131,7 +131,7 @@ export default function OrphansPage() {
                     
                     <div className="flex flex-col gap-1 text-sm">
                       <span className="font-bold text-foreground">مبلغ الكفالة:</span>
-                      <span className="text-primary">60 ريال سعودي • 15 دولار • او مايقابله 25 الف ريال يمني</span>
+                      <span className="text-primary">{sponsorshipAmountSetting?.value || "٦٠ ريال سعودي • ١٥ دولار • او مايقابله ٢٥ الف ريال يمني"}</span>
                     </div>
                     
                     <div className="flex gap-2">

@@ -53,6 +53,7 @@ export default function OrphansPage() {
     data: orphans,
     isLoading
   } = useOrphans();
+  const { data: sponsorshipAmountSetting } = useSiteSetting("sponsorship_amount_text");
   const [search, setSearch] = useState('');
   const [selectedImage, setSelectedImage] = useState<SelectedImage | null>(null);
   const filteredOrphans = orphans?.filter(orphan => orphan.full_name.includes(search) || orphan.city.includes(search) || orphan.country.includes(search)) || [];

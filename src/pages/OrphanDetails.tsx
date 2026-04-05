@@ -320,15 +320,25 @@ export default function OrphanDetailsPage() {
                 <div className="bg-primary/10 rounded-xl p-4">
                   <div className="font-bold text-primary mb-3 text-center">طريقة الدفع: تواصلوا معنا على الأرقام التالية</div>
                   <div className="flex flex-col gap-3">
-                    <a href="tel:04251675" className="flex items-center justify-center gap-2 bg-background hover:bg-muted rounded-lg p-3 transition-colors border">
-                      <Phone className="h-5 w-5 text-primary" />
-                      <span className="font-medium" dir="ltr">04251675</span>
-                      <span className="text-muted-foreground text-sm">(اتصال)</span>
+                    <a href="https://wa.me/967778391912" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 bg-green-50 hover:bg-green-100 rounded-lg p-3 transition-colors border border-green-200">
+                      <MessageCircle className="h-5 w-5 text-green-600" />
+                      <span className="font-medium" dir="ltr">778391912</span>
+                      <span className="text-green-600 text-sm">(واتس)</span>
                     </a>
                     <a href="https://wa.me/967784665006" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 bg-green-50 hover:bg-green-100 rounded-lg p-3 transition-colors border border-green-200">
                       <MessageCircle className="h-5 w-5 text-green-600" />
                       <span className="font-medium" dir="ltr">784665006</span>
-                      <span className="text-green-600 text-sm">(واتساب)</span>
+                      <span className="text-green-600 text-sm">(واتس واتصال)</span>
+                    </a>
+                    <a href="tel:772433079" className="flex items-center justify-center gap-2 bg-background hover:bg-muted rounded-lg p-3 transition-colors border">
+                      <Phone className="h-5 w-5 text-primary" />
+                      <span className="font-medium" dir="ltr">772433079</span>
+                      <span className="text-muted-foreground text-sm">(اتصال ورسائل نصية)</span>
+                    </a>
+                    <a href="tel:04251675" className="flex items-center justify-center gap-2 bg-background hover:bg-muted rounded-lg p-3 transition-colors border">
+                      <Phone className="h-5 w-5 text-primary" />
+                      <span className="font-medium" dir="ltr">04251675</span>
+                      <span className="text-muted-foreground text-sm">(اتصال)</span>
                     </a>
                   </div>
                 </div>

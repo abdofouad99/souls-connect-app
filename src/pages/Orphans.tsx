@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { useOrphans } from '@/hooks/useOrphans';
+import { useSiteSetting } from '@/hooks/useSiteSettings';
 import { LazyImage } from '@/components/common/LazyImage';
 import { SkeletonCard } from '@/components/common/LoadingSpinner';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';

@@ -25,9 +25,7 @@ const sponsorshipFormSchema = z.object({
   phone: z.string().trim().regex(/^[0-9]{9}$/, {
     message: "رقم الهاتف يجب أن يكون 9 أرقام"
   }),
-  country: z.string().trim().max(100, {
-    message: "اسم البلد يجب أن يكون أقل من 100 حرف"
-  }).optional().or(z.literal("")),
+  amount: z.string().optional().or(z.literal("")),
   sponsorshipType: z.enum(["monthly", "yearly"])
 });
 const statusLabels: Record<string, {

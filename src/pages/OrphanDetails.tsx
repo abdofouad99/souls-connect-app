@@ -189,10 +189,9 @@ export default function OrphanDetailsPage() {
       await createSponsorshipRequest.mutateAsync({
         sponsor_full_name: validatedData.fullName,
         sponsor_phone: validatedData.phone,
-        sponsor_country: validatedData.country || undefined,
         orphan_id: orphan.id,
         sponsorship_type: validatedData.sponsorshipType,
-        amount,
+        amount: validatedData.amount ? Number(validatedData.amount) : amount,
         transfer_receipt_image: receiptImageUrl || undefined,
         user_id: user?.id
       });

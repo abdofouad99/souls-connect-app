@@ -338,7 +338,7 @@ export default function OrphanDetailsPage() {
                     <a href="tel:04251675" className="flex items-center justify-center gap-2 bg-background hover:bg-muted rounded-lg p-3 transition-colors border">
                       <Phone className="h-5 w-5 text-primary" />
                       <span className="font-medium" dir="ltr">04251675</span>
-                      <span className="text-muted-foreground text-sm">(اتصال)</span>
+                      <span className="font-medium" dir="ltr">04251675</span>
                     </a>
                   </div>
                 </div>

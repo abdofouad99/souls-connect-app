@@ -289,10 +289,10 @@ export default function OrphanDetailsPage() {
                 </div>
 
                 <div>
-                  <Label htmlFor="country">البلد</Label>
-                  <Input id="country" value={formData.country} onChange={e => setFormData({
+                  <Label htmlFor="amount">مبلغ الكفالة</Label>
+                  <Input id="amount" type="number" min="1" placeholder="أدخل مبلغ الكفالة" value={formData.amount} onChange={e => setFormData({
                     ...formData,
-                    country: e.target.value
+                    amount: e.target.value
                   })} />
                 </div>
 

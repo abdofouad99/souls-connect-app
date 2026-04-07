@@ -297,9 +297,9 @@ export default function OrphanDetailsPage() {
                       onChange={e => setFormData({ ...formData, currency: e.target.value })}
                       className="w-32 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                     >
-                      <option value="YER">ريال يمني</option>
-                      <option value="SAR">ريال سعودي</option>
                       <option value="USD">دولار</option>
+                      <option value="SAR">ريال سعودي</option>
+                      <option value="YER">ريال يمني</option>
                     </select>
                   </div>
                 </div>

@@ -288,19 +288,20 @@ export default function OrphanDetailsPage() {
                 <div>
                   <Label htmlFor="amount">مبلغ الكفالة *</Label>
                   <div className="flex gap-2 mt-1">
+                    <Input id="amount" type="number" min="1" required placeholder="أدخل مبلغ الكفالة" value={formData.amount} onChange={e => setFormData({
+                      ...formData,
+                      amount: e.target.value
+                    })} className="flex-1 min-w-0" style={{ flexGrow: 1, flexBasis: '70%' }} />
                     <select
                       value={formData.currency}
                       onChange={e => setFormData({ ...formData, currency: e.target.value })}
-                      className="w-28 shrink-0 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                      className="shrink-0 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                      style={{ width: '7rem' }}
                     >
                       <option value="USD">دولار</option>
                       <option value="SAR">ريال سعودي</option>
                       <option value="YER">ريال يمني</option>
                     </select>
-                    <Input id="amount" type="number" min="1" required placeholder="أدخل مبلغ الكفالة" value={formData.amount} onChange={e => setFormData({
-                      ...formData,
-                      amount: e.target.value
-                    })} className="flex-1 min-w-0" />
                   </div>
                 </div>
 

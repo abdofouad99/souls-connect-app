@@ -339,10 +339,10 @@ export default function OrphanDetailsPage() {
                       <span className="font-medium" dir="ltr">784665006</span>
                       <span className="text-green-600 text-sm">(واتس واتصال)</span>
                     </a>
-                    <a href="tel:772433079" className="flex items-center justify-center gap-2 bg-background hover:bg-muted rounded-lg p-3 transition-colors border">
-                      <Phone className="h-5 w-5 text-primary" />
+                    <a href="https://wa.me/967772433079" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 bg-green-50 hover:bg-green-100 rounded-lg p-3 transition-colors border border-green-200">
+                      <MessageCircle className="h-5 w-5 text-green-600" />
                       <span className="font-medium" dir="ltr">772433079</span>
-                      <span className="text-muted-foreground text-sm">(اتصال ورسائل نصية)</span>
+                      <span className="text-green-600 text-sm">(واتس)</span>
                     </a>
                     <a href="tel:04251675" className="flex items-center justify-center gap-2 bg-background hover:bg-muted rounded-lg p-3 transition-colors border">
                       <Phone className="h-5 w-5 text-primary" />

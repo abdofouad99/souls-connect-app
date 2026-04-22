@@ -8,7 +8,7 @@ const Index = () => {
   const contactNumbers = [
     { number: "778391912", label: "واتس" },
     { number: "784665006", label: "واتس واتصال" },
-    { number: "772433079", label: "اتصال ورسائل نصية" },
+    { number: "772433079", label: "واتس" },
     { number: "04251675", label: "اتصال" },
   ];
   return <Layout>

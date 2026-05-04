@@ -12,6 +12,11 @@ export interface Orphan {
   story?: string;
   photo_url?: string;
   intro_video_url?: string;
+  birth_place?: string;
+  birth_date?: string;
+  father_death_date?: string;
+  education_level?: string;
+  notes?: string;
   created_at: string;
   updated_at: string;
 }

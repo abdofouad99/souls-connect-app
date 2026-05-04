@@ -67,6 +67,11 @@ const emptyOrphan: Omit<Orphan, 'id' | 'created_at' | 'updated_at'> = {
   story: '',
   photo_url: '',
   intro_video_url: '',
+  birth_place: '',
+  birth_date: '',
+  father_death_date: '',
+  education_level: '',
+  notes: '',
 };
 
 export default function OrphansManagement() {
@@ -144,6 +149,11 @@ export default function OrphansManagement() {
       story: orphan.story || '',
       photo_url: orphan.photo_url || '',
       intro_video_url: orphan.intro_video_url || '',
+      birth_place: orphan.birth_place || '',
+      birth_date: orphan.birth_date || '',
+      father_death_date: orphan.father_death_date || '',
+      education_level: orphan.education_level || '',
+      notes: orphan.notes || '',
     });
     setSelectedFile(null);
     setSelectedCurrency('SAR');
@@ -164,7 +174,15 @@ export default function OrphansManagement() {
         photoUrl = await uploadOrphanPhoto(selectedFile, tempId);
       }
 
-      const dataToSave = { ...formData, photo_url: photoUrl };
+      const dataToSave: any = {
+        ...formData,
+        photo_url: photoUrl,
+        birth_date: formData.birth_date || null,
+        father_death_date: formData.father_death_date || null,
+        birth_place: formData.birth_place || null,
+        education_level: formData.education_level || null,
+        notes: formData.notes || null,
+      };
 
       if (selectedOrphan) {
         await updateOrphan.mutateAsync({ id: selectedOrphan.id, ...dataToSave });
@@ -514,6 +532,52 @@ export default function OrphansManagement() {
                 value={formData.story}
                 onChange={(e) => setFormData({ ...formData, story: e.target.value })}
                 rows={3}
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label>مكان الميلاد</Label>
+                <Input
+                  value={formData.birth_place || ''}
+                  onChange={(e) => setFormData({ ...formData, birth_place: e.target.value })}
+                />
+              </div>
+              <div>
+                <Label>تاريخ الميلاد</Label>
+                <Input
+                  type="date"
+                  value={formData.birth_date || ''}
+                  onChange={(e) => setFormData({ ...formData, birth_date: e.target.value })}
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label>تاريخ وفاة الأب</Label>
+                <Input
+                  type="date"
+                  value={formData.father_death_date || ''}
+                  onChange={(e) => setFormData({ ...formData, father_death_date: e.target.value })}
+                />
+              </div>
+              <div>
+                <Label>المستوى التعليمي</Label>
+                <Input
+                  value={formData.education_level || ''}
+                  onChange={(e) => setFormData({ ...formData, education_level: e.target.value })}
+                  placeholder="مثال: الصف الخامس الابتدائي"
+                />
+              </div>
+            </div>
+
+            <div>
+              <Label>ملاحظة</Label>
+              <Textarea
+                value={formData.notes || ''}
+                onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                rows={2}
               />
             </div>
 

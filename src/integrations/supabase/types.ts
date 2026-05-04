@@ -134,14 +134,19 @@ export type Database = {
       orphans: {
         Row: {
           age: number
+          birth_date: string | null
+          birth_place: string | null
           city: string
           country: string
           created_at: string
+          education_level: string | null
+          father_death_date: string | null
           full_name: string
           gender: string
           id: string
           intro_video_url: string | null
           monthly_amount: number
+          notes: string | null
           photo_url: string | null
           status: string
           story: string | null
@@ -149,14 +154,19 @@ export type Database = {
         }
         Insert: {
           age: number
+          birth_date?: string | null
+          birth_place?: string | null
           city: string
           country: string
           created_at?: string
+          education_level?: string | null
+          father_death_date?: string | null
           full_name: string
           gender: string
           id?: string
           intro_video_url?: string | null
           monthly_amount: number
+          notes?: string | null
           photo_url?: string | null
           status?: string
           story?: string | null
@@ -164,14 +174,19 @@ export type Database = {
         }
         Update: {
           age?: number
+          birth_date?: string | null
+          birth_place?: string | null
           city?: string
           country?: string
           created_at?: string
+          education_level?: string | null
+          father_death_date?: string | null
           full_name?: string
           gender?: string
           id?: string
           intro_video_url?: string | null
           monthly_amount?: number
+          notes?: string | null
           photo_url?: string | null
           status?: string
           story?: string | null

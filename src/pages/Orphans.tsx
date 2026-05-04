@@ -79,70 +79,52 @@ export default function OrphansPage() {
             </div> : filteredOrphans.length === 0 ? <div className="text-center py-20">
               <Heart className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
               <p className="text-lg text-muted-foreground">لا يوجد أيتام حالياً</p>
-            </div> : <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {filteredOrphans.map((orphan, index) => <div key={orphan.id} className="bg-card rounded-2xl overflow-hidden shadow-card card-hover animate-fade-up" style={{
+            </div> : <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredOrphans.map((orphan, index) => <div key={orphan.id} className="bg-card rounded-2xl p-6 shadow-card card-hover animate-fade-up flex flex-col" style={{
             animationDelay: `${0.05 * index}s`
           }}>
-                  <div className="aspect-square bg-muted relative">
-                    {orphan.photo_url ? <div className="w-full h-full cursor-pointer" onClick={e => handleImageClick(e, orphan.photo_url!, orphan.full_name)}>
-                        <LazyImage src={orphan.photo_url} alt={`صورة اليتيم ${orphan.full_name}`} className="w-full h-full" fallback={<div className="w-full h-full flex items-center justify-center bg-muted">
-                              <Heart className="h-16 w-16 text-muted-foreground/50" />
-                            </div>} />
-                      </div> : <div className="w-full h-full flex items-center justify-center">
-                        <Heart className="h-16 w-16 text-muted-foreground/50" />
-                      </div>}
-                    <Badge className={`absolute top-3 right-3 ${statusLabels[orphan.status].class}`}>
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="font-serif font-bold text-xl text-foreground">{orphan.full_name}</h3>
+                    <Badge className={statusLabels[orphan.status].class}>
                       {statusLabels[orphan.status].label}
                     </Badge>
                   </div>
-                  
-                  <div className="p-5 space-y-2">
+
+                  <div className="space-y-2 text-sm flex-1">
                     <div className="flex items-start gap-2">
-                      <span className="font-bold text-foreground whitespace-nowrap">اليتيم:</span>
-                      <span className="font-serif font-bold text-lg text-foreground">{orphan.full_name}</span>
+                      <span className="font-bold text-foreground whitespace-nowrap">مكان الميلاد:</span>
+                      <span className="text-muted-foreground">{orphan.birth_place || '—'}</span>
                     </div>
-                    
-                    
-                    
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <span className="font-bold text-foreground">الجنس:</span>
-                      <span>{orphan.gender === 'male' ? 'ذكر' : 'أنثى'}</span>
+                    <div className="flex items-start gap-2">
+                      <span className="font-bold text-foreground whitespace-nowrap">تاريخ الميلاد:</span>
+                      <span className="text-muted-foreground" dir="ltr">{orphan.birth_date || '—'}</span>
                     </div>
-                    
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <span className="font-bold text-foreground">العمر:</span>
-                      <span>{orphan.age} سنة</span>
+                    <div className="flex items-start gap-2">
+                      <span className="font-bold text-foreground whitespace-nowrap">تاريخ وفاة الأب:</span>
+                      <span className="text-muted-foreground" dir="ltr">{orphan.father_death_date || '—'}</span>
                     </div>
-                    
-                    <div className="flex flex-col gap-1 text-sm">
+                    <div className="flex items-start gap-2">
+                      <span className="font-bold text-foreground whitespace-nowrap">المستوى التعليمي:</span>
+                      <span className="text-muted-foreground">{orphan.education_level || '—'}</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <span className="font-bold text-foreground whitespace-nowrap">ملاحظة:</span>
+                      <span className="text-muted-foreground">{orphan.notes || '—'}</span>
+                    </div>
+                    <div className="flex flex-col gap-1 pt-2 border-t mt-3">
                       <span className="font-bold text-foreground">مبلغ الكفالة:</span>
                       <span className="text-primary">{sponsorshipAmountSetting?.value || "٦٠ ريال سعودي • ١٥ دولار • او مايقابله ٢٥ الف ريال يمني"}</span>
                     </div>
-                    
-                    <div className="flex gap-2">
-                      {!['fully_sponsored', 'full', 'sponsored'].includes(orphan.status) && <Button asChild variant="hero" size="sm" className="flex-1">
-                          <Link to={`/orphan/${orphan.id}?sponsor=true`}>أكفل هذا اليتيم</Link>
-                        </Button>}
-                    </div>
+                  </div>
+
+                  <div className="flex gap-2 mt-4">
+                    {!['fully_sponsored', 'full', 'sponsored'].includes(orphan.status) && <Button asChild variant="hero" size="sm" className="flex-1">
+                        <Link to={`/orphan/${orphan.id}?sponsor=true`}>أكفل هذا اليتيم</Link>
+                      </Button>}
                   </div>
                 </div>)}
             </div>}
         </section>
       </div>
-
-      {/* Image Modal */}
-      <Dialog open={!!selectedImage} onOpenChange={() => setSelectedImage(null)}>
-        <DialogContent className="max-w-4xl w-[95vw] max-h-[95vh] p-0 overflow-hidden">
-          <DialogTitle className="sr-only">
-            {selectedImage?.name ? `صورة ${selectedImage.name}` : 'صورة اليتيم'}
-          </DialogTitle>
-          <div className="relative">
-            <Button variant="ghost" size="icon" className="absolute top-2 left-2 z-10 bg-background/80 hover:bg-background" onClick={() => setSelectedImage(null)}>
-              <X className="h-5 w-5" />
-            </Button>
-            {selectedImage && <img src={selectedImage.url} alt={`صورة ${selectedImage.name}`} className="w-full h-auto max-h-[90vh] object-contain" />}
-          </div>
-        </DialogContent>
-      </Dialog>
     </Layout>;
 }

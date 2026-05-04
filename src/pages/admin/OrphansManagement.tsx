@@ -174,7 +174,15 @@ export default function OrphansManagement() {
         photoUrl = await uploadOrphanPhoto(selectedFile, tempId);
       }
 
-      const dataToSave = { ...formData, photo_url: photoUrl };
+      const dataToSave: any = {
+        ...formData,
+        photo_url: photoUrl,
+        birth_date: formData.birth_date || null,
+        father_death_date: formData.father_death_date || null,
+        birth_place: formData.birth_place || null,
+        education_level: formData.education_level || null,
+        notes: formData.notes || null,
+      };
 
       if (selectedOrphan) {
         await updateOrphan.mutateAsync({ id: selectedOrphan.id, ...dataToSave });

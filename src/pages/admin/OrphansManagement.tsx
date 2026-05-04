@@ -535,6 +535,52 @@ export default function OrphansManagement() {
               />
             </div>
 
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label>مكان الميلاد</Label>
+                <Input
+                  value={formData.birth_place || ''}
+                  onChange={(e) => setFormData({ ...formData, birth_place: e.target.value })}
+                />
+              </div>
+              <div>
+                <Label>تاريخ الميلاد</Label>
+                <Input
+                  type="date"
+                  value={formData.birth_date || ''}
+                  onChange={(e) => setFormData({ ...formData, birth_date: e.target.value })}
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label>تاريخ وفاة الأب</Label>
+                <Input
+                  type="date"
+                  value={formData.father_death_date || ''}
+                  onChange={(e) => setFormData({ ...formData, father_death_date: e.target.value })}
+                />
+              </div>
+              <div>
+                <Label>المستوى التعليمي</Label>
+                <Input
+                  value={formData.education_level || ''}
+                  onChange={(e) => setFormData({ ...formData, education_level: e.target.value })}
+                  placeholder="مثال: الصف الخامس الابتدائي"
+                />
+              </div>
+            </div>
+
+            <div>
+              <Label>ملاحظة</Label>
+              <Textarea
+                value={formData.notes || ''}
+                onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                rows={2}
+              />
+            </div>
+
             <div>
               <Label>رابط الفيديو التعريفي</Label>
               <Input

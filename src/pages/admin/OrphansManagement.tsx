@@ -67,6 +67,11 @@ const emptyOrphan: Omit<Orphan, 'id' | 'created_at' | 'updated_at'> = {
   story: '',
   photo_url: '',
   intro_video_url: '',
+  birth_place: '',
+  birth_date: '',
+  father_death_date: '',
+  education_level: '',
+  notes: '',
 };
 
 export default function OrphansManagement() {
@@ -144,6 +149,11 @@ export default function OrphansManagement() {
       story: orphan.story || '',
       photo_url: orphan.photo_url || '',
       intro_video_url: orphan.intro_video_url || '',
+      birth_place: orphan.birth_place || '',
+      birth_date: orphan.birth_date || '',
+      father_death_date: orphan.father_death_date || '',
+      education_level: orphan.education_level || '',
+      notes: orphan.notes || '',
     });
     setSelectedFile(null);
     setSelectedCurrency('SAR');

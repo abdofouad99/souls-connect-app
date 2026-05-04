@@ -1,15 +1,13 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, MapPin, Heart, X } from 'lucide-react';
+import { Search, Heart } from 'lucide-react';
 import { Layout } from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { useOrphans } from '@/hooks/useOrphans';
 import { useSiteSetting } from '@/hooks/useSiteSettings';
-import { LazyImage } from '@/components/common/LazyImage';
 import { SkeletonCard } from '@/components/common/LoadingSpinner';
-import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 const statusLabels: Record<string, {
   label: string;
   class: string;
@@ -44,10 +42,6 @@ const statusLabels: Record<string, {
     class: 'bg-muted text-muted-foreground'
   }
 };
-interface SelectedImage {
-  url: string;
-  name: string;
-}
 export default function OrphansPage() {
   const {
     data: orphans,
@@ -55,16 +49,7 @@ export default function OrphansPage() {
   } = useOrphans();
   const { data: sponsorshipAmountSetting } = useSiteSetting("sponsorship_amount_text");
   const [search, setSearch] = useState('');
-  const [selectedImage, setSelectedImage] = useState<SelectedImage | null>(null);
   const filteredOrphans = orphans?.filter(orphan => orphan.full_name.includes(search) || orphan.city.includes(search) || orphan.country.includes(search)) || [];
-  const handleImageClick = (e: React.MouseEvent, photoUrl: string, name: string) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setSelectedImage({
-      url: photoUrl,
-      name
-    });
-  };
   return <Layout>
       <div className="min-h-screen bg-background">
         {/* Header */}

@@ -227,7 +227,7 @@ export function exportSponsorships(sponsorships: any[]) {
 
   const formattedData = sponsorships.map((s) => ({
     orphan_name: s.orphan?.full_name || '-',
-    sponsor_name: s.sponsor?.full_name || '-',
+    sponsor_name: s.sponsor_full_name || s.sponsor?.full_name || '-',
     type: s.type === 'monthly' ? 'شهري' : 'سنوي',
     monthly_amount: s.monthly_amount,
     status: statusMap[s.status] || s.status,
@@ -251,7 +251,7 @@ export function exportReceipts(receipts: any[]) {
 
   const formattedData = receipts.map((r) => ({
     receipt_number: r.receipt_number,
-    sponsor_name: r.sponsorship?.sponsor?.full_name || '-',
+    sponsor_name: r.sponsorship?.sponsor_full_name || r.sponsorship?.sponsor?.full_name || '-',
     orphan_name: r.sponsorship?.orphan?.full_name || '-',
     amount: r.amount,
     payment_reference: r.payment_reference || '-',
